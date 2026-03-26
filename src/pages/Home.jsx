@@ -92,7 +92,7 @@ const Home = () => {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <div className="absolute inset-0 bg-black opacity-50"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-purple/50 to-primary/70"></div>
             <img
               src={slide.image}
               alt={slide.title}
@@ -106,7 +106,7 @@ const Home = () => {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     to={slide.link}
-                    className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 transition-colors inline-block"
+                    className="bg-gradient-to-r from-yellow to-orange text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity inline-block shadow-lg"
                   >
                     {slide.cta}
                   </Link>
@@ -160,7 +160,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-3xl font-bold text-primary">Upcoming Events</h2>
-            <Link to="/events" className="text-secondary font-semibold hover:underline flex items-center gap-2">
+            <Link to="/events" className="text-orange font-semibold hover:underline flex items-center gap-2">
               View All <FaCalendarAlt />
             </Link>
           </div>
@@ -192,11 +192,11 @@ const Home = () => {
 
       <GoogleMap />
 
-      <section className="py-16 bg-primary text-white text-center">
+      <section className="py-16 bg-gradient-to-r from-purple to-blue text-white text-center">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
           <p className="text-xl mb-8">We'd love to welcome you to BETHEL CHURCH</p>
-          <Link to="/contact" className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 transition-colors">
+          <Link to="/contact" className="bg-gradient-to-r from-yellow to-orange text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity">
             Get In Touch
           </Link>
         </div>

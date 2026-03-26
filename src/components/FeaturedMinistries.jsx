@@ -7,7 +7,7 @@ const ministries = [
     title: "Children's Ministry",
     description: "Nurturing faith from an early age",
     icon: FaBaby,
-    color: "bg-blue-500",
+    color: "bg-blue",
     link: "/events"
   },
   {
@@ -15,7 +15,7 @@ const ministries = [
     title: "Youth Ministry",
     description: "Empowering the next generation",
     icon: FaUsers,
-    color: "bg-green-500",
+    color: "bg-green",
     link: "/events"
   },
   {
@@ -23,7 +23,7 @@ const ministries = [
     title: "Worship Ministry",
     description: "Leading people to God's presence",
     icon: FaGuitar,
-    color: "bg-purple-500",
+    color: "bg-purple",
     link: "/sermons"
   },
   {
@@ -31,7 +31,7 @@ const ministries = [
     title: "Outreach",
     description: "Serving our community",
     icon: FaHandsHelping,
-    color: "bg-orange-500",
+    color: "bg-orange",
     link: "/donations"
   },
   {
@@ -39,7 +39,7 @@ const ministries = [
     title: "Bible Study",
     description: "Growing together in God's Word",
     icon: FaBook,
-    color: "bg-red-500",
+    color: "bg-red",
     link: "/small-groups"
   },
   {
@@ -47,7 +47,7 @@ const ministries = [
     title: "Prayer Ministry",
     description: "Standing in faith together",
     icon: FaPrayingHands,
-    color: "bg-teal-500",
+    color: "bg-yellow",
     link: "/prayer"
   }
 ];

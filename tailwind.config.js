@@ -8,8 +8,14 @@ export default {
     extend: {
       colors: {
         primary: '#1e3a5f',
-        secondary: '#c9a227',
+        secondary: '#f59e0b',
         accent: '#2d5a7b',
+        blue: '#3b82f6',
+        yellow: '#fbbf24',
+        green: '#10b981',
+        red: '#ef4444',
+        orange: '#f97316',
+        purple: '#8b5cf6',
       }
     },
   },

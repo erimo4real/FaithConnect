@@ -91,8 +91,8 @@ const Donations = () => {
 
   return (
     <div>
-      <div className="relative h-64 bg-gradient-to-r from-primary to-accent">
-        <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="relative h-64 bg-gradient-to-r from-red to-orange">
+        <div className="absolute inset-0 bg-black/30"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-2">Give & Support</h1>

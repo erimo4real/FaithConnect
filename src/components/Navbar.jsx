@@ -35,7 +35,7 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bg-primary text-white shadow-lg">
+    <nav className="bg-gradient-to-r from-primary to-purple text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center">
@@ -74,7 +74,7 @@ const Navbar = () => {
                     <Link
                       key={link.name}
                       to={link.path}
-                      className="block px-4 py-2 text-gray-700 hover:bg-secondary hover:text-primary"
+                      className="block px-4 py-2 text-gray-700 hover:bg-yellow-400 hover:text-gray-900"
                       onClick={() => setDropdownOpen(false)}
                     >
                       {link.name}
@@ -103,7 +103,7 @@ const Navbar = () => {
                     <Link
                       key={link.name}
                       to={link.path}
-                      className="block px-4 py-2 text-gray-700 hover:bg-secondary hover:text-primary"
+                      className="block px-4 py-2 text-gray-700 hover:bg-yellow-400 hover:text-gray-900"
                       onClick={() => setMoreDropdownOpen(false)}
                     >
                       {link.name}

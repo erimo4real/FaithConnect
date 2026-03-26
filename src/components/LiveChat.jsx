@@ -31,7 +31,7 @@ const LiveChat = () => {
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+          className="bg-gradient-to-r from-blue to-purple text-white p-4 rounded-full shadow-lg hover:opacity-90 transition-opacity flex items-center gap-2"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -40,12 +40,12 @@ const LiveChat = () => {
         </button>
       ) : (
         <div className="bg-white rounded-lg shadow-2xl w-80 h-96 flex flex-col">
-          <div className="bg-green-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+          <div className="bg-gradient-to-r from-blue to-purple text-white p-4 rounded-t-lg flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-green-300 rounded-full animate-pulse"></span>
+              <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
               <span className="font-semibold">Live Chat</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="hover:bg-green-700 p-1 rounded">
+            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded">
               ✕
             </button>
           </div>
@@ -55,7 +55,7 @@ const LiveChat = () => {
               <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] p-3 rounded-lg ${
                   msg.sender === 'user' 
-                    ? 'bg-green-600 text-white' 
+                    ? 'bg-gradient-to-r from-blue to-purple text-white' 
                     : 'bg-gray-100 text-gray-800'
                 }`}>
                   {msg.text}
@@ -72,11 +72,11 @@ const LiveChat = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Type a message..."
-                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple"
               />
               <button
                 onClick={handleSend}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                className="bg-gradient-to-r from-blue to-purple text-white px-4 py-2 rounded-lg hover:opacity-90"
               >
                 Send
               </button>

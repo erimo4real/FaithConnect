@@ -35,8 +35,8 @@ const About = () => {
 
   return (
     <div>
-      <div className="relative h-64 bg-gradient-to-r from-primary to-accent">
-        <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="relative h-64 bg-gradient-to-r from-blue via-purple to-primary">
+        <div className="absolute inset-0 bg-black/30"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-2">About BETHEL CHURCH</h1>
@@ -68,23 +68,23 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-primary mb-12 text-center">Our Values</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-              <FaHeart className="text-5xl text-secondary mx-auto mb-4" />
+            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-red">
+              <FaHeart className="text-5xl text-red mx-auto mb-4" />
               <h3 className="text-xl font-bold text-primary mb-2">Love</h3>
               <p className="text-gray-600">We show God's love to everyone</p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-              <FaBible className="text-5xl text-secondary mx-auto mb-4" />
+            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-purple">
+              <FaBible className="text-5xl text-purple mx-auto mb-4" />
               <h3 className="text-xl font-bold text-primary mb-2">Truth</h3>
               <p className="text-gray-600">We teach God's Word with excellence</p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-              <FaUsers className="text-5xl text-secondary mx-auto mb-4" />
+            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-green">
+              <FaUsers className="text-5xl text-green mx-auto mb-4" />
               <h3 className="text-xl font-bold text-primary mb-2">Community</h3>
               <p className="text-gray-600">We build authentic relationships</p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-              <FaGlobe className="text-5xl text-secondary mx-auto mb-4" />
+            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-orange">
+              <FaGlobe className="text-5xl text-orange mx-auto mb-4" />
               <h3 className="text-xl font-bold text-primary mb-2">Mission</h3>
               <p className="text-gray-600">We reach our community and beyond</p>
             </div>

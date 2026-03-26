@@ -5,8 +5,8 @@ import { events } from '../data/events';
 const Events = () => {
   return (
     <div>
-      <div className="relative h-64 bg-gradient-to-r from-primary to-accent">
-        <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="relative h-64 bg-gradient-to-r from-orange to-yellow">
+        <div className="absolute inset-0 bg-black/30"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-2">Events</h1>
