@@ -7,14 +7,14 @@ const testimonials = [
     name: "Maria Garcia",
     role: "Member since 2018",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-    content: "FaithConnect has been a blessing to my family. The worship services are inspiring, and the community has become our second family. I've grown so much in my faith here!"
+    content: "BETHEL CHURCH has been a blessing to my family. The worship services are inspiring, and the community has become our second family. I've grown so much in my faith here!"
   },
   {
     id: 2,
     name: "James Wilson",
     role: "New Member",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
-    content: "I was looking for a church home for months before finding FaithConnect. The warm welcome I received made me feel like I belonged here immediately."
+    content: "I was looking for a church home for months before finding BETHEL CHURCH. The warm welcome I received made me feel like I belonged here immediately."
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const testimonials = [
     name: "Robert Chen",
     role: "Volunteer",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop",
-    content: "Serving at FaithConnect has been the most rewarding experience. There's always a way to use your gifts and talents to make a difference."
+    content: "Serving at BETHEL CHURCH has been the most rewarding experience. There's always a way to use your gifts and talents to make a difference."
   }
 ];
 

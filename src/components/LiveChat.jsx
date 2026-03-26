@@ -3,7 +3,7 @@ import { useState } from 'react';
 const LiveChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, text: "Welcome to FaithConnect! How can we help you?", sender: 'bot' }
+    { id: 1, text: "Welcome to BETHEL CHURCH! How can we help you?", sender: 'bot' }
   ]);
   const [inputText, setInputText] = useState('');
 

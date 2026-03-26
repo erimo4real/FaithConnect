@@ -6,18 +6,18 @@ const StaffDirectory = () => {
   const [departmentFilter, setDepartmentFilter] = useState('all');
 
   const staff = [
-    { id: 1, name: "Pastor John Smith", role: "Senior Pastor", department: "Pastoral", email: "pastorjohn@faithconnect.org", phone: "(555) 123-4567", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" },
-    { id: 2, name: "Pastor Sarah Johnson", role: "Associate Pastor", department: "Pastoral", email: "pastorsarah@faithconnect.org", phone: "(555) 123-4568", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" },
-    { id: 3, name: "Pastor Michael Brown", role: "Youth Pastor", department: "Youth", email: "pastormichael@faithconnect.org", phone: "(555) 123-4569", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" },
-    { id: 4, name: "Lisa Martinez", role: "Worship Leader", department: "Worship", email: "lisa@faithconnect.org", phone: "(555) 123-4570", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop" },
-    { id: 5, name: "David Wilson", role: "Children's Pastor", department: "Children", email: "david@faithconnect.org", phone: "(555) 123-4571", image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=200&h=200&fit=crop" },
-    { id: 6, name: "Rebecca Taylor", role: "Outreach Director", department: "Outreach", email: "rebecca@faithconnect.org", phone: "(555) 123-4572", image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop" },
-    { id: 7, name: "Jennifer Lee", role: "Office Manager", department: "Administration", email: "jennifer@faithconnect.org", phone: "(555) 123-4573", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop" },
-    { id: 8, name: "Mark Anderson", role: "Facilities Manager", department: "Facilities", email: "mark@faithconnect.org", phone: "(555) 123-4574", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop" },
-    { id: 9, name: "Amanda Garcia", role: "Administrative Secretary", department: "Administration", email: "amanda@faithconnect.org", phone: "(555) 123-4575", image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop" },
-    { id: 10, name: "Chris Martin", role: "Media Director", department: "Media", email: "chris@faithconnect.org", phone: "(555) 123-4576", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop" },
-    { id: 11, name: "Emily Davis", role: "Nursery Coordinator", department: "Children", email: "emily@faithconnect.org", phone: "(555) 123-4577", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" },
-    { id: 12, name: "Robert Chen", role: "Small Groups Coordinator", department: "Discipleship", email: "robert@faithconnect.org", phone: "(555) 123-4578", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" }
+    { id: 1, name: "Pastor John Smith", role: "Senior Pastor", department: "Pastoral", email: "pastorjohn@bethelchurch.org", phone: "(555) 123-4567", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" },
+    { id: 2, name: "Pastor Sarah Johnson", role: "Associate Pastor", department: "Pastoral", email: "pastorsarah@bethelchurch.org", phone: "(555) 123-4568", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" },
+    { id: 3, name: "Pastor Michael Brown", role: "Youth Pastor", department: "Youth", email: "pastormichael@bethelchurch.org", phone: "(555) 123-4569", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" },
+    { id: 4, name: "Lisa Martinez", role: "Worship Leader", department: "Worship", email: "lisa@bethelchurch.org", phone: "(555) 123-4570", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop" },
+    { id: 5, name: "David Wilson", role: "Children's Pastor", department: "Children", email: "david@bethelchurch.org", phone: "(555) 123-4571", image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=200&h=200&fit=crop" },
+    { id: 6, name: "Rebecca Taylor", role: "Outreach Director", department: "Outreach", email: "rebecca@bethelchurch.org", phone: "(555) 123-4572", image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop" },
+    { id: 7, name: "Jennifer Lee", role: "Office Manager", department: "Administration", email: "jennifer@bethelchurch.org", phone: "(555) 123-4573", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop" },
+    { id: 8, name: "Mark Anderson", role: "Facilities Manager", department: "Facilities", email: "mark@bethelchurch.org", phone: "(555) 123-4574", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop" },
+    { id: 9, name: "Amanda Garcia", role: "Administrative Secretary", department: "Administration", email: "amanda@bethelchurch.org", phone: "(555) 123-4575", image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop" },
+    { id: 10, name: "Chris Martin", role: "Media Director", department: "Media", email: "chris@bethelchurch.org", phone: "(555) 123-4576", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop" },
+    { id: 11, name: "Emily Davis", role: "Nursery Coordinator", department: "Children", email: "emily@bethelchurch.org", phone: "(555) 123-4577", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" },
+    { id: 12, name: "Robert Chen", role: "Small Groups Coordinator", department: "Discipleship", email: "robert@bethelchurch.org", phone: "(555) 123-4578", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" }
   ];
 
   const departments = ['all', ...new Set(staff.map(s => s.department))];

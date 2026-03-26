@@ -7,11 +7,11 @@ const Shop = () => {
   const products = [
     {
       id: 1,
-      name: "FaithConnect T-Shirt",
+      name: "BETHEL CHURCH T-Shirt",
       category: "Apparel",
       price: 25,
       image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
-      description: "Comfortable cotton t-shirt with FaithConnect logo"
+      description: "Comfortable cotton t-shirt with BETHEL CHURCH logo"
     },
     {
       id: 2,
@@ -203,7 +203,7 @@ const Shop = () => {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-primary mb-4">Proceeds Support Ministry</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            All purchases from our shop support FaithConnect's ongoing ministry programs, 
+            All purchases from our shop support BETHEL CHURCH's ongoing ministry programs, 
             including community outreach, youth programs, and missions. Thank you for your support!
           </p>
         </div>

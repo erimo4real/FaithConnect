@@ -47,7 +47,7 @@ const GoogleMap = () => {
                 <FaEnvelope className="text-secondary text-xl mt-1" />
                 <div>
                   <h4 className="font-bold text-primary">Email</h4>
-                  <p className="text-gray-600">info@faithconnect.org</p>
+                  <p className="text-gray-600">info@bethelchurch.org</p>
                 </div>
               </div>
 

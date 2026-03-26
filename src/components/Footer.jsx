@@ -9,7 +9,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <FaChurch className="text-3xl text-secondary" />
-              <h3 className="text-xl font-bold">FaithConnect</h3>
+              <h3 className="text-xl font-bold">BETHEL CHURCH</h3>
             </div>
             <p className="text-gray-300">
               A community of believers dedicated to sharing the love of Christ and making a difference in our world.
@@ -44,12 +44,12 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-center gap-2"><FaMapMarkerAlt className="text-secondary" /> 123 Church Street, City, State 12345</li>
               <li className="flex items-center gap-2"><FaPhone className="text-secondary" /> (555) 123-4567</li>
-              <li className="flex items-center gap-2"><FaEnvelope className="text-secondary" /> info@faithconnect.org</li>
+              <li className="flex items-center gap-2"><FaEnvelope className="text-secondary" /> info@bethelchurch.org</li>
             </ul>
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} FaithConnect. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BETHEL CHURCH. All rights reserved.</p>
         </div>
       </div>
     </footer>

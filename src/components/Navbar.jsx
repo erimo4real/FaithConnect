@@ -38,9 +38,8 @@ const Navbar = () => {
     <nav className="bg-primary text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-secondary">✝</span>
-            <span className="text-xl font-semibold">FaithConnect</span>
+          <Link to="/" className="flex items-center">
+            <img src="/churchlogo.jpeg" alt="Bethel Church" className="h-12 w-auto" />
           </Link>
 
           <div className="hidden md:flex space-x-4 items-center">

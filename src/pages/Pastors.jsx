@@ -7,8 +7,8 @@ const Pastors = () => {
       name: "Pastor John Smith",
       role: "Senior Pastor",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      email: "pastorjohn@faithconnect.org",
-      bio: "Pastor John has been serving at FaithConnect for over 20 years. He is passionate about teaching God's Word and building community. He holds a Master of Divinity from Fuller Theological Seminary and has a heart for making the Gospel accessible to everyone.",
+      email: "pastorjohn@bethelchurch.org",
+      bio: "Pastor John has been serving at BETHEL CHURCH for over 20 years. He is passionate about teaching God's Word and building community. He holds a Master of Divinity from Fuller Theological Seminary and has a heart for making the Gospel accessible to everyone.",
       ministry: "Senior Leadership, Preaching"
     },
     {
@@ -16,7 +16,7 @@ const Pastors = () => {
       name: "Pastor Sarah Johnson",
       role: "Associate Pastor",
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-      email: "pastorsarah@faithconnect.org",
+      email: "pastorsarah@bethelchurch.org",
       bio: "Pastor Sarah leads our women's ministry and youth programs. She has a heart for discipling the next generation and has been instrumental in growing our youth congregation.",
       ministry: "Women's Ministry, Youth"
     },
@@ -25,7 +25,7 @@ const Pastors = () => {
       name: "Pastor Michael Brown",
       role: "Youth Pastor",
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-      email: "pastormichael@faithconnect.org",
+      email: "pastormichael@bethelchurch.org",
       bio: "Pastor Michael oversees our youth ministry. He loves helping young people discover their identity in Christ and has a gift for making biblical teaching relevant to today's youth.",
       ministry: "Youth Ministry, Students"
     },
@@ -34,7 +34,7 @@ const Pastors = () => {
       name: "Lisa Martinez",
       role: "Worship Leader",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-      email: "lisa@faithconnect.org",
+      email: "lisa@bethelchurch.org",
       bio: "Lisa leads our worship team and has a gift for creating meaningful worship experiences. She has been in ministry for over 15 years and is passionate about using music to draw people closer to God.",
       ministry: "Worship, Music"
     },
@@ -43,7 +43,7 @@ const Pastors = () => {
       name: "David Wilson",
       role: "Children's Pastor",
       image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=400&fit=crop",
-      email: "david@faithconnect.org",
+      email: "david@bethelchurch.org",
       bio: "David leads our children's ministry with joy and creativity. He believes in investing in the next generation and creating a safe, fun environment for kids to learn about God's love.",
       ministry: "Children's Ministry"
     },
@@ -52,7 +52,7 @@ const Pastors = () => {
       name: "Rebecca Taylor",
       role: "Outreach Director",
       image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=400&fit=crop",
-      email: "rebecca@faithconnect.org",
+      email: "rebecca@bethelchurch.org",
       bio: "Rebecca oversees our community outreach programs. She has a passion for serving those in need and has developed partnerships with local organizations to make a greater impact.",
       ministry: "Outreach, Community Service"
     }
@@ -70,7 +70,7 @@ const Pastors = () => {
       <section className="bg-primary text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">Our Team</h1>
-          <p className="text-xl">Meet the people who serve at FaithConnect</p>
+          <p className="text-xl">Meet the people who serve at BETHEL CHURCH</p>
         </div>
       </section>
 

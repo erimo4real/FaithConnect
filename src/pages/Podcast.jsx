@@ -20,7 +20,7 @@ const Podcast = () => {
       <section className="bg-primary text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">Podcast</h1>
-          <p className="text-xl">FaithConnect Podcast - Sermons & Teaching</p>
+          <p className="text-xl">BETHEL CHURCH Podcast - Sermons & Teaching</p>
         </div>
       </section>
 
@@ -81,7 +81,7 @@ const Podcast = () => {
                   <h4 className="font-bold text-primary mb-2">RSS Feed</h4>
                   <input
                     type="text"
-                    value="https://faithconnect.org/feed/podcast"
+                    value="https://bethelchurch.org/feed/podcast"
                     readOnly
                     className="w-full px-3 py-2 bg-gray-100 border rounded text-sm"
                   />
@@ -90,7 +90,7 @@ const Podcast = () => {
                 <div className="mt-6 pt-6 border-t">
                   <h4 className="font-bold text-primary mb-2">🎙️ About the Podcast</h4>
                   <p className="text-gray-600 text-sm">
-                    FaithConnect Podcast features weekly sermons and teaching from our pastoral team. 
+                    BETHEL CHURCH Podcast features weekly sermons and teaching from our pastoral team. 
                     Subscribe to stay encouraged and grow in your faith.
                   </p>
                 </div>

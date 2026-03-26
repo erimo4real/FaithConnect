@@ -263,7 +263,7 @@ const Donations = () => {
             <div className="p-6">
               <div className="text-4xl mb-4 text-secondary"><FaEnvelope /></div>
               <h3 className="text-xl font-bold text-primary mb-2">Bank Transfer</h3>
-              <p className="text-gray-600">Account: FaithConnect Church<br />Routing: XXXXXXXXX</p>
+              <p className="text-gray-600">Account: BETHEL CHURCH<br />Routing: XXXXXXXXX</p>
             </div>
             <div className="p-6">
               <div className="text-4xl mb-4 text-secondary"><FaEnvelope /></div>

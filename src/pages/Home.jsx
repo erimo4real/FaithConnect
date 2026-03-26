@@ -16,7 +16,7 @@ import { events } from '../data/events';
 const slides = [
   {
     id: 1,
-    title: "Welcome to FaithConnect",
+    title: "Welcome to BETHEL CHURCH",
     subtitle: "Connecting People to God and Each Other",
     description: "Join us every Sunday for worship, prayer, and community",
     image: "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=1920&h=1080&fit=crop",
@@ -195,7 +195,7 @@ const Home = () => {
       <section className="py-16 bg-primary text-white text-center">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
-          <p className="text-xl mb-8">We'd love to welcome you to FaithConnect</p>
+          <p className="text-xl mb-8">We'd love to welcome you to BETHEL CHURCH</p>
           <Link to="/contact" className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 transition-colors">
             Get In Touch
           </Link>

@@ -230,7 +230,7 @@ const PrayerRequest = () => {
                   <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
                     <FaMailBulk className="text-secondary" /> Email Prayer Team
                   </h3>
-                  <p className="text-gray-600">Email prayers@faithconnect.org for ongoing prayer support.</p>
+                  <p className="text-gray-600">Email prayers@bethelchurch.org for ongoing prayer support.</p>
                 </div>
               </div>
 

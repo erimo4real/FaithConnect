@@ -1,7 +1,8 @@
 {
-  "name": "faithconnect-platform",
+  "name": "bethel-church",
   "private": true,
   "version": "1.0.0",
+  "description": "BETHEL CHURCH - A professional React church website with sermons, events, donations, gallery, blog, prayer requests, and more",
   "type": "module",
   "scripts": {
     "dev": "vite",

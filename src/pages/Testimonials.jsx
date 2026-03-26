@@ -14,7 +14,7 @@ const Testimonials = () => {
       name: "Maria Garcia",
       role: "Member since 2018",
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-      content: "FaithConnect has been a blessing to my family. The worship services are inspiring, and the community has become our second family. I've grown so much in my faith here!",
+      content: "BETHEL CHURCH has been a blessing to my family. The worship services are inspiring, and the community has become our second family. I've grown so much in my faith here!",
       rating: 5
     },
     {
@@ -22,7 +22,7 @@ const Testimonials = () => {
       name: "James Wilson",
       role: "New Member",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
-      content: "I was looking for a church home for months before finding FaithConnect. The warm welcome I received made me feel like I belonged here. The teaching is biblical and relevant to daily life.",
+      content: "I was looking for a church home for months before finding BETHEL CHURCH. The warm welcome I received made me feel like I belonged here. The teaching is biblical and relevant to daily life.",
       rating: 5
     },
     {
@@ -38,7 +38,7 @@ const Testimonials = () => {
       name: "Robert Chen",
       role: "Volunteer",
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop",
-      content: "Serving at FaithConnect has been the most rewarding experience. There's always a way to use your gifts and talents to make a difference in the community.",
+      content: "Serving at BETHEL CHURCH has been the most rewarding experience. There's always a way to use your gifts and talents to make a difference in the community.",
       rating: 5
     },
     {
@@ -54,7 +54,7 @@ const Testimonials = () => {
       name: "Michael Brown",
       role: "Elder",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop",
-      content: "I've been part of many churches, but the genuine love and unity at FaithConnect is unmatched. It's a place where people truly live out their faith.",
+      content: "I've been part of many churches, but the genuine love and unity at BETHEL CHURCH is unmatched. It's a place where people truly live out their faith.",
       rating: 5
     }
   ];
@@ -112,7 +112,7 @@ const Testimonials = () => {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-primary mb-4">Share Your Story</h2>
-          <p className="text-gray-600 mb-8">Has FaithConnect made a difference in your life? We'd love to hear your testimony!</p>
+          <p className="text-gray-600 mb-8">Has BETHEL CHURCH made a difference in your life? We'd love to hear your testimony!</p>
           
           {submitted ? (
             <div className="max-w-md mx-auto bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">

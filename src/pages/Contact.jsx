@@ -173,7 +173,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-primary mb-1">Email</h3>
-                      <p className="text-gray-600">info@faithconnect.org</p>
+                      <p className="text-gray-600">info@bethelchurch.org</p>
                       <p className="text-gray-500 text-sm">We respond within 24 hours</p>
                     </div>
                   </div>

@@ -7,29 +7,29 @@ const About = () => {
       name: "Pastor John Smith",
       role: "Senior Pastor",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      bio: "Pastor John has been serving at FaithConnect for over 20 years. He is passionate about teaching God's Word and building community.",
-      email: "pastorjohn@faithconnect.org"
+      bio: "Pastor John has been serving at BETHEL CHURCH for over 20 years. He is passionate about teaching God's Word and building community.",
+      email: "pastorjohn@bethelchurch.org"
     },
     {
       name: "Pastor Sarah Johnson",
       role: "Associate Pastor",
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
       bio: "Pastor Sarah leads our women's ministry and youth programs. She has a heart for discipling the next generation.",
-      email: "pastorsarah@faithconnect.org"
+      email: "pastorsarah@bethelchurch.org"
     },
     {
       name: "Pastor Michael Brown",
       role: "Youth Pastor",
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
       bio: "Pastor Michael oversees our youth ministry. He loves helping young people discover their identity in Christ.",
-      email: "pastormichael@faithconnect.org"
+      email: "pastormichael@bethelchurch.org"
     },
     {
       name: "Lisa Martinez",
       role: "Worship Leader",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
       bio: "Lisa leads our worship team and has a gift for creating meaningful worship experiences.",
-      email: "lisa@faithconnect.org"
+      email: "lisa@bethelchurch.org"
     }
   ];
 
@@ -39,7 +39,7 @@ const About = () => {
         <div className="absolute inset-0 bg-black opacity-30"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">About FaithConnect</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">About BETHEL CHURCH</h1>
             <p className="text-xl">A community of faith, hope, and love</p>
           </div>
         </div>
@@ -52,7 +52,7 @@ const About = () => {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-primary mb-6">Our Mission</h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-6">
-              At FaithConnect, our mission is to connect people to God and to each other. 
+              At BETHEL CHURCH, our mission is to connect people to God and to each other. 
               We believe that church should be a place where everyone feels welcome, 
               regardless of their background or where they are in their spiritual journey.
             </p>
@@ -128,7 +128,7 @@ const About = () => {
             <div>
               <h2 className="text-3xl font-bold mb-4">Watch Our Welcome Video</h2>
               <p className="text-gray-300 mb-6">
-                Learn more about FaithConnect and what to expect when you visit us.
+                Learn more about BETHEL CHURCH and what to expect when you visit us.
               </p>
               <button className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2">
                 <FaPlay /> Play Video
