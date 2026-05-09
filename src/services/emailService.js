@@ -19,12 +19,15 @@ export const sendEmail = async (formData) => {
     const response = await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: netlifyData.toString()
+      body: netlifyData.toString(),
+      redirect: 'follow'
     });
 
-    if (response.ok) {
+    if (response.ok || response.redirected) {
       return { success: true };
     } else {
+      const text = await response.text().catch(() => '');
+      console.error('Netlify form error:', response.status, text);
       return { success: false, error: `Server error: ${response.status}` };
     }
   } catch (error) {

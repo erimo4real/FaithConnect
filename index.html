@@ -14,8 +14,8 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Hidden form for Netlify Forms detection (React renders the real form) -->
-    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+    <!-- Static form for Netlify Forms detection (React renders the live form) -->
+    <form name="contact" netlify netlify-honeypot="bot-field" style="position:absolute;left:-9999px" aria-hidden="true">
       <input type="text" name="name" />
       <input type="email" name="email" />
       <input type="tel" name="phone" />

@@ -77,7 +77,7 @@ const Contact = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} data-netlify="true" name="contact" className="space-y-4">
+              <form onSubmit={handleSubmit} data-netlify="true" name="contact" method="POST" action="/" className="space-y-4">
                 <input type="hidden" name="form-name" value="contact" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
