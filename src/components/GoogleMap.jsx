@@ -39,7 +39,7 @@ const GoogleMap = () => {
                 <FaPhone className="text-secondary text-xl mt-1" />
                 <div>
                   <h4 className="font-bold text-primary">Phone</h4>
-                  <p className="text-gray-600">+2340934720201</p>
+                  <p className="text-gray-600">+234 934 720 201</p>
                 </div>
               </div>
 

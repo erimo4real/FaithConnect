@@ -44,7 +44,7 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-200">
               <li className="flex items-center gap-2"><FaMapMarkerAlt className="text-yellow" /> Bethel Church ilaje Bus Stop Ajah Lagos
 Lagos State Nigeria</li>
-              <li className="flex items-center gap-2"><FaPhone className="text-yellow" /> +2340934720201</li>
+              <li className="flex items-center gap-2"><FaPhone className="text-yellow" /> +234 934 720 201</li>
               <li className="flex items-center gap-2"><FaEnvelope className="text-yellow" /> bethelministriesinc01@gmail.com</li>
             </ul>
           </div>
