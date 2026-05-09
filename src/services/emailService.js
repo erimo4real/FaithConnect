@@ -7,6 +7,7 @@ export const sendEmail = async (formData) => {
     netlifyData.append('phone', formData.phone || '');
     netlifyData.append('subject', formData.subject);
     netlifyData.append('message', formData.message);
+    netlifyData.append('bot-field', '');
 
     const response = await fetch('/', {
       method: 'POST',
