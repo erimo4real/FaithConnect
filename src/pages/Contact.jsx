@@ -12,7 +12,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
-  const [status, setStatus] = useState({ submitted: false, loading: false, error: false });
+  const [status, setStatus] = useState({ submitted: false, loading: false, error: false, demo: false });
 
   const handleChange = (e) => {
     setFormData({
@@ -23,17 +23,17 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ submitted: false, loading: true, error: false });
+    setStatus({ submitted: false, loading: true, error: false, demo: false });
 
     const result = await sendEmail(formData);
 
     if (result.success) {
-      setStatus({ submitted: true, loading: false, error: false });
+      setStatus({ submitted: true, loading: false, error: false, demo: result.demo || false });
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      setTimeout(() => setStatus({ submitted: false, loading: false, error: false }), 8000);
+      setTimeout(() => setStatus({ submitted: false, loading: false, error: false, demo: false }), 8000);
     } else {
-      setStatus({ submitted: false, loading: false, error: true });
-      setTimeout(() => setStatus({ submitted: false, loading: false, error: false }), 8000);
+      setStatus({ submitted: false, loading: false, error: true, demo: false });
+      setTimeout(() => setStatus({ submitted: false, loading: false, error: false, demo: false }), 8000);
     }
   };
 
@@ -62,7 +62,7 @@ const Contact = () => {
                   <FaCheckCircle className="text-xl" />
                   <div>
                     <p className="font-bold">Message sent successfully!</p>
-                    <p className="text-sm">We'll get back to you soon.</p>
+                    <p className="text-sm">{status.demo ? 'Local mode: form data logged to console. Test on the live Netlify site to receive emails.' : "We'll get back to you soon."}</p>
                   </div>
                 </div>
               )}

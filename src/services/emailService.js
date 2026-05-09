@@ -1,4 +1,11 @@
 export const sendEmail = async (formData) => {
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  if (isLocal) {
+    console.log('Local dev — form data logged (not sent):', formData);
+    return { success: true, demo: true };
+  }
+
   try {
     const netlifyData = new URLSearchParams();
     netlifyData.append('form-name', 'contact');
