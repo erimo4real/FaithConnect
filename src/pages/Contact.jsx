@@ -12,7 +12,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
-  const [status, setStatus] = useState({ submitted: false, loading: false, error: false, demo: false });
+  const [status, setStatus] = useState({ submitted: false, loading: false, error: false });
 
   const handleChange = (e) => {
     setFormData({
@@ -23,17 +23,17 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ submitted: false, loading: true, error: false, demo: false });
+    setStatus({ submitted: false, loading: true, error: false });
 
     const result = await sendEmail(formData);
 
     if (result.success) {
-      setStatus({ submitted: true, loading: false, error: false, demo: result.demo || false });
+      setStatus({ submitted: true, loading: false, error: false });
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      setTimeout(() => setStatus({ submitted: false, loading: false, error: false, demo: false }), 8000);
+      setTimeout(() => setStatus({ submitted: false, loading: false, error: false }), 8000);
     } else {
-      setStatus({ submitted: false, loading: false, error: true, demo: false });
-      setTimeout(() => setStatus({ submitted: false, loading: false, error: false, demo: false }), 8000);
+      setStatus({ submitted: false, loading: false, error: true });
+      setTimeout(() => setStatus({ submitted: false, loading: false, error: false }), 8000);
     }
   };
 
@@ -62,7 +62,7 @@ const Contact = () => {
                   <FaCheckCircle className="text-xl" />
                   <div>
                     <p className="font-bold">Message sent successfully!</p>
-                    <p className="text-sm">{status.demo ? 'Demo mode: no email was sent. Configure EmailJS in .env to enable email delivery.' : "We'll get back to you soon."}</p>
+                    <p className="text-sm">We'll get back to you soon.</p>
                   </div>
                 </div>
               )}
@@ -77,7 +77,8 @@ const Contact = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} data-netlify="true" name="contact" className="space-y-4">
+                <input type="hidden" name="form-name" value="contact" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
