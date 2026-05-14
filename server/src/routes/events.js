@@ -1,25 +1,25 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../supabase.js';
+import { query } from '../db.js';
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from('events')
-    .select('*')
-    .order('date', { ascending: true });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  try {
+    const result = await query('SELECT * FROM events ORDER BY date ASC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.get('/:id', async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from('events')
-    .select('*')
-    .eq('id', req.params.id)
-    .single();
-  if (error) return res.status(404).json({ error: 'Not found' });
-  res.json(data);
+  try {
+    const result = await query('SELECT * FROM events WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;

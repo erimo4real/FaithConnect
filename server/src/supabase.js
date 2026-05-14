@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import ws from 'ws';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
@@ -9,8 +10,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
   process.exit(1);
 }
 
+const realtimeOpts = { transport: ws };
+
 // Public client (used from frontend)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, { realtime: realtimeOpts });
 
 // Admin client (bypasses RLS — used only on server)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey, { realtime: realtimeOpts });

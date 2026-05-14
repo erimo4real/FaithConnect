@@ -1,61 +1,68 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../supabase.js';
+import { query } from '../db.js';
 
 const router = Router();
 
-// GET /api/sermons
 router.get('/', async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from('sermons')
-    .select('*')
-    .order('date', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  try {
+    const result = await query(
+      'SELECT * FROM sermons ORDER BY date DESC'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// GET /api/sermons/:id
 router.get('/:id', async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from('sermons')
-    .select('*')
-    .eq('id', req.params.id)
-    .single();
-  if (error) return res.status(404).json({ error: 'Not found' });
-  res.json(data);
+  try {
+    const result = await query(
+      'SELECT * FROM sermons WHERE id = $1', [req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// POST /api/sermons (admin)
 router.post('/', async (req, res) => {
   const { title, speaker, date, thumbnail, audio_url, video_url } = req.body;
-  const { data, error } = await supabaseAdmin
-    .from('sermons')
-    .insert({ title, speaker, date, thumbnail, audio_url, video_url })
-    .select()
-    .single();
-  if (error) return res.status(400).json({ error: error.message });
-  res.status(201).json(data);
+  try {
+    const result = await query(
+      `INSERT INTO sermons (title, speaker, date, thumbnail, audio_url, video_url)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [title, speaker, date, thumbnail, audio_url, video_url]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
-// PUT /api/sermons/:id (admin)
 router.put('/:id', async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from('sermons')
-    .update(req.body)
-    .eq('id', req.params.id)
-    .select()
-    .single();
-  if (error) return res.status(400).json({ error: error.message });
-  res.json(data);
+  const { title, speaker, date, thumbnail, audio_url, video_url } = req.body;
+  try {
+    const result = await query(
+      `UPDATE sermons SET title=$1, speaker=$2, date=$3, thumbnail=$4, audio_url=$5, video_url=$6
+       WHERE id=$7 RETURNING *`,
+      [title, speaker, date, thumbnail, audio_url, video_url, req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
-// DELETE /api/sermons/:id (admin)
 router.delete('/:id', async (req, res) => {
-  const { error } = await supabaseAdmin
-    .from('sermons')
-    .delete()
-    .eq('id', req.params.id);
-  if (error) return res.status(400).json({ error: error.message });
-  res.status(204).end();
+  try {
+    const result = await query('DELETE FROM sermons WHERE id=$1 RETURNING id', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.status(204).end();
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 export default router;

@@ -1,17 +1,17 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../supabase.js';
+import { query } from '../db.js';
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from('streams')
-    .select('*')
-    .order('scheduled_at', { ascending: false })
-    .limit(1)
-    .single();
-  if (error && error.code !== 'PGRST116') return res.status(500).json({ error: error.message });
-  res.json(data || null);
+  try {
+    const result = await query(
+      'SELECT * FROM streams ORDER BY scheduled_at DESC LIMIT 1'
+    );
+    res.json(result.rows[0] || null);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;

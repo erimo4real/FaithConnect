@@ -3,7 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { supabase } from './src/supabase.js';
 
 import sermonsRouter from './src/routes/sermons.js';
 import eventsRouter from './src/routes/events.js';
