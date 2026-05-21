@@ -5,3 +5,9 @@ dist
 .env
 .vite
 server/.env
+
+# Docker
+pgdata/
+
+# Client build output
+client/dist

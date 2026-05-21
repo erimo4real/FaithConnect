@@ -1,0 +1,153 @@
+CREATE TABLE IF NOT EXISTS sermons (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  speaker TEXT NOT NULL,
+  date DATE NOT NULL DEFAULT CURRENT_DATE,
+  thumbnail TEXT,
+  audio_url TEXT,
+  video_url TEXT,
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'published',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  date TEXT,
+  time TEXT,
+  location TEXT NOT NULL,
+  description TEXT,
+  image TEXT,
+  spots INTEGER DEFAULT 30,
+  days TEXT,
+  status TEXT NOT NULL DEFAULT 'published',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  author TEXT NOT NULL,
+  date DATE NOT NULL DEFAULT CURRENT_DATE,
+  category TEXT NOT NULL,
+  image TEXT,
+  excerpt TEXT,
+  content TEXT,
+  status TEXT NOT NULL DEFAULT 'published',
+  slug TEXT,
+  meta_description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS gallery (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  src TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'worship',
+  type TEXT NOT NULL DEFAULT 'image',
+  thumbnail TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS prayer_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  prayer_type TEXT DEFAULT 'personal',
+  request TEXT NOT NULL,
+  is_confidential BOOLEAN DEFAULT false,
+  is_urgent BOOLEAN DEFAULT false,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS donations (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  amount DECIMAL(10,2) NOT NULL,
+  type TEXT DEFAULT 'one-time',
+  cause TEXT DEFAULT 'general',
+  message TEXT,
+  reference TEXT,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  items JSONB NOT NULL,
+  total DECIMAL(10,2) NOT NULL,
+  status TEXT DEFAULT 'pending',
+  reference TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS streams (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  youtube_url TEXT,
+  scheduled_date DATE,
+  scheduled_time TIME,
+  end_time TIME,
+  recurring TEXT,
+  is_live BOOLEAN DEFAULT false,
+  manually_stopped BOOLEAN DEFAULT false,
+  last_activated_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS stream_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  stream_id UUID REFERENCES streams(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  youtube_url TEXT,
+  activated_at TIMESTAMPTZ NOT NULL,
+  deactivated_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'unread',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS subscribers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'admin',
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  user_name TEXT,
+  action TEXT NOT NULL,
+  resource TEXT NOT NULL,
+  resource_id TEXT,
+  details JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

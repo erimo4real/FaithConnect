@@ -10,6 +10,8 @@ CREATE TABLE sermons (
   thumbnail TEXT,
   audio_url TEXT,
   video_url TEXT,
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'published',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -17,12 +19,14 @@ CREATE TABLE sermons (
 CREATE TABLE events (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
-  date TEXT NOT NULL,
-  time TEXT NOT NULL,
+  date TEXT,
+  time TEXT,
   location TEXT NOT NULL,
   description TEXT,
   image TEXT,
   spots INTEGER DEFAULT 30,
+  days TEXT,
+  status TEXT NOT NULL DEFAULT 'published',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -36,6 +40,9 @@ CREATE TABLE blog_posts (
   image TEXT,
   excerpt TEXT,
   content TEXT,
+  status TEXT NOT NULL DEFAULT 'published',
+  slug TEXT,
+  meta_description TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -98,8 +105,23 @@ CREATE TABLE streams (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   youtube_url TEXT,
-  scheduled_at TIMESTAMPTZ,
+  scheduled_date DATE,
+  scheduled_time TIME,
+  end_time TIME,
+  recurring TEXT,
   is_live BOOLEAN DEFAULT false,
+  manually_stopped BOOLEAN DEFAULT false,
+  last_activated_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE stream_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  stream_id UUID REFERENCES streams(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  youtube_url TEXT,
+  activated_at TIMESTAMPTZ NOT NULL,
+  deactivated_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -111,6 +133,7 @@ CREATE TABLE contact_messages (
   phone TEXT,
   subject TEXT NOT NULL,
   message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'unread',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -118,5 +141,28 @@ CREATE TABLE contact_messages (
 CREATE TABLE subscribers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 11. Admin Users
+CREATE TABLE users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'admin',
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 12. Audit Logs
+CREATE TABLE audit_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  user_name TEXT,
+  action TEXT NOT NULL,
+  resource TEXT NOT NULL,
+  resource_id TEXT,
+  details JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
