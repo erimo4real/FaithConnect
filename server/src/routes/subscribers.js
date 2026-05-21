@@ -7,6 +7,22 @@ import logger from '../config/logger.js';
 
 const router = Router();
 
+router.post('/', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+  try {
+    const existing = await query('SELECT id FROM subscribers WHERE email = $1', [email]);
+    if (existing.rows.length > 0) {
+      return res.json({ success: true, message: 'Already subscribed' });
+    }
+    await query('INSERT INTO subscribers (email) VALUES ($1)', [email]);
+    res.status(201).json({ success: true });
+  } catch (err) {
+    logger.error({ err }, 'Failed to subscribe');
+    res.status(400).json({ error: 'Failed to subscribe' });
+  }
+});
+
 router.get('/', authenticate, requireAdmin, async (req, res) => {
   try {
     const { limit, offset, hasPagination } = paginate(req);

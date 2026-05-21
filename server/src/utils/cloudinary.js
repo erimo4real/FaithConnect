@@ -1,4 +1,5 @@
 import cloudinary from '../config/cloudinary.js';
+import logger from '../config/logger.js';
 
 export function isCloudinaryUrl(url) {
   return url && typeof url === 'string' && url.includes('res.cloudinary.com');
@@ -20,6 +21,6 @@ export async function deleteCloudinaryImage(url) {
   try {
     await cloudinary.uploader.destroy(publicId, { resource_type: isVideo ? 'video' : 'image' });
   } catch (err) {
-    console.warn(`Failed to delete Cloudinary image ${publicId}:`, err.message);
+    logger.warn({ err, publicId }, 'Failed to delete Cloudinary image');
   }
 }

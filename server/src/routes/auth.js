@@ -5,9 +5,11 @@ import { query } from '../db.js';
 import { sendResetEmail } from '../config/email.js';
 import { validate } from '../middleware/validate.js';
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/index.js';
+import logger from '../config/logger.js';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'bethel-church-dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+const SALT_ROUNDS = 12;
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -37,21 +39,15 @@ function clearTokenCookie(res) {
 
 router.post('/register', validate(registerSchema), async (req, res) => {
   const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Name, email, and password are required' });
-  }
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
-  }
   try {
     const existing = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
       return res.status(409).json({ error: 'Email already registered' });
     }
-    const hash = await bcrypt.hash(password, 12);
+    const hash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await query(
        `INSERT INTO users (name, email, password_hash, role)
-        VALUES ($1, $2, $3, 'admin') RETURNING id, name, email, role, avatar_url, created_at`,
+        VALUES ($1, $2, $3, 'viewer') RETURNING id, name, email, role, avatar_url, created_at`,
       [name, email, hash]
     );
     const user = result.rows[0];
@@ -66,9 +62,6 @@ router.post('/register', validate(registerSchema), async (req, res) => {
 
 router.post('/login', validate(loginSchema), async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
-  }
   try {
     const result = await query('SELECT * FROM users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
@@ -98,7 +91,6 @@ router.post('/logout', (req, res) => {
 
 router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
   try {
     const result = await query('SELECT id, email FROM users WHERE email = $1', [email]);
     if (result.rows.length > 0) {
@@ -116,11 +108,9 @@ router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res)
 
 router.post('/reset-password', validate(resetPasswordSchema), async (req, res) => {
   const { token, password } = req.body;
-  if (!token || !password) return res.status(400).json({ error: 'Token and password are required' });
-  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const hash = await bcrypt.hash(password, 12);
+    const hash = await bcrypt.hash(password, SALT_ROUNDS);
     await query('UPDATE users SET password_hash=$1 WHERE id=$2', [hash, decoded.id]);
     res.json({ success: true, message: 'Password updated. You can now login.' });
   } catch (err) {
@@ -136,7 +126,7 @@ router.get('/me', async (req, res) => {
     if (!token && req.cookies?.token) token = req.cookies.token;
     if (!token) return res.json(null);
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bethel-church-dev-secret-change-in-production');
+    const decoded = jwt.verify(token, JWT_SECRET);
     const result = await query('SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = $1', [decoded.id]);
     res.json(result.rows[0] || null);
   } catch {

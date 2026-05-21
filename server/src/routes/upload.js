@@ -4,7 +4,7 @@ import cloudinary from '../config/cloudinary.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import logger from '../config/logger.js';
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 const router = Router();
 
 const folder = 'bethel-church';
@@ -46,7 +46,7 @@ function uploadToCloudinary(buffer, filename) {
 router.post('/', authenticate, async (req, res) => {
   upload.single('file')(req, res, async (err) => {
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE')
-      return res.status(413).json({ error: 'File too large — max 200MB' });
+      return res.status(413).json({ error: 'File too large — max 20MB' });
     if (err) { logger.error({ err }, 'File upload failed'); return res.status(400).json({ error: 'File upload failed' }); }
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     try {
@@ -63,7 +63,7 @@ router.post('/multiple', authenticate, requireAdmin, async (req, res) => {
   upload.array('files', 20)(req, res, async (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE')
-        return res.status(413).json({ error: 'File too large — max 200MB per file' });
+        return res.status(413).json({ error: 'File too large — max 20MB per file' });
       if (err.code === 'LIMIT_UNEXPECTED_FILE')
         return res.status(400).json({ error: 'Maximum 20 files per upload' });
     }
@@ -76,7 +76,8 @@ router.post('/multiple', authenticate, requireAdmin, async (req, res) => {
           const result = await uploadToCloudinary(f.buffer, f.originalname);
           results.push(result);
         } catch (uploadErr) {
-          results.push({ error: uploadErr.message, filename: f.originalname });
+          logger.error({ err: uploadErr }, 'Upload failed for file');
+          results.push({ error: 'Upload failed', filename: f.originalname });
         }
       }
       res.json(results);

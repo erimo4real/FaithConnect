@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import logger from '../config/logger.js';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendResetEmail(to, resetUrl) {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.log(`[Email] SMTP not configured — would send reset link to ${to}: ${resetUrl}`);
+    logger.info({ to, resetUrl }, 'SMTP not configured — would send reset email');
     return;
   }
   await transporter.sendMail({

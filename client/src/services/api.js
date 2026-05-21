@@ -88,6 +88,7 @@ export async function fetchSermons() { return apiFetch('/sermons'); }
 export async function fetchEvents() { return apiFetch('/events'); }
 export async function fetchBlogPosts() { return apiFetch('/blog'); }
 export async function fetchGallery() { return apiFetch('/gallery'); }
+export async function subscribeNewsletter(email) { return apiFetch('/subscribers', { method: 'POST', body: JSON.stringify({ email }) }); }
 export async function fetchCurrentStream() { return apiFetch('/streams'); }
 export async function fetchUpcomingStreams() { return apiFetch('/streams/upcoming'); }
 export async function fetchStreamArchive() { return apiFetch('/streams/archive'); }

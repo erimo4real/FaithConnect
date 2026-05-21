@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaPrayingHands, FaHeart, FaHospital, FaMoneyBillWave, FaHandHoldingHeart, FaStarAndCrescent, FaEnvelope, FaCheckCircle, FaChurch, FaVideo, FaPhone, FaMailBulk } from 'react-icons/fa';
+import { sendPrayerRequest } from '../services/api';
 
 const PrayerRequest = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const PrayerRequest = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [urgent, setUrgent] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const prayerTypes = [
     { id: 'personal', label: 'Personal Prayer', icon: FaPrayingHands },
@@ -32,18 +34,27 @@ const PrayerRequest = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      prayerType: 'personal',
-      request: '',
-      isConfidential: false,
-      allowShare: true
-    });
+    setSending(true);
+    try {
+      await sendPrayerRequest({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        prayer_type: formData.prayerType,
+        request: formData.request,
+        is_confidential: formData.isConfidential,
+        is_urgent: urgent,
+      });
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', prayerType: 'personal', request: '', isConfidential: false, allowShare: true });
+      setUrgent(false);
+    } catch {
+      // silently fail
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -197,9 +208,10 @@ const PrayerRequest = () => {
 
                   <button
                     type="submit"
-                    className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors"
+                    disabled={sending}
+                    className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
                   >
-                    {urgent ? 'Submit Urgent Prayer Request' : 'Submit Prayer Request'}
+                    {sending ? 'Submitting...' : urgent ? 'Submit Urgent Prayer Request' : 'Submit Prayer Request'}
                   </button>
                 </form>
               )}

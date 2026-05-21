@@ -4,10 +4,12 @@ import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { paginate } from '../paginate.js';
 import { auditLog } from '../middleware/audit.js';
 import logger from '../config/logger.js';
+import { validate } from '../middleware/validate.js';
+import { contactMessageSchema } from '../schemas/index.js';
 
 const router = Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validate(contactMessageSchema), async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
   try {
     const result = await query(

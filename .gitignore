@@ -3,11 +3,29 @@ dist
 .DS_Store
 *.log
 .env
+.env.local
+.env.production
 .vite
 server/.env
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
 
 # Docker
 pgdata/
 
 # Client build output
 client/dist
+
+# Server uploads
+server/uploads/
+
+# TypeScript
+*.tsbuildinfo

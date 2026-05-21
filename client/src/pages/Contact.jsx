@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Breadcrumbs from '../components/Breadcrumbs';
 import GoogleMap from '../components/GoogleMap';
-import { sendEmail } from '../services/emailService';
+import { sendContactMessage } from '../services/api';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock, FaPaperPlane, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 
 const Contact = () => {
@@ -25,14 +25,13 @@ const Contact = () => {
     e.preventDefault();
     setStatus({ submitted: false, loading: true, error: false, demo: false });
 
-    const result = await sendEmail(formData);
-
-    if (result.success) {
-      setStatus({ submitted: true, loading: false, error: false, demo: result.demo || false });
+    try {
+      await sendContactMessage(formData);
+      setStatus({ submitted: true, loading: false, error: false });
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       setTimeout(() => setStatus({ submitted: false, loading: false, error: false, demo: false }), 8000);
-    } else {
-      setStatus({ submitted: false, loading: false, error: true, demo: false });
+    } catch {
+      setStatus({ submitted: false, loading: false, error: true });
       setTimeout(() => setStatus({ submitted: false, loading: false, error: false, demo: false }), 8000);
     }
   };
@@ -62,7 +61,7 @@ const Contact = () => {
                   <FaCheckCircle className="text-xl" />
                   <div>
                     <p className="font-bold">Message sent successfully!</p>
-                    <p className="text-sm">{status.demo ? 'Local mode: form data logged to console. Test on the live Netlify site to receive emails.' : "We'll get back to you soon."}</p>
+                    <p className="text-sm">We'll get back to you soon.</p>
                   </div>
                 </div>
               )}
@@ -77,8 +76,7 @@ const Contact = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} data-netlify="true" name="contact" method="POST" action="/" className="space-y-4">
-                <input type="hidden" name="form-name" value="contact" />
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">

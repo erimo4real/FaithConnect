@@ -1,4 +1,5 @@
 import pg from 'pg';
+import logger from './config/logger.js';
 
 const { Pool } = pg;
 
@@ -6,10 +7,11 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 10,
   idleTimeoutMillis: 30000,
+  ...(process.env.DATABASE_SSL === 'true' ? { ssl: { rejectUnauthorized: true } } : {}),
 });
 
 pool.on('error', (err) => {
-  console.error('Database pool error:', err.message);
+  logger.error({ err }, 'Database pool error');
 });
 
 // Simple query helper — same API for local & Supabase
@@ -18,7 +20,7 @@ export async function query(text, params) {
   const result = await pool.query(text, params);
   const duration = Date.now() - start;
   if (process.env.NODE_ENV !== 'production') {
-    console.log('Query:', text.slice(0, 60), '| Duration:', duration, 'ms');
+    logger.debug({ query: text.slice(0, 60), duration }, 'Query');
   }
   return result;
 }

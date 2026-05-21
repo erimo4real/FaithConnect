@@ -4,13 +4,10 @@ import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { paginate } from '../paginate.js';
 import { auditLog } from '../middleware/audit.js';
 import logger from '../config/logger.js';
+import { validate } from '../middleware/validate.js';
+import { streamSchema } from '../schemas/index.js';
 
 const router = Router();
-
-function dayName(date) {
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return days[new Date(date).getDay()];
-}
 
 router.get('/', async (req, res) => {
   try {
@@ -77,7 +74,7 @@ router.get('/all', authenticate, requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/', authenticate, requireAdmin, auditLog('create', 'stream'), async (req, res) => {
+router.post('/', authenticate, requireAdmin, validate(streamSchema), auditLog('create', 'stream'), async (req, res) => {
   const { title, youtube_url, scheduled_date, scheduled_time, end_time, recurring, is_live } = req.body;
   try {
     const result = await query(
@@ -92,7 +89,7 @@ router.post('/', authenticate, requireAdmin, auditLog('create', 'stream'), async
   }
 });
 
-router.put('/:id', authenticate, requireAdmin, auditLog('update', 'stream'), async (req, res) => {
+router.put('/:id', authenticate, requireAdmin, validate(streamSchema), auditLog('update', 'stream'), async (req, res) => {
   const { title, youtube_url, scheduled_date, scheduled_time, end_time, recurring, is_live } = req.body;
   try {
     const manuallyStopped = is_live === false;

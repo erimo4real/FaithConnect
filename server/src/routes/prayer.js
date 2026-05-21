@@ -4,10 +4,22 @@ import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { paginate } from '../paginate.js';
 import { auditLog } from '../middleware/audit.js';
 import logger from '../config/logger.js';
+import { validate } from '../middleware/validate.js';
+import { z } from 'zod';
+
+const prayerSchema = z.object({
+  name: z.string().min(1, 'Name required'),
+  email: z.string().email('Valid email required'),
+  phone: z.string().nullable().optional(),
+  prayer_type: z.string().optional(),
+  request: z.string().min(1, 'Prayer request required'),
+  is_confidential: z.boolean().optional(),
+  is_urgent: z.boolean().optional(),
+});
 
 const router = Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validate(prayerSchema), async (req, res) => {
   const { name, email, phone, prayer_type, request, is_confidential, is_urgent } = req.body;
   try {
     const result = await query(

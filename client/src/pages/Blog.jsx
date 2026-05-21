@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { FaTimes, FaShareAlt } from 'react-icons/fa';
 import { fetchBlogPosts } from '../services/api';
+import DOMPurify from 'dompurify';
 
 const Blog = () => {
   const [posts, setPosts] = useState([]);
@@ -133,7 +134,7 @@ const Blog = () => {
                 <span className="mx-2">•</span>
                 <span>{formatDate(selectedPost.date)}</span>
               </div>
-              <div className="prose max-w-none text-gray-700 mb-6" dangerouslySetInnerHTML={{ __html: selectedPost.content }} />
+              <div className="prose max-w-none text-gray-700 mb-6" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedPost.content) }} />
               <div className="flex items-center justify-between pt-4 border-t">
                 <button className="text-gray-500 hover:text-secondary flex items-center gap-2">
                   <FaShareAlt /> Share

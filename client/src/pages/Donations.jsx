@@ -6,12 +6,15 @@ const Donations = () => {
   const [donationAmount, setDonationAmount] = useState(50);
   const [customAmount, setCustomAmount] = useState('');
   const [donationType, setDonationType] = useState('one-time');
+  const [donationCause, setDonationCause] = useState('general');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     message: ''
   });
+  const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const handleAmountClick = (amount) => {
     setDonationAmount(amount);
@@ -34,13 +37,33 @@ const Donations = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSending(true);
     const amount = customAmount || donationAmount;
-    alert(`Thank you for your generous donation of $${amount}! This is a demo - no payment was processed.`);
-    setFormData({ name: '', email: '', phone: '', message: '' });
-    setDonationAmount(50);
-    setCustomAmount('');
+    try {
+      await fetch('/api/donations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          amount: parseFloat(amount),
+          type: donationType,
+          cause: donationCause,
+          message: formData.message,
+        }),
+      });
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setDonationAmount(50);
+      setCustomAmount('');
+    } catch {
+      // silently fail
+    } finally {
+      setSending(false);
+    }
   };
 
   const donationTypes = [
@@ -184,6 +207,13 @@ const Donations = () => {
 
             <div>
               <h2 className="text-2xl font-bold text-primary mb-6">Your Information</h2>
+              {submitted ? (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center">
+                  <p className="font-bold text-lg">Thank you for your donation!</p>
+                  <p>A payment link will be sent to your email to complete the process.</p>
+                  <button onClick={() => setSubmitted(false)} className="mt-4 text-green-800 underline font-semibold">Donate Again</button>
+                </div>
+              ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
@@ -230,11 +260,13 @@ const Donations = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-primary text-white font-bold py-4 rounded-lg hover:bg-primary/90 transition-colors text-lg"
+                  disabled={sending}
+                  className="w-full bg-primary text-white font-bold py-4 rounded-lg hover:bg-primary/90 transition-colors text-lg disabled:opacity-50"
                 >
-                  Donate ${customAmount || donationAmount}
+                  {sending ? 'Processing...' : `Donate $${customAmount || donationAmount}`}
                 </button>
               </form>
+              )}
             </div>
           </div>
         </div>
@@ -246,7 +278,13 @@ const Donations = () => {
           <p className="text-gray-600 text-center mb-12">Select where you want your donation to go</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {donationCauses.map((cause) => (
-              <div key={cause.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div
+                key={cause.id}
+                onClick={() => setDonationCause(cause.id)}
+                className={`bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer ${
+                  donationCause === cause.id ? 'ring-2 ring-primary' : ''
+                }`}
+              >
                 <div className="text-4xl mb-3">{cause.icon}</div>
                 <h3 className="text-xl font-bold text-primary mb-2">{cause.title}</h3>
                 <p className="text-gray-600">{cause.description}</p>

@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
+import { subscribeNewsletter } from '../services/api';
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubscribed(true);
-    setEmail('');
+    try {
+      await subscribeNewsletter(email);
+      setSubscribed(true);
+      setEmail('');
+    } catch {
+      // silently fail - newsletter is non-critical
+    }
   };
 
   return (

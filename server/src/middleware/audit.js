@@ -1,9 +1,9 @@
 import { query } from '../db.js';
+import logger from '../config/logger.js';
 
 export function auditLog(action, resource) {
   return async (req, res, next) => {
     const originalJson = res.json.bind(res);
-    const originalEnd = res.end.bind(res);
 
     res.json = function (body) {
       if (res.statusCode < 400 && req.user) {
@@ -19,7 +19,7 @@ export function auditLog(action, resource) {
             resourceId,
             JSON.stringify({ method: req.method, path: req.originalUrl }),
           ]
-        ).catch(() => {});
+        ).catch(err => logger.warn({ err }, 'Audit log write failed'));
       }
       return originalJson(body);
     };

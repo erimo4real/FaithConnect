@@ -10,6 +10,10 @@ import logger from './src/config/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+process.on('unhandledRejection', (reason) => {
+  logger.error({ err: reason }, 'Unhandled promise rejection');
+});
+
 import authRouter from './src/routes/auth.js';
 import sermonsRouter from './src/routes/sermons.js';
 import eventsRouter from './src/routes/events.js';
@@ -37,16 +41,23 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Auth routes — before rate limiter so login/register never get blocked
-app.use('/api/auth', authRouter);
-
-// Rate limiting
+// Rate limiting — applied before auth routes to protect login/register too
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
   message: { error: 'Too many requests, try again later' },
 });
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many login attempts, try again later' },
+});
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 app.use('/api/', limiter);
+
+// Auth routes
+app.use('/api/auth', authRouter);
 
 // Content routes
 app.use('/api/sermons', sermonsRouter);
