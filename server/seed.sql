@@ -1,5 +1,20 @@
 -- Run this SQL in your Supabase SQL Editor (https://supabase.com -> SQL Editor)
--- It creates all the tables for the Bethel Church app
+-- Drops existing tables and recreates them fresh
+-- WARNING: This will DELETE all existing data
+
+DROP TABLE IF EXISTS stream_logs CASCADE;
+DROP TABLE IF EXISTS streams CASCADE;
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS donations CASCADE;
+DROP TABLE IF EXISTS prayer_requests CASCADE;
+DROP TABLE IF EXISTS contact_messages CASCADE;
+DROP TABLE IF EXISTS subscribers CASCADE;
+DROP TABLE IF EXISTS blog_posts CASCADE;
+DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS gallery CASCADE;
+DROP TABLE IF EXISTS sermons CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 -- 1. Sermons
 CREATE TABLE sermons (
