@@ -154,7 +154,7 @@ const Donations = () => {
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
-                <div className="grid grid-cols-3 gap-3 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                   {[25, 50, 100, 250, 500, 1000].map((amount) => (
                     <button
                       key={amount}

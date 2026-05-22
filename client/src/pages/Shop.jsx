@@ -100,7 +100,7 @@ const Shop = () => {
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full aspect-video object-cover"
                 />
                 <div className="p-4">
                   <span className="text-xs text-gray-500">{product.category}</span>
@@ -122,7 +122,7 @@ const Shop = () => {
         </div>
       </section>
 
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-4 right-4 sm:bottom-20 sm:right-4">
         <button
           onClick={() => setShowCart(!showCart)}
           className="bg-primary text-white p-4 rounded-full shadow-lg flex items-center gap-2 hover:bg-primary/90 transition-colors"

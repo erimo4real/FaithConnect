@@ -17,7 +17,7 @@ const SermonCard = ({ sermon }) => {
         <img
           src={imgSrc(sermon.thumbnail)}
           alt={sermon.title}
-          className="w-full h-48 object-cover"
+          className="w-full aspect-video object-cover"
         />
         <div className="absolute top-2 right-2 flex gap-2">
           {sermon.audioUrl && (

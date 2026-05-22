@@ -18,7 +18,7 @@ const EventCard = ({ event }) => {
       <img
         src={imgSrc(event.image)}
         alt={event.title}
-        className="w-full h-48 object-cover cursor-pointer"
+        className="w-full aspect-video object-cover cursor-pointer"
         onClick={() => setShowPreview(true)}
       />
       <div className="p-4">

@@ -27,7 +27,7 @@ const LiveChat = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-4 left-4 sm:left-auto sm:right-4 z-50">
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
@@ -39,7 +39,7 @@ const LiveChat = () => {
           <span className="font-semibold">Chat</span>
         </button>
       ) : (
-        <div className="bg-white rounded-lg shadow-2xl w-80 h-96 flex flex-col">
+        <div className="bg-white rounded-lg shadow-2xl w-[calc(100vw-2rem)] sm:w-80 h-[70vh] max-h-96 flex flex-col">
           <div className="bg-gradient-to-r from-blue to-purple text-white p-4 rounded-t-lg flex justify-between items-center">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
@@ -70,13 +70,13 @@ const LiveChat = () => {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Type a message..."
-                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple"
+                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple min-w-0"
               />
               <button
                 onClick={handleSend}
-                className="bg-gradient-to-r from-blue to-purple text-white px-4 py-2 rounded-lg hover:opacity-90"
+                className="bg-gradient-to-r from-blue to-purple text-white px-4 py-2 rounded-lg hover:opacity-90 flex-shrink-0"
               >
                 Send
               </button>

@@ -140,7 +140,7 @@ const Home = () => {
 
   return (
     <div>
-      <section className="relative h-[600px] overflow-hidden">
+      <section className="relative min-h-[400px] md:h-[600px] overflow-hidden">
         {slides.map((slide, index) => (
           <div
             key={slide.id}

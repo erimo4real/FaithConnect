@@ -102,7 +102,7 @@ const About = () => {
                   <img
                     src={leader.image}
                     alt={leader.name}
-                    className="w-full h-[500px] object-cover object-top"
+                    className="w-full h-[300px] md:h-[500px] object-cover object-top"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-6">
