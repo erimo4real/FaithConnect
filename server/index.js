@@ -139,6 +139,28 @@ setInterval(async () => {
   }
 }, 30000);
 
+// Auto-seed admin user on first startup
+(async () => {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (adminEmail && adminPassword) {
+      const existing = await query('SELECT id FROM users WHERE email = $1', [adminEmail]);
+      if (existing.rows.length === 0) {
+        const bcrypt = (await import('bcryptjs')).default;
+        const hash = await bcrypt.hash(adminPassword, 12);
+        await query(
+          `INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, 'admin')`,
+          ['Admin', adminEmail, hash]
+        );
+        logger.info({ email: adminEmail }, 'Admin user auto-created from env vars');
+      }
+    }
+  } catch (err) {
+    logger.warn({ err }, 'Admin auto-seed skipped (tables may not exist yet)');
+  }
+})();
+
 app.listen(PORT, () => {
   logger.info({ port: PORT }, 'Bethel Church API started');
 });
