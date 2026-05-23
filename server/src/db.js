@@ -1,34 +1,52 @@
-import pg from 'pg';
+import { createClient } from '@supabase/supabase-js';
 import logger from './config/logger.js';
 
-const { Pool } = pg;
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  family: 4,
-  ...(process.env.DATABASE_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {}),
-});
+let client;
 
-pool.on('error', (err) => {
-  logger.error({ err }, 'Database pool error');
-});
+try {
+  client = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+  logger.info('Supabase REST client initialized');
+} catch (err) {
+  logger.error({ err }, 'Failed to initialize Supabase client');
+  process.exit(1);
+}
 
-// Simple query helper — same API for local & Supabase
-export async function query(text, params) {
+export async function query(text, params = []) {
   const start = Date.now();
-  const result = await pool.query(text, params);
+  const { data, error } = await client.rpc('execute_sql', {
+    query_text: text,
+    query_params: params,
+  });
+
   const duration = Date.now() - start;
   if (process.env.NODE_ENV !== 'production') {
     logger.debug({ query: text.slice(0, 60), duration }, 'Query');
   }
-  return result;
+
+  if (error) throw error;
+
+  if (data && data.error) {
+    const err = new Error(data.error);
+    err.code = data.code;
+    throw err;
+  }
+
+  if (data && data.rows) {
+    return { rows: data.rows, rowCount: data.rows.length };
+  }
+  if (data && data.row_count !== undefined) {
+    return { rows: [], rowCount: data.row_count };
+  }
+  return { rows: [], rowCount: 0 };
 }
 
-// Get a client from the pool (for transactions)
 export async function getClient() {
-  return pool.connect();
+  throw new Error('Transactions not supported via Supabase REST API');
 }
 
 export default { query, getClient };
