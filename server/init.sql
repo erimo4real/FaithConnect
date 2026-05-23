@@ -1,3 +1,37 @@
+-- Helper function used by the server for database queries via Supabase REST API
+CREATE OR REPLACE FUNCTION execute_sql(query_text text, query_params jsonb DEFAULT '[]'::jsonb)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  result jsonb;
+  i integer;
+  full_sql text;
+BEGIN
+  IF query_params IS NOT NULL AND jsonb_typeof(query_params) = 'array' AND jsonb_array_length(query_params) > 0 THEN
+    FOR i IN 0..jsonb_array_length(query_params)-1 LOOP
+      query_text := replace(query_text, '$' || (i+1), quote_nullable(query_params->>i));
+    END LOOP;
+  END IF;
+
+  full_sql := 'WITH _r AS (' || query_text || ') SELECT COALESCE(jsonb_agg(row_to_json(_r)), '[]'::jsonb) FROM _r';
+
+  BEGIN
+    EXECUTE full_sql INTO result;
+    RETURN jsonb_build_object('rows', COALESCE(result, '[]'::jsonb));
+  EXCEPTION WHEN OTHERS THEN
+    BEGIN
+      EXECUTE query_text;
+      GET DIAGNOSTICS result = ROW_COUNT;
+      RETURN jsonb_build_object('row_count', result::int);
+    EXCEPTION WHEN OTHERS THEN
+      RETURN jsonb_build_object('error', SQLERRM, 'code', SQLSTATE);
+    END;
+  END;
+END;
+$$;
+
 DROP TABLE IF EXISTS stream_logs CASCADE;
 DROP TABLE IF EXISTS streams CASCADE;
 DROP TABLE IF EXISTS audit_logs CASCADE;
