@@ -143,8 +143,8 @@ setInterval(async () => {
 // Auto-seed admin user on first startup
 (async () => {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminEmail = process.env.ADMIN_EMAIL?.trim();
+    const adminPassword = process.env.ADMIN_PASSWORD?.trim();
     if (adminEmail && adminPassword) {
       const existing = await query('SELECT id FROM users WHERE email = $1', [adminEmail]);
       if (existing.rows.length === 0) {

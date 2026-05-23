@@ -38,7 +38,8 @@ function clearTokenCookie(res) {
 }
 
 router.post('/register', validate(registerSchema), async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
+  const email = req.body.email?.trim();
   try {
     const existing = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
@@ -61,7 +62,8 @@ router.post('/register', validate(registerSchema), async (req, res) => {
 });
 
 router.post('/login', validate(loginSchema), async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email?.trim();
   try {
     const result = await query('SELECT * FROM users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
