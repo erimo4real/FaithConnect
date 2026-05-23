@@ -20,7 +20,7 @@ BEGIN
     END LOOP;
   END IF;
 
-  full_sql := 'WITH _r AS (' || query_text || ') SELECT COALESCE(jsonb_agg(row_to_json(_r)), '[]'::jsonb) FROM _r';
+  full_sql := 'WITH _r AS (' || query_text || ') SELECT COALESCE(jsonb_agg(row_to_json(_r)), ''[]''::jsonb) FROM _r';
 
   BEGIN
     EXECUTE full_sql INTO result;
