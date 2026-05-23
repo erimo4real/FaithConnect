@@ -14,7 +14,7 @@ function removeCookie(name) {
 function getToken() {
   return localStorage.getItem('fc_token') || getCookie('client_token') || getCookie('app_token');
 }
-function setToken(token) {
+export function setToken(token) {
   if (token) localStorage.setItem('fc_token', token);
 }
 function clearToken() {
