@@ -11,10 +11,12 @@ const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 12;
 
+const SAME_SITE = process.env.NODE_ENV === 'production' ? 'none' : 'lax';
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: SAME_SITE,
   path: '/',
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
@@ -22,7 +24,7 @@ const COOKIE_OPTIONS = {
 const CLIENT_COOKIE_OPTIONS = {
   httpOnly: false,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: SAME_SITE,
   path: '/',
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };

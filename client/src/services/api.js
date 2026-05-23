@@ -12,7 +12,13 @@ function removeCookie(name) {
 }
 
 function getToken() {
-  return getCookie('client_token') || getCookie('app_token');
+  return localStorage.getItem('fc_token') || getCookie('client_token') || getCookie('app_token');
+}
+function setToken(token) {
+  if (token) localStorage.setItem('fc_token', token);
+}
+function clearToken() {
+  localStorage.removeItem('fc_token');
 }
 
 export function getStoredUser() {
@@ -26,6 +32,7 @@ export function clearStoredUser() {
   removeCookie('auth_user');
   removeCookie('client_token');
   removeCookie('app_token');
+  clearToken();
 }
 
 async function apiFetch(url, options = {}) {
