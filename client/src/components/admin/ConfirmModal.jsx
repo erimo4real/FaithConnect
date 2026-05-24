@@ -1,4 +1,4 @@
-export default function ConfirmModal({ open, title, message, onConfirm, onCancel }) {
+export default function ConfirmModal({ open, title, message, confirmLabel = 'Delete', confirmDisabled = false, onConfirm, onCancel }) {
   if (!open) return null;
 
   return (
@@ -8,7 +8,7 @@ export default function ConfirmModal({ open, title, message, onConfirm, onCancel
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{message || 'Are you sure?'}</p>
         <div className="flex gap-3 justify-end">
           <button onClick={onCancel} className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-          <button onClick={onConfirm} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">Delete</button>
+          <button onClick={onConfirm} disabled={confirmDisabled} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50">{confirmLabel}</button>
         </div>
       </div>
     </div>

@@ -13,6 +13,8 @@ export default function AdminGallery() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ title: '', description: '', src: '', category: 'worship', type: 'image', thumbnail: '' });
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -34,8 +36,8 @@ export default function AdminGallery() {
   useEffect(() => { load(); }, []);
   const resetForm = () => { setForm({ title: '', description: '', src: '', category: 'worship', type: 'image', thumbnail: '' }); setEditId(null); setShowForm(false); };
   const handleEdit = (item) => { setForm(item); setEditId(item.id); setShowForm(true); };
-  const handleSubmit = async (e) => { e.preventDefault(); try { if (editId) { await adminUpdateGalleryItem(editId, form); toast.success('Gallery item updated'); } else { await adminCreateGalleryItem(form); toast.success('Gallery item created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } };
-  const handleDelete = async (id) => { if (!confirm('Delete this item?')) return; try { await adminDeleteGalleryItem(id); toast.success('Gallery item deleted'); load(); } catch (err) { toast.error(err.message); } };
+  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); try { if (editId) { await adminUpdateGalleryItem(editId, form); toast.success('Gallery item updated'); } else { await adminCreateGalleryItem(form); toast.success('Gallery item created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
+  const handleDelete = async (id) => { if (!confirm('Delete this item?')) return; setDeleting(id); try { await adminDeleteGalleryItem(id); toast.success('Gallery item deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
 
   return (
     <AdminLayout title="Gallery">
@@ -75,7 +77,7 @@ export default function AdminGallery() {
               </div>
             </div>
             <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" rows="2" />
-            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors">{editId ? 'Update' : 'Create'}</button>
+            <button type="submit" disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50">{saving ? 'Saving...' : (editId ? 'Update' : 'Create')}</button>
           </form>
         )}
 
@@ -91,7 +93,7 @@ export default function AdminGallery() {
                   </div>
                   <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => handleEdit(item)} className="bg-white dark:bg-gray-700 p-1.5 rounded-lg shadow text-blue-600 hover:bg-blue-50"><HiOutlinePencil className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleDelete(item.id)} className="bg-white dark:bg-gray-700 p-1.5 rounded-lg shadow text-red-600 hover:bg-red-50"><HiOutlineTrash className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="bg-white dark:bg-gray-700 p-1.5 rounded-lg shadow text-red-600 hover:bg-red-50 disabled:opacity-40"><HiOutlineTrash className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               ))}

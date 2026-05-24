@@ -10,6 +10,7 @@ export default function AdminSubscribers() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const [deleting, setDeleting] = useState(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -20,7 +21,7 @@ export default function AdminSubscribers() {
 
   const load = async () => { try { setItems(await adminFetchSubscribers()); } catch (err) { toast.error(err.message); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
-  const handleDelete = async (id) => { if (!confirm('Remove this subscriber?')) return; try { await adminDeleteSubscriber(id); toast.success('Subscriber removed'); load(); } catch (err) { toast.error(err.message); } };
+  const handleDelete = async (id) => { if (!confirm('Remove this subscriber?')) return; setDeleting(id); try { await adminDeleteSubscriber(id); toast.success('Subscriber removed'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
   const exportCSV = () => { window.open(`${API_URL}/export/subscribers`, '_blank'); };
 
   return (
@@ -51,7 +52,7 @@ export default function AdminSubscribers() {
                         <td className="py-3 pr-4 text-sm font-medium text-gray-800 dark:text-gray-100">{item.email}</td>
                         <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">{new Date(item.created_at).toLocaleDateString()}</td>
                         <td className="py-3">
-                          <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"><HiOutlineTrash className="w-4 h-4" /></button>
+                          <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
                         </td>
                       </tr>
                     ))}

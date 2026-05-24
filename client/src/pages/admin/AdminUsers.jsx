@@ -14,6 +14,9 @@ export default function AdminUsers() {
   const [page, setPage] = useState(1);
   const [editUser, setEditUser] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const [adding, setAdding] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarRef = useRef(null);
   const pageSize = 10;
@@ -31,18 +34,22 @@ export default function AdminUsers() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this admin user?')) return;
+    setDeleting(id);
     try { await adminDeleteUser(id); toast.success('User deleted'); load(); }
     catch (err) { toast.error(err.message); }
+    finally { setDeleting(null); }
   };
 
   const handleEdit = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       await adminUpdateUser(editUser.id, { name: editUser.name, email: editUser.email, role: editUser.role, avatar_url: editUser.avatar_url });
       toast.success('User updated');
       setEditUser(null);
       load();
     } catch (err) { toast.error(err.message); }
+    finally { setSaving(false); }
   };
 
   const handleAvatarUpload = async (file) => {
@@ -62,6 +69,7 @@ export default function AdminUsers() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
+    setAdding(true);
     const form = e.target;
     try {
       await registerAdmin(form.name.value, form.email.value, form.password.value);
@@ -69,6 +77,7 @@ export default function AdminUsers() {
       setShowAdd(false);
       load();
     } catch (err) { toast.error(err.message); }
+    finally { setAdding(false); }
   };
 
   return (
@@ -113,7 +122,7 @@ export default function AdminUsers() {
                         <td className="py-3">
                           <div className="flex items-center gap-2">
                             <button onClick={() => setEditUser({ ...item })} className="p-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><HiOutlinePencil className="w-4 h-4" /></button>
-                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"><HiOutlineTrash className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
@@ -173,7 +182,7 @@ export default function AdminUsers() {
               </div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setEditUser(null)} className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">Save</button>
+                <button type="submit" disabled={saving} className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
               </div>
             </form>
           </div>
@@ -200,7 +209,7 @@ export default function AdminUsers() {
               </div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">Create User</button>
+                <button type="submit" disabled={adding} className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50">{adding ? 'Creating...' : 'Create User'}</button>
               </div>
             </form>
           </div>

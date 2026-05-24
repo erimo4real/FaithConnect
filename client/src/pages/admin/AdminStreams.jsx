@@ -14,6 +14,8 @@ export default function AdminStreams() {
   const [form, setForm] = useState({ title: '', youtube_url: '', scheduled_date: '', scheduled_time: '', end_time: '', recurring: '', is_live: false });
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
@@ -21,12 +23,12 @@ export default function AdminStreams() {
   const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
 
-  const load = async () => { try { const [all, cur] = await Promise.all([adminFetchStreams(), fetchCurrentStream()]); setItems(all); setCurrent(cur); } catch (err) { toast.error(err.message); } finally { setLoading(false); } };
-  useEffect(() => { load(); const id = setInterval(load, 10000); return () => clearInterval(id); }, []);
-  const resetForm = () => { setForm({ title: '', youtube_url: '', scheduled_date: '', scheduled_time: '', end_time: '', recurring: '', is_live: false }); setEditId(null); setShowForm(false); };
-  const handleEdit = (item) => { setForm({ ...item, scheduled_date: item.scheduled_date?.slice(0, 10) || '', scheduled_time: item.scheduled_time?.slice(0, 5) || '', end_time: item.end_time?.slice(0, 5) || '', recurring: item.recurring || '' }); setEditId(item.id); setShowForm(true); };
-  const handleSubmit = async (e) => { e.preventDefault(); if (submitting) return; setSubmitting(true); const payload = { ...form, scheduled_date: form.scheduled_date || null, scheduled_time: form.scheduled_time || null, end_time: form.end_time || null, recurring: form.recurring || null }; try { if (editId) { await adminUpdateStream(editId, payload); toast.success('Stream updated'); } else { await adminCreateStream(payload); toast.success('Stream created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSubmitting(false); } };
-  const handleDelete = async (id) => { if (!confirm('Delete this stream?')) return; try { await adminDeleteStream(id); toast.success('Stream deleted'); load(); } catch (err) { toast.error(err.message); } };
+  const load = async () => { try { setItems(await adminFetchStreams()); } catch (err) { toast.error(err.message); } finally { setLoading(false); } };
+  useEffect(() => { load(); }, []);
+  const resetForm = () => { setForm({ title: '', url: '', description: '', status: 'upcoming' }); setEditId(null); setShowForm(false); };
+  const handleEdit = (item) => { setForm(item); setEditId(item.id); setShowForm(true); };
+  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); try { if (editId) { await adminUpdateStream(editId, form); toast.success('Stream updated'); } else { await adminCreateStream(form); toast.success('Stream created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
+  const handleDelete = async (id) => { if (!confirm('Delete this stream?')) return; setDeleting(id); try { await adminDeleteStream(id); toast.success('Stream deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
 
   return (
     <AdminLayout title="Live Streams">
@@ -106,7 +108,7 @@ export default function AdminStreams() {
                         <td className="py-3">
                           <div className="flex items-center gap-2">
                             <button onClick={() => handleEdit(item)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><HiOutlinePencil className="w-4 h-4" /></button>
-                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"><HiOutlineTrash className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>

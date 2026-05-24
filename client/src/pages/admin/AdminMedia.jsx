@@ -25,6 +25,8 @@ export default function AdminMedia() {
   const [showUpload, setShowUpload] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [previewItem, setPreviewItem] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const [selected, setSelected] = useState(new Set());
 
   const toggleSelect = (publicId) => {
@@ -39,6 +41,7 @@ export default function AdminMedia() {
   const handleBulkDelete = async () => {
     if (selected.size === 0) return;
     if (!confirm(`Delete ${selected.size} files?`)) return;
+    setBulkDeleting(true);
     const ids = Array.from(selected);
     try {
       await deleteMultipleMedia(ids);
@@ -47,6 +50,8 @@ export default function AdminMedia() {
       setSelected(new Set());
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      setBulkDeleting(false);
     }
   };
 
@@ -63,8 +68,10 @@ export default function AdminMedia() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+    setDeleting(true);
     try { await deleteMedia(deleteTarget.public_id); toast.success('File deleted'); setItems(prev => prev.filter(i => i.public_id !== deleteTarget.public_id)); setDeleteTarget(null); }
     catch (err) { toast.error(err.message); }
+    finally { setDeleting(false); }
   };
 
   const copyUrl = (url) => {
@@ -108,7 +115,7 @@ export default function AdminMedia() {
           <div className="flex items-center gap-3">
             <p className="text-sm text-gray-500 dark:text-gray-400 shrink-0">{items.length} files</p>
             {selected.size > 0 && (
-              <button onClick={handleBulkDelete} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-colors"><HiOutlineTrash className="w-4 h-4" /> Delete {selected.size}</button>
+              <button onClick={handleBulkDelete} disabled={bulkDeleting} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"><HiOutlineTrash className="w-4 h-4" /> {bulkDeleting ? 'Deleting...' : `Delete ${selected.size}`}</button>
             )}
           </div>
           <button onClick={() => setShowUpload(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors"><HiOutlineUpload className="w-4 h-4" /> Upload</button>
@@ -142,7 +149,7 @@ export default function AdminMedia() {
         </div>
       </div>
       <UploadModal open={showUpload} onClose={() => setShowUpload(false)} onUploaded={handleUploaded} />
-      <ConfirmModal open={!!deleteTarget} title="Delete file?" message="This cannot be undone." confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+      <ConfirmModal open={!!deleteTarget} title="Delete file?" message="This cannot be undone." confirmLabel={deleting ? 'Deleting...' : 'Delete'} confirmDisabled={deleting} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
       {previewItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setPreviewItem(null)}>
           <div className="relative max-w-4xl max-h-[90vh] mx-4" onClick={e => e.stopPropagation()}>

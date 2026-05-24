@@ -12,6 +12,8 @@ export default function AdminEvents() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ title: '', date: '', time: '', days: '', location: '', description: '', image: '', spots: null, status: 'published' });
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [search, setSearch] = useState('');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -25,8 +27,8 @@ export default function AdminEvents() {
   useEffect(() => { load(); }, []);
   const resetForm = () => { setForm({ title: '', date: '', time: '', days: '', location: '', description: '', image: '', spots: null, status: 'published' }); setEditId(null); setShowForm(false); };
   const handleEdit = (item) => { setForm({ ...item, date: item.date?.slice(0, 10) || '', time: item.time || '', days: item.days || '' }); setEditId(item.id); setShowForm(true); };
-  const handleSubmit = async (e) => { e.preventDefault(); const payload = { ...form, date: form.date || null, time: form.time || null, days: form.days || null }; try { if (editId) { await adminUpdateEvent(editId, payload); toast.success('Event updated'); } else { await adminCreateEvent(payload); toast.success('Event created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } };
-  const handleDelete = async (id) => { if (!confirm('Delete this event?')) return; try { await adminDeleteEvent(id); toast.success('Event deleted'); load(); } catch (err) { toast.error(err.message); } };
+  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || null, time: form.time || null, days: form.days || null }; try { if (editId) { await adminUpdateEvent(editId, payload); toast.success('Event updated'); } else { await adminCreateEvent(payload); toast.success('Event created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
+  const handleDelete = async (id) => { if (!confirm('Delete this event?')) return; setDeleting(id); try { await adminDeleteEvent(id); toast.success('Event deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
 
   return (
     <AdminLayout title="Events">
@@ -61,7 +63,7 @@ export default function AdminEvents() {
                 </select>
               </div>
               <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" rows="3" />
-              <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors">{editId ? 'Update' : 'Create'}</button>
+              <button type="submit" disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50">{saving ? 'Saving...' : (editId ? 'Update' : 'Create')}</button>
             </form>
           </div>
         )}
@@ -92,7 +94,7 @@ export default function AdminEvents() {
                         <td className="py-3">
                           <div className="flex items-center gap-2">
                             <button onClick={() => handleEdit(item)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><HiOutlinePencil className="w-4 h-4" /></button>
-                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"><HiOutlineTrash className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>

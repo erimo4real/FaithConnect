@@ -12,6 +12,8 @@ export default function AdminDonations() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [updating, setUpdating] = useState(null);
+  const [deleting, setDeleting] = useState(null);
   const pageSize = 10;
 
   const filtered = items.filter(item => { if (!search) return true; const q = search.toLowerCase(); return Object.values(item).some(v => String(v).toLowerCase().includes(q)); });
@@ -29,14 +31,18 @@ export default function AdminDonations() {
   const exportCSV = () => { window.open(`${API_URL}/export/donations`, '_blank'); };
 
   const handleStatus = async (id, status) => {
+    setUpdating(id);
     try { await adminUpdateDonation(id, { status }); toast.success('Status updated'); load(); }
     catch (err) { toast.error(err.message); }
+    finally { setUpdating(null); }
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this donation record?')) return;
+    setDeleting(id);
     try { await adminDeleteDonation(id); toast.success('Donation deleted'); load(); }
     catch (err) { toast.error(err.message); }
+    finally { setDeleting(null); }
   };
 
   return (
@@ -78,12 +84,12 @@ export default function AdminDonations() {
                         <td className="py-3">
                           <div className="flex items-center gap-2">
                             <button onClick={() => setSelected(item)} className="p-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><HiOutlineEye className="w-4 h-4" /></button>
-                            <select value={item.status} onChange={(e) => handleStatus(item.id, e.target.value)} className="border border-gray-200 dark:border-gray-600 rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-primary">
+                            <select value={item.status} onChange={(e) => handleStatus(item.id, e.target.value)} disabled={updating === item.id} className="border border-gray-200 dark:border-gray-600 rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-primary disabled:opacity-40">
                               <option value="pending">Pending</option>
                               <option value="completed">Completed</option>
                               <option value="failed">Failed</option>
                             </select>
-                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"><HiOutlineTrash className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
