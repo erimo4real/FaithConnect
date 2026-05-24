@@ -12,5 +12,11 @@ export function optimizeCloudinaryUrl(url, options = {}) {
     if (isVideo) parts.push('vc_auto', 'q_auto');
     else parts.push('f_auto', 'q_auto');
   }
-  return parts.length ? url.replace('/upload/', `/upload/${parts.join(',')}/`) : url;
+  if (!parts.length) return url;
+  const segment = `${parts.join(',')}`;
+  const hasTransforms = /\/upload\/([a-z_]+,?)+(?=\/v\d+\/)/.test(url);
+  if (hasTransforms) {
+    url = url.replace(/\/upload\/([a-z_]+,?)+\//, '/upload/');
+  }
+  return url.replace('/upload/', `/upload/${segment}/`);
 }
