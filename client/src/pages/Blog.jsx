@@ -66,6 +66,11 @@ const Blog = () => {
 
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
+          {loading ? (
+            <p className="text-gray-400 text-center py-8">Loading posts...</p>
+          ) : filteredPosts.length === 0 ? (
+            <p className="text-gray-400 text-center py-8">No posts yet.</p>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post) => (
               <div
@@ -97,6 +102,7 @@ const Blog = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
 

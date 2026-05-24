@@ -23,13 +23,14 @@ const Live = () => {
   const [upcoming, setUpcoming] = useState([]);
   const [archive, setArchive] = useState([]);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [loadingUpcoming, setLoadingUpcoming] = useState(true);
 
   useEffect(() => {
     let stopped = false;
     const poll = async () => { try { const s = await fetchCurrentStream(); if (!stopped) setStream(s); } catch {} };
     poll();
     const id = setInterval(poll, 5000);
-    fetchUpcomingStreams().then(setUpcoming).catch(() => {});
+    fetchUpcomingStreams().then(setUpcoming).catch(() => {}).finally(() => setLoadingUpcoming(false));
     fetchStreamArchive().then(setArchive).catch(() => {});
     return () => { stopped = true; clearInterval(id); };
   }, []);
@@ -155,7 +156,9 @@ const Live = () => {
                 <h3 className="text-lg font-bold text-primary">Stream Schedule</h3>
               </div>
               <div className="space-y-3">
-                {upcoming.length === 0 ? (
+                {loadingUpcoming ? (
+                  <p className="text-gray-400 text-sm text-center py-4">Loading schedule...</p>
+                ) : upcoming.length === 0 ? (
                   <p className="text-gray-400 text-sm text-center py-4">No upcoming streams scheduled</p>
                 ) : (
                   upcoming.map((s) => (

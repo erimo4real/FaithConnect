@@ -78,12 +78,13 @@ const Home = () => {
   const [events, setEvents] = useState([]);
   const [stream, setStream] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSermons().then(data => {
       setSermons(data.map(s => ({ ...s, audioUrl: s.audio_url, videoUrl: s.video_url })));
     }).catch(() => {});
-    fetchEvents().then(setEvents).catch(() => {});
+    fetchEvents().then(setEvents).catch(() => {}).finally(() => setLoading(false));
     const poll = () => fetchCurrentStream().then(setStream).catch(() => {});
     poll();
     const pollId = setInterval(poll, 30000);
@@ -222,9 +223,15 @@ const Home = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
+            {loading ? (
+              <p className="text-gray-400 col-span-full text-center py-8">Loading events...</p>
+            ) : upcomingEvents.length === 0 ? (
+              <p className="text-gray-400 col-span-full text-center py-8">No upcoming events.</p>
+            ) : (
+              upcomingEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))
+            )}
           </div>
         </div>
       </section>

@@ -120,7 +120,9 @@ const Sermons = () => {
 
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
-          {filteredSermons.length > 0 ? (
+          {loading ? (
+            <p className="text-gray-400 text-center py-8">Loading sermons...</p>
+          ) : filteredSermons.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSermons.map((sermon) => (
                 <SermonCard key={sermon.id} sermon={sermon} />
