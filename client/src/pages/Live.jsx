@@ -101,8 +101,8 @@ const Live = () => {
               ) : (
                 <div className="aspect-video bg-gray-800 flex items-center justify-center relative">
                   <img 
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop" 
-                    alt="Stream placeholder"
+                    src="https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1920&h=1080&fit=crop" 
+                    alt="Church interior"
                     className="absolute inset-0 w-full h-full object-cover opacity-30"
                   />
                   <div className="relative text-center text-white">
