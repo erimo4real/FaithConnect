@@ -3,9 +3,16 @@ import { fetchCurrentStream, fetchUpcomingStreams, fetchStreamArchive } from '..
 import Breadcrumbs from '../components/Breadcrumbs';
 import { FaBroadcastTower, FaCalendarAlt, FaClock } from 'react-icons/fa';
 
-function extractId(url) {
-  const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-  return m ? m[1] : url;
+function getEmbedUrl(url) {
+  if (!url) return '';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1`;
+  }
+  if (url.includes('facebook.com')) {
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&autoplay=1`;
+  }
+  return url;
 }
 
 function combineSchedule(stream) {
@@ -45,7 +52,7 @@ const Live = () => {
   }, [stream?.scheduled_date, stream?.scheduled_time, stream?.is_live]);
 
   const isLive = stream?.is_live;
-  const youtubeUrl = stream?.youtube_url || '';
+  const streamUrl = stream?.youtube_url || '';
   const days = timeLeft ? Math.floor(timeLeft / 86400000) : 0;
   const hours = timeLeft ? Math.floor((timeLeft % 86400000) / 3600000) : 0;
   const mins = timeLeft ? Math.floor((timeLeft % 3600000) / 60000) : 0;
@@ -69,10 +76,10 @@ const Live = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
             <div className="relative">
-              {isLive && youtubeUrl ? (
+              {isLive && streamUrl ? (
                 <div className="aspect-video bg-black">
                   <iframe
-                    src={`https://www.youtube.com/embed/${extractId(youtubeUrl)}?autoplay=1`}
+                    src={getEmbedUrl(streamUrl)}
                     title="Live Stream"
                     className="w-full h-full"
                     frameBorder="0"
