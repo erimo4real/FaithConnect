@@ -36,7 +36,7 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/+$/, '');
 app.use(cors({
-  origin: [clientUrl, 'https://bethel-church-wonder-city.netlify.app', 'http://localhost:5173'],
+  origin: [clientUrl, 'https://bethel-church-wonder-city.netlify.app', 'https://bethelchurchng.com', 'https://www.bethelchurchng.com', 'http://localhost:5173'],
   credentials: true,
 }));
 app.use(express.json());
