@@ -107,14 +107,14 @@ const Live = () => {
                   </div>
                 </div>
               ) : (
-                <div className="aspect-video bg-gray-800 flex items-center justify-center relative">
+                <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
                   <img 
-                    src="https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1920&h=1080&fit=crop" 
-                    alt="Church interior"
-                    className="absolute inset-0 w-full h-full object-cover opacity-30"
+                    src="/churchlogo.png" 
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-contain opacity-10"
                   />
                   <div className="relative text-center text-white">
-                    <FaBroadcastTower className="text-6xl mx-auto mb-4 text-gray-500" />
+                    <img src="/churchlogo.png" alt="Bethel Church" className="h-20 mx-auto mb-4" />
                     <h2 className="text-2xl font-bold mb-2">Stream Offline</h2>
                     <p className="text-gray-400">We're not live right now</p>
                   </div>
