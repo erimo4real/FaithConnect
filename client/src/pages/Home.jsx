@@ -39,7 +39,7 @@ const defaultSlides = [
     title: "Live Stream Services",
     subtitle: "Worship From Anywhere",
     description: "Experience the presence of God from the comfort of your home",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop",
+    image: "/images/Live Stream Services.png",
     cta: "Watch Live",
     link: "/live"
   },
