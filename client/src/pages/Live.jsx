@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchCurrentStream, fetchUpcomingStreams, fetchStreamArchive } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
-import { FaBroadcastTower, FaCalendarAlt, FaClock } from 'react-icons/fa';
+import { FaBroadcastTower, FaCalendarAlt, FaClock, FaTimes, FaExpand } from 'react-icons/fa';
 import FadeInSection from '../components/FadeInSection';
 
 function getEmbedUrl(url) {
@@ -32,6 +32,7 @@ const Live = () => {
   const [archive, setArchive] = useState([]);
   const [timeLeft, setTimeLeft] = useState(null);
   const [loadingUpcoming, setLoadingUpcoming] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     let stopped = false;
@@ -78,7 +79,7 @@ const Live = () => {
           <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
             <div className="relative">
               {isLive && streamUrl ? (
-                <div className="aspect-video bg-black">
+                <div className="aspect-video bg-black relative group cursor-pointer" onClick={() => setShowPreview(true)}>
                   <iframe
                     src={getEmbedUrl(streamUrl)}
                     title="Live Stream"
@@ -87,6 +88,11 @@ const Live = () => {
                     allowFullScreen
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 rounded-full p-3">
+                      <FaExpand className="text-white text-2xl" />
+                    </div>
+                  </div>
                 </div>
               ) : timeLeft !== null && timeLeft > 0 ? (
                 <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
@@ -152,6 +158,34 @@ const Live = () => {
           </div>
         </div>
       </section>
+
+      {showPreview && isLive && streamUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+          onClick={() => setShowPreview(false)}
+        >
+          <button
+            onClick={() => setShowPreview(false)}
+            className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            aria-label="Close preview"
+          >
+            <FaTimes className="text-xl" />
+          </button>
+          <div
+            className="w-full h-full max-w-[90vw] max-h-[90vh]"
+            onClick={e => e.stopPropagation()}
+          >
+            <iframe
+              src={getEmbedUrl(streamUrl)}
+              title="Live Stream Preview"
+              className="w-full h-full rounded-lg"
+              frameBorder="0"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+          </div>
+        </div>
+      )}
 
       <FadeInSection>
         <section className="section-padding bg-gray-50 dark:bg-gray-900">
