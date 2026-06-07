@@ -54,6 +54,7 @@ function App() {
   return (
     <ThemeProvider>
     <ToastProvider>
+    <a href="#main-content" className="skip-link">Skip to main content</a>
     <Routes>
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/forgot-password" element={<ForgotPassword />} />

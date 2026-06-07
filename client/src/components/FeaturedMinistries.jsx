@@ -1,5 +1,6 @@
 import { FaBaby, FaGuitar, FaUsers, FaHandsHelping, FaBook, FaPrayingHands } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import FadeInSection from './FadeInSection';
 
 const ministries = [
   {
@@ -7,7 +8,6 @@ const ministries = [
     title: "Children's Ministry",
     description: "Nurturing faith from an early age",
     icon: FaBaby,
-    color: "bg-primary",
     link: "/events"
   },
   {
@@ -15,7 +15,6 @@ const ministries = [
     title: "Young Adults (CHAMPIONS)",
     description: "Empowering the next generation",
     icon: FaUsers,
-    color: "bg-primary",
     link: "/events"
   },
   {
@@ -23,7 +22,6 @@ const ministries = [
     title: "Worship Ministry",
     description: "Leading people to God's presence",
     icon: FaGuitar,
-    color: "bg-primary",
     link: "/sermons"
   },
   {
@@ -31,7 +29,6 @@ const ministries = [
     title: "Outreach",
     description: "Serving our community",
     icon: FaHandsHelping,
-    color: "bg-primary",
     link: "/donations"
   },
   {
@@ -39,7 +36,6 @@ const ministries = [
     title: "Bible Study",
     description: "Growing together in God's Word",
     icon: FaBook,
-    color: "bg-primary",
     link: "/small-groups"
   },
   {
@@ -47,39 +43,39 @@ const ministries = [
     title: "Prayer Ministry",
     description: "Standing in faith together",
     icon: FaPrayingHands,
-    color: "bg-primary",
     link: "/prayer"
   }
 ];
 
 const FeaturedMinistries = () => {
   return (
-    <section className="py-16 bg-gray-50">
+    <FadeInSection>
+    <section className="section-padding bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-primary mb-4">Our Ministries</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-primary mb-4 font-display">Our Ministries</h2>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Discover ways to get involved and grow in your faith through our various ministries
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ministries.map((ministry) => {
             const Icon = ministry.icon;
             return (
-              <Link 
-                key={ministry.id} 
+              <Link
+                key={ministry.id}
                 to={ministry.link}
-                className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="card overflow-hidden group"
               >
-                <div className={`${ministry.color} p-6 text-white`}>
+                <div className="bg-primary p-6 text-white group-hover:bg-primary-dark transition-colors duration-300">
                   <Icon className="text-4xl mx-auto" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-primary mb-2">
+                  <h3 className="text-xl font-bold text-primary mb-2 font-display">
                     {ministry.title}
                   </h3>
-                  <p className="text-gray-600">{ministry.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{ministry.description}</p>
                 </div>
               </Link>
             );
@@ -87,6 +83,7 @@ const FeaturedMinistries = () => {
         </div>
       </div>
     </section>
+    </FadeInSection>
   );
 };
 

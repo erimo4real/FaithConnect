@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
+  const { theme, toggleTheme } = useTheme();
 
   const linkClass = (path) =>
-    `text-sm font-medium transition-colors ${
+    `text-sm font-medium transition-colors duration-200 ${
       location.pathname === path ? 'text-white' : 'text-white/70 hover:text-white'
     }`;
 
@@ -23,12 +25,12 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="bg-primary text-white shadow-lg">
+    <nav className="bg-primary dark:bg-[#1e3a8a] text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-3">
             <img src="/churchlogo.png" alt="Bethel Church" className="h-10 w-auto" />
-            <span className="font-bold text-lg">Bethel Church</span>
+            <span className="font-bold text-lg font-display">Bethel Church</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
@@ -40,9 +42,24 @@ export default function Navbar() {
                 Admin
               </Link>
             )}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-white/20 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+              )}
+            </button>
           </div>
 
-          <button onClick={() => setMobileOpen(true)} className="md:hidden p-2 rounded-lg hover:bg-white/20 transition-colors">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden p-2 rounded-lg hover:bg-white/20 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+            aria-label="Open navigation menu"
+          >
             <HiOutlineMenu className="w-6 h-6" />
           </button>
         </div>
@@ -50,11 +67,18 @@ export default function Navbar() {
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-72 bg-primary shadow-2xl">
+          <div
+            className="absolute inset-0 bg-black/50 animate-fade-in"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-72 bg-primary dark:bg-[#1e3a8a] shadow-2xl animate-slide-up">
             <div className="flex items-center justify-between px-4 h-16 border-b border-white/20">
-              <span className="font-bold text-lg">Menu</span>
-              <button onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-white/20 transition-colors">
+              <span className="font-bold text-lg font-display">Menu</span>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="p-2 rounded-lg hover:bg-white/20 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+                aria-label="Close navigation menu"
+              >
                 <HiOutlineX className="w-6 h-6" />
               </button>
             </div>
@@ -64,7 +88,7 @@ export default function Navbar() {
                   key={l.to}
                   to={l.to}
                   onClick={() => setMobileOpen(false)}
-                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors min-h-[48px] flex items-center ${
                     location.pathname === l.to ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
                 >
@@ -75,11 +99,23 @@ export default function Navbar() {
                 <Link
                   to="/admin"
                   onClick={() => setMobileOpen(false)}
-                  className="block px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors mt-2 border-t border-white/20 pt-4"
+                  className="block px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors mt-2 border-t border-white/20 pt-4 min-h-[48px] flex items-center"
                 >
                   Admin Panel
                 </Link>
               )}
+              <button
+                onClick={() => { toggleTheme(); setMobileOpen(false); }}
+                className="w-full px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors min-h-[48px] flex items-center gap-3"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                )}
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </button>
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import Newsletter from '../components/Newsletter';
 import WhatToExpect from '../components/WhatToExpect';
 import SocialFeed from '../components/SocialFeed';
 import GoogleMap from '../components/GoogleMap';
+import FadeInSection from '../components/FadeInSection';
 import { FaPlay, FaCalendarAlt } from 'react-icons/fa';
 import { fetchSermons, fetchEvents, fetchCurrentStream } from '../services/api';
 
@@ -156,11 +157,11 @@ const Home = () => {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white px-4">
-                <h1 className="text-4xl md:text-6xl font-bold mb-4">{slide.title}</h1>
-                <p className="text-xl md:text-2xl mb-2 text-secondary font-semibold">{slide.subtitle}</p>
-                <p className="text-lg mb-8 max-w-2xl mx-auto">{slide.description}</p>
-                <div className="flex flex-wrap justify-center gap-4">
+              <div className="text-center text-white px-4 max-w-4xl">
+                <h1 className="text-4xl md:text-6xl font-bold mb-4 font-display animate-fade-in-up">{slide.title}</h1>
+                <p className="text-xl md:text-2xl mb-2 text-secondary font-semibold animate-fade-in-up animation-delay-100">{slide.subtitle}</p>
+                <p className="text-lg mb-8 max-w-2xl mx-auto animate-fade-in-up animation-delay-200">{slide.description}</p>
+                <div className="flex flex-wrap justify-center gap-4 animate-fade-in-up animation-delay-300">
                   <Link
                     to={slide.link}
                     className="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-opacity inline-block shadow-lg"
@@ -214,10 +215,11 @@ const Home = () => {
       {/* <StatsCounter /> */}
       <WhatToExpect />
 
-      <section className="py-16 bg-gray-50">
+      <FadeInSection>
+      <section className="section-padding bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold text-primary">Upcoming Events</h2>
+            <h2 className="text-3xl font-bold text-primary font-display">Upcoming Events</h2>
             <Link to="/events" className="text-orange font-semibold hover:underline flex items-center gap-2">
               View All <FaCalendarAlt />
             </Link>
@@ -229,42 +231,33 @@ const Home = () => {
               <p className="text-gray-400 col-span-full text-center py-8">No upcoming events.</p>
             ) : (
               upcomingEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <div key={event.id}>
+                  <EventCard event={event} />
+                </div>
               ))
             )}
           </div>
         </div>
       </section>
+      </FadeInSection>
 
-      <FeaturedMinistries />
+      <FadeInSection><FeaturedMinistries /></FadeInSection>
 
-      {/* <section className="py-16">
+      <FadeInSection><SocialFeed /></FadeInSection>
+
+      <FadeInSection><GoogleMap /></FadeInSection>
+
+      <FadeInSection>
+      <section className="section-padding bg-gradient-to-r from-primary to-primary/80 text-white text-center">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary text-center mb-4">Featured Sermon</h2>
-          <p className="text-gray-600 text-center mb-12">Latest message from our pastors</p>
-          <div className="max-w-2xl mx-auto">
-            <SermonCard sermon={featuredSermon} />
-          </div>
-        </div>
-      </section> */}
-
-      {/* <TestimonialsSlider /> */}
-
-      {/* <Newsletter /> */}
-
-      <SocialFeed />
-
-      <GoogleMap />
-
-      <section className="py-16 bg-gradient-to-r from-primary to-primary/80 text-white text-center">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
+          <h2 className="text-3xl font-bold mb-4 font-display">Join Our Community</h2>
           <p className="text-xl mb-8">We'd love to welcome you to BETHEL CHURCH</p>
-          <Link to="/contact" className="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-opacity">
+          <Link to="/contact" className="bg-white text-primary font-bold py-3 px-8 rounded-lg hover:bg-white/90 transition-all duration-200 hover:-translate-y-0.5 inline-block shadow-lg min-h-[48px]">
             Get In Touch
           </Link>
         </div>
       </section>
+      </FadeInSection>
     </div>
   );
 };
