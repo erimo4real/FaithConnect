@@ -45,10 +45,10 @@ export default function AdminStreams() {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
         <div className="px-4 lg:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 shrink-0">{items.length} streams</p>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <input placeholder="Search..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="flex-1 sm:w-48 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
-            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium min-h-[44px]">
-            <HiOutlinePlus className="w-4 h-4" /> {showForm ? 'Cancel' : 'Add Stream'}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input placeholder="Search..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="min-w-0 flex-1 sm:w-48 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
+            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="shrink-0 flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium min-h-[44px]">
+            <HiOutlinePlus className="w-4 h-4" /> <span className="hidden sm:inline">{showForm ? 'Cancel' : 'Add Stream'}</span>
           </button>
           </div>
         </div>
@@ -71,7 +71,7 @@ export default function AdminStreams() {
                   <span>Live now</span>
                 </label>
               </div>
-              <button type="submit" disabled={submitting} className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50">{submitting ? 'Saving...' : editId ? 'Update' : 'Create'}</button>
+              <button type="submit" disabled={submitting} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]">{submitting ? 'Saving...' : editId ? 'Update' : 'Create'}</button>
             </form>
           </div>
         )}
@@ -118,11 +118,11 @@ export default function AdminStreams() {
                 </table>
               </div>
               {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 mt-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-gray-700 mt-4">
                   <p className="text-sm text-gray-400 dark:text-gray-500">Page {page} of {totalPages}</p>
                   <div className="flex gap-2">
-                    <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Previous</button>
-                    <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Next</button>
+                    <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]">Previous</button>
+                    <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]">Next</button>
                   </div>
                 </div>
               )}
