@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchStreamArchive } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
-import { FaPlay, FaClock, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { FaPlay, FaFacebook, FaYoutube } from 'react-icons/fa';
 import FadeInSection from '../components/FadeInSection';
 
 function getYoutubeId(url) {
@@ -10,11 +10,32 @@ function getYoutubeId(url) {
   return m ? m[1] : null;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 export default function PastStreams() {
   const [items, setItems] = useState([]);
+  const [thumbnails, setThumbnails] = useState({});
 
   useEffect(() => {
-    fetchStreamArchive().then(setItems).catch(() => {});
+    fetchStreamArchive().then(async (data) => {
+      setItems(data);
+      const fbItems = data.filter(s => s.youtube_url?.includes('facebook.com'));
+      if (fbItems.length === 0) return;
+      const results = await Promise.allSettled(
+        fbItems.map(s =>
+          fetch(`${API_URL}/streams/thumbnail?url=${encodeURIComponent(s.youtube_url)}`)
+            .then(r => r.json())
+            .then(d => ({ id: s.id, url: d.thumbnail }))
+        )
+      );
+      const map = {};
+      for (const r of results) {
+        if (r.status === 'fulfilled' && r.value.url) {
+          map[r.value.id] = r.value.url;
+        }
+      }
+      setThumbnails(map);
+    }).catch(() => {});
   }, []);
 
   return (
@@ -41,6 +62,7 @@ export default function PastStreams() {
                 {items.map((s) => {
                   const videoId = getYoutubeId(s.youtube_url);
                   const isFacebook = s.youtube_url?.includes('facebook.com');
+                  const fbThumb = thumbnails[s.id];
                   return (
                     <div key={s.id} className="card overflow-hidden border border-gray-100 dark:border-gray-700">
                       <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="block relative aspect-video bg-gray-900 group">
@@ -49,15 +71,25 @@ export default function PastStreams() {
                             src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
                             alt={s.title}
                             className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : fbThumb ? (
+                          <img
+                            src={fbThumb}
+                            alt={s.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
                           />
                         ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-2">
-                            {isFacebook ? <FaFacebook className="text-4xl text-blue-500" /> : <FaClock className="text-4xl" />}
-                            <span className="text-xs">{isFacebook ? 'Facebook Video' : 'No preview'}</span>
+                          <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4">
+                            <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center">
+                              <FaFacebook className="text-3xl text-blue-500" />
+                            </div>
+                            <p className="text-gray-500 text-xs text-center">Facebook Video</p>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center">
+                          <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
                             <FaPlay className="text-white text-xl ml-1" />
                           </div>
                         </div>
@@ -68,7 +100,7 @@ export default function PastStreams() {
                           {isFacebook ? <><FaFacebook className="text-blue-500" /> Facebook</> : <><FaYoutube className="text-red-500" /> YouTube</>}
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(s.activated_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                          {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       </div>
                     </div>

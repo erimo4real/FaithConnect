@@ -47,12 +47,31 @@ router.get('/upcoming', async (req, res) => {
 router.get('/archive', async (req, res) => {
   try {
     const result = await query(
-      'SELECT * FROM stream_logs ORDER BY deactivated_at DESC LIMIT 20'
+      'SELECT * FROM stream_logs ORDER BY deactivated_at DESC LIMIT 50'
     );
     res.json(result.rows);
   } catch (err) {
     logger.error({ err }, 'Failed to list stream archive');
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/thumbnail', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).json({ error: 'Missing url param' });
+    if (!url.includes('facebook.com')) {
+      return res.json({ thumbnail: null });
+    }
+    const fbRes = await fetch(`https://www.facebook.com/plugins/video/oembed.json/?url=${encodeURIComponent(url)}`, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await fbRes.json();
+    res.json({ thumbnail: data.thumbnail_url || null, title: data.title || null });
+  } catch (err) {
+    logger.error({ err }, 'Failed to fetch Facebook thumbnail');
+    res.json({ thumbnail: null });
   }
 });
 
