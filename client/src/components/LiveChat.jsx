@@ -17,7 +17,7 @@ const LiveChat = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 animate-slide-in-right">
       {isOpen && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-[calc(100vw-2rem)] sm:w-80 border border-gray-100 dark:border-gray-700 overflow-hidden animate-fade-in-up">
           <div className="bg-primary p-4 flex items-center justify-between">
