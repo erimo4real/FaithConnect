@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import FadeInSection from '../components/FadeInSection';
 
 const StaffDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,71 +32,77 @@ const StaffDirectory = () => {
 
   return (
     <div>
-      <section className="bg-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Staff Directory</h1>
-          <p className="text-xl">Meet our dedicated team</p>
-        </div>
-      </section>
+      <FadeInSection>
+        <section className="bg-primary text-white py-20">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold font-display mb-4">Staff Directory</h1>
+            <p className="text-xl">Meet our dedicated team</p>
+          </div>
+        </section>
+      </FadeInSection>
 
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex-1 min-w-[200px]">
-              <input
-                type="text"
-                placeholder="Search by name or role..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-              />
-            </div>
-            <div>
-              <select
-                value={departmentFilter}
-                onChange={(e) => setDepartmentFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-              >
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>
-                    {dept === 'all' ? 'All Departments' : dept}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="text-gray-500">
-              Showing {filteredStaff.length} staff members
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-wrap gap-4 items-center">
+              <div className="flex-1 min-w-[200px]">
+                <input
+                  type="text"
+                  placeholder="Search by name or role..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary dark:bg-gray-800 dark:text-gray-100"
+                />
+              </div>
+              <div>
+                <select
+                  value={departmentFilter}
+                  onChange={(e) => setDepartmentFilter(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary dark:bg-gray-800 dark:text-gray-100"
+                >
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>
+                      {dept === 'all' ? 'All Departments' : dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="text-gray-500 dark:text-gray-400">
+                Showing {filteredStaff.length} staff members
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredStaff.map((member) => (
-              <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                    {member.department}
-                  </span>
-                  <h3 className="font-bold text-primary mt-2">{member.name}</h3>
-                  <p className="text-gray-600 text-sm">{member.role}</p>
-                  <div className="mt-3 pt-3 border-t space-y-1 text-sm">
-                    <p className="flex items-center gap-2"><FaEnvelope className="text-secondary" /> <a href={`mailto:${member.email}`} className="text-secondary hover:underline">{member.email}</a></p>
-                    <p className="flex items-center gap-2"><FaPhone className="text-secondary" /> <a href={`tel:${member.phone}`} className="text-secondary hover:underline">{member.phone}</a></p>
+      <FadeInSection>
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredStaff.map((member) => (
+                <div key={member.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                      {member.department}
+                    </span>
+                    <h3 className="font-bold text-primary mt-2">{member.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">{member.role}</p>
+                    <div className="mt-3 pt-3 border-t space-y-1 text-sm">
+                      <p className="flex items-center gap-2"><FaEnvelope className="text-secondary" /> <a href={`mailto:${member.email}`} className="text-secondary hover:underline">{member.email}</a></p>
+                      <p className="flex items-center gap-2"><FaPhone className="text-secondary" /> <a href={`tel:${member.phone}`} className="text-secondary hover:underline">{member.phone}</a></p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
     </div>
   );
 };

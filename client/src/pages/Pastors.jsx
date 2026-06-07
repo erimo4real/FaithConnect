@@ -1,4 +1,5 @@
 import { FaEnvelope } from 'react-icons/fa';
+import FadeInSection from '../components/FadeInSection';
 
 const Pastors = () => {
   const leaders = [
@@ -74,12 +75,13 @@ const Pastors = () => {
         </div>
       </section>
 
-      <section className="py-16">
+      <FadeInSection>
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary text-center mb-12">Pastoral Leadership</h2>
+          <h2 className="text-3xl font-bold text-primary font-display text-center mb-12">Pastoral Leadership</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {leaders.map((leader) => (
-              <div key={leader.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div key={leader.id} className="card overflow-hidden">
                 <div className="relative">
                   <img
                     src={leader.image}
@@ -91,13 +93,13 @@ const Pastors = () => {
                     <p className="text-secondary">{leader.role}</p>
                   </div>
                 </div>
-                <div className="p-6">
+                <div className="p-6 dark:bg-gray-800 dark:text-gray-100">
                   <div className="mb-4">
                     <span className="bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded">
                       {leader.ministry}
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-4">{leader.bio}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">{leader.bio}</p>
                   <a
                     href={`mailto:${leader.email}`}
                     className="text-secondary hover:underline flex items-center gap-2"
@@ -110,30 +112,34 @@ const Pastors = () => {
           </div>
         </div>
       </section>
+      </FadeInSection>
 
-      <section className="py-16 bg-gray-50">
+      <FadeInSection>
+      <section className="section-padding bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary text-center mb-12">Church Staff</h2>
+          <h2 className="text-3xl font-bold text-primary font-display text-center mb-12">Church Staff</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {staff.map((member, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-6 text-center">
+              <div key={index} className="card p-6 text-center dark:bg-gray-800 dark:text-gray-100">
                 <img
                   src={member.image}
                   alt={member.name}
                   className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
                 />
                 <h3 className="font-bold text-primary">{member.name}</h3>
-                <p className="text-gray-500">{member.role}</p>
+                <p className="text-gray-500 dark:text-gray-400">{member.role}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+      </FadeInSection>
 
-      <section className="py-16">
+      <FadeInSection>
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-4">Join Our Team</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-primary font-display mb-4">Join Our Team</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
             We're always looking for dedicated individuals to join our ministry team. 
             Whether you're called to pastoral ministry, music, children's work, or support roles, 
             we'd love to hear from you.
@@ -146,6 +152,7 @@ const Pastors = () => {
           </a>
         </div>
       </section>
+      </FadeInSection>
     </div>
   );
 };

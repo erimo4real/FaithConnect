@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import FadeInSection from '../components/FadeInSection';
 
 const Testimonials = () => {
   const [formData, setFormData] = useState({
@@ -81,11 +82,12 @@ const Testimonials = () => {
         </div>
       </section>
 
-      <section className="py-16">
+      <FadeInSection>
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="bg-white rounded-lg shadow-lg p-6">
+              <div key={testimonial.id} className="card p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <img
                     src={testimonial.image}
@@ -94,7 +96,7 @@ const Testimonials = () => {
                   />
                   <div>
                     <h3 className="font-bold text-primary">{testimonial.name}</h3>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
                   </div>
                 </div>
                 <div className="flex gap-1 mb-3">
@@ -108,11 +110,13 @@ const Testimonials = () => {
           </div>
         </div>
       </section>
+      </FadeInSection>
 
-      <section className="py-16 bg-gray-50">
+      <FadeInSection>
+      <section className="section-padding bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-4">Share Your Story</h2>
-          <p className="text-gray-600 mb-8">Has BETHEL CHURCH made a difference in your life? We'd love to hear your testimony!</p>
+          <h2 className="text-3xl font-bold text-primary font-display mb-4">Share Your Story</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">Has BETHEL CHURCH made a difference in your life? We'd love to hear your testimony!</p>
           
           {submitted ? (
             <div className="max-w-md mx-auto bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -170,30 +174,33 @@ const Testimonials = () => {
           )}
         </div>
       </section>
+      </FadeInSection>
 
-      <section className="py-16">
+      <FadeInSection>
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-8">What Our Community Says</h2>
+          <h2 className="text-3xl font-bold text-primary font-display mb-8">What Our Community Says</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="p-6">
               <div className="text-4xl font-bold text-secondary mb-2">500+</div>
-              <div className="text-gray-600">Active Members</div>
+              <div className="text-gray-600 dark:text-gray-400">Active Members</div>
             </div>
             <div className="p-6">
               <div className="text-4xl font-bold text-secondary mb-2">50+</div>
-              <div className="text-gray-600">Volunteers</div>
+              <div className="text-gray-600 dark:text-gray-400">Volunteers</div>
             </div>
             <div className="p-6">
               <div className="text-4xl font-bold text-secondary mb-2">100+</div>
-              <div className="text-gray-600">Testimonies Shared</div>
+              <div className="text-gray-600 dark:text-gray-400">Testimonies Shared</div>
             </div>
             <div className="p-6">
               <div className="text-4xl font-bold text-secondary mb-2">15+</div>
-              <div className="text-gray-600">Years of Ministry</div>
+              <div className="text-gray-600 dark:text-gray-400">Years of Ministry</div>
             </div>
           </div>
         </div>
       </section>
+      </FadeInSection>
     </div>
   );
 };

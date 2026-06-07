@@ -3,6 +3,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import { FaTimes, FaShareAlt } from 'react-icons/fa';
 import { fetchBlogPosts } from '../services/api';
 import DOMPurify from 'dompurify';
+import FadeInSection from '../components/FadeInSection';
 
 const Blog = () => {
   const [posts, setPosts] = useState([]);
@@ -44,67 +45,71 @@ const Blog = () => {
 
       <Breadcrumbs items={[{ label: 'Blog', link: '/blog' }]} />
 
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-5 py-2 rounded-full font-semibold transition-colors ${
-                   selectedCategory === cat
-                    ? 'bg-primary text-white'
-                    : 'bg-white text-gray-700 hover:bg-primary hover:text-white'
-                }`}
-              >
-                {cat === 'all' ? 'All Posts' : cat}
-              </button>
-            ))}
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-wrap justify-center gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-5 py-2 rounded-full font-semibold transition-colors ${
+                     selectedCategory === cat
+                      ? 'bg-primary text-white'
+                      : 'bg-white text-gray-700 hover:bg-primary hover:text-white dark:bg-gray-800 dark:text-gray-300'
+                  }`}
+                >
+                  {cat === 'all' ? 'All Posts' : cat}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          {loading ? (
-            <p className="text-gray-400 text-center py-8">Loading posts...</p>
-          ) : filteredPosts.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">No posts yet.</p>
-          ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post) => (
-              <div
-                key={post.id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer group"
-                onClick={() => setSelectedPost(post)}
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full aspect-video object-cover transform group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
-                      {post.category}
-                    </span>
+      <FadeInSection>
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto px-4">
+            {loading ? (
+              <p className="text-gray-400 text-center py-8">Loading posts...</p>
+            ) : filteredPosts.length === 0 ? (
+              <p className="text-gray-400 text-center py-8">No posts yet.</p>
+            ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="card overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer group"
+                  onClick={() => setSelectedPost(post)}
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full aspect-video object-cover transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2 left-2">
+                      <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
+                        {post.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-secondary transition-colors">{post.title}</h3>
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      <span>{post.author}</span>
+                      <span className="mx-2">•</span>
+                      <span>{formatDate(post.date)}</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 line-clamp-2">{post.excerpt}</p>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-secondary transition-colors">{post.title}</h3>
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
-                    <span>{post.author}</span>
-                    <span className="mx-2">•</span>
-                    <span>{formatDate(post.date)}</span>
-                  </div>
-                  <p className="text-gray-600 line-clamp-2">{post.excerpt}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            )}
           </div>
-          )}
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
       {selectedPost && (
         <div
@@ -134,8 +139,8 @@ const Blog = () => {
               </div>
             </div>
             <div className="p-8">
-              <h2 className="text-2xl font-bold text-primary mb-2">{selectedPost.title}</h2>
-              <div className="flex items-center text-gray-500 mb-4">
+              <h2 className="text-2xl font-bold font-display text-primary mb-2">{selectedPost.title}</h2>
+              <div className="flex items-center text-gray-500 dark:text-gray-400 mb-4">
                 <span>By {selectedPost.author}</span>
                 <span className="mx-2">•</span>
                 <span>{formatDate(selectedPost.date)}</span>
@@ -151,26 +156,28 @@ const Blog = () => {
         </div>
       )}
 
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-primary mb-4">Subscribe to Our Newsletter</h2>
-          <p className="text-gray-600 mb-6">Get the latest blog posts and church updates delivered to your inbox</p>
-          <form className="max-w-md mx-auto flex gap-3">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              required
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h2 className="text-2xl font-bold font-display text-primary mb-4">Subscribe to Our Newsletter</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Get the latest blog posts and church updates delivered to your inbox</p>
+            <form className="max-w-md mx-auto flex gap-3">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                required
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <button
+                type="submit"
+                className="bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </section>
+      </FadeInSection>
     </div>
   );
 };

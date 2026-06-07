@@ -1,5 +1,6 @@
 import { FaHeart, FaBible, FaUsers, FaGlobe, FaPlay, FaArrowRight, FaEnvelope } from 'react-icons/fa';
 import Breadcrumbs from '../components/Breadcrumbs';
+import FadeInSection from '../components/FadeInSection';
 
 const About = () => {
   const leadership = [
@@ -47,80 +48,86 @@ const About = () => {
       
       <Breadcrumbs items={[{ label: 'About' }]} />
 
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-primary mb-6">Our Mission</h2>
-            <p className="text-lg text-gray-700 leading-relaxed mb-6">
-              At BETHEL CHURCH, our mission is to connect people to God and to each other. 
-              We believe that church should be a place where everyone feels welcome, 
-              regardless of their background or where they are in their spiritual journey.
-            </p>
-            <p className="text-lg text-gray-700 leading-relaxed">
-              Our vision is to see lives transformed by the love of Christ, families restored, 
-              and communities changed through the power of the Gospel.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary mb-12 text-center">Our Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
-              <FaHeart className="text-5xl text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-primary mb-2">Love</h3>
-              <p className="text-gray-600">We show God's love to everyone</p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
-              <FaBible className="text-5xl text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-primary mb-2">Truth</h3>
-              <p className="text-gray-600">We teach God's Word with excellence</p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
-              <FaUsers className="text-5xl text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-primary mb-2">Community</h3>
-              <p className="text-gray-600">We build authentic relationships</p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
-              <FaGlobe className="text-5xl text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-primary mb-2">Mission</h3>
-              <p className="text-gray-600">We reach our community and beyond</p>
+      <FadeInSection>
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl font-bold font-display text-primary mb-6">Our Mission</h2>
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                At BETHEL CHURCH, our mission is to connect people to God and to each other. 
+                We believe that church should be a place where everyone feels welcome, 
+                regardless of their background or where they are in their spiritual journey.
+              </p>
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                Our vision is to see lives transformed by the love of Christ, families restored, 
+                and communities changed through the power of the Gospel.
+              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-primary mb-12 text-center">Leadership Team</h2>
-          <div className="flex flex-wrap justify-center gap-8">
-            {leadership.map((leader, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow w-full max-w-2xl">
-                <div className="relative bg-gray-100">
-                  <img
-                    src={leader.image}
-                    alt={leader.name}
-                    className="w-full h-[300px] md:h-[500px] object-cover object-top"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-white font-bold text-2xl mb-1">{leader.name}</h3>
-                    <p className="text-secondary text-lg font-medium">{leader.role}</p>
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl font-bold font-display text-primary mb-12 text-center">Our Values</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="card p-8 text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
+                <FaHeart className="text-5xl text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-primary mb-2">Love</h3>
+                <p className="text-gray-600 dark:text-gray-400">We show God's love to everyone</p>
+              </div>
+              <div className="card p-8 text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
+                <FaBible className="text-5xl text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-primary mb-2">Truth</h3>
+                <p className="text-gray-600 dark:text-gray-400">We teach God's Word with excellence</p>
+              </div>
+              <div className="card p-8 text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
+                <FaUsers className="text-5xl text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-primary mb-2">Community</h3>
+                <p className="text-gray-600 dark:text-gray-400">We build authentic relationships</p>
+              </div>
+              <div className="card p-8 text-center hover:shadow-xl transition-shadow border-t-4 border-primary">
+                <FaGlobe className="text-5xl text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-primary mb-2">Mission</h3>
+                <p className="text-gray-600 dark:text-gray-400">We reach our community and beyond</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <FadeInSection>
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl font-bold font-display text-primary mb-12 text-center">Leadership Team</h2>
+            <div className="flex flex-wrap justify-center gap-8">
+              {leadership.map((leader, index) => (
+                <div key={index} className="card overflow-hidden hover:shadow-2xl transition-shadow w-full max-w-2xl">
+                  <div className="relative bg-gray-100">
+                    <img
+                      src={leader.image}
+                      alt={leader.name}
+                      className="w-full h-[300px] md:h-[500px] object-cover object-top"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-white font-bold text-2xl mb-1">{leader.name}</h3>
+                      <p className="text-secondary text-lg font-medium">{leader.role}</p>
+                    </div>
+                  </div>
+                  <div className="p-6 bg-gradient-to-b from-white to-gray-50">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">{leader.bio}</p>
+                    <a href={`mailto:${leader.email}`} className="text-primary font-semibold hover:text-primary/80 transition-colors">
+                      <FaEnvelope className="inline mr-2" />{leader.email}
+                    </a>
                   </div>
                 </div>
-                <div className="p-6 bg-gradient-to-b from-white to-gray-50">
-                  <p className="text-gray-700 leading-relaxed mb-4">{leader.bio}</p>
-                  <a href={`mailto:${leader.email}`} className="text-primary font-semibold hover:text-primary/80 transition-colors">
-                    <FaEnvelope className="inline mr-2" />{leader.email}
-                  </a>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
       {/* <section className="py-16 bg-primary text-white">
         <div className="max-w-7xl mx-auto px-4">

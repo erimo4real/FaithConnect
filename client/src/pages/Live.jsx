@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchCurrentStream, fetchUpcomingStreams, fetchStreamArchive } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { FaBroadcastTower, FaCalendarAlt, FaClock } from 'react-icons/fa';
+import FadeInSection from '../components/FadeInSection';
 
 function getEmbedUrl(url) {
   if (!url) return '';
@@ -72,7 +73,7 @@ const Live = () => {
 
       <Breadcrumbs items={[{ label: 'Live Stream', link: '/live' }]} />
 
-      <section className="py-8">
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
             <div className="relative">
@@ -152,49 +153,51 @@ const Live = () => {
         </div>
       </section>
 
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-center gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md flex-1 max-w-md">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
-                  <FaCalendarAlt className="text-secondary text-xl" />
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-center gap-6">
+              <div className="card p-6 flex-1 max-w-md">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                    <FaCalendarAlt className="text-secondary text-xl" />
+                  </div>
+                  <h3 className="text-lg font-display font-bold text-primary">Stream Schedule</h3>
                 </div>
-                <h3 className="text-lg font-bold text-primary">Stream Schedule</h3>
+                <div className="space-y-3">
+                  {loadingUpcoming ? (
+                    <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-4">Loading schedule...</p>
+                  ) : upcoming.length === 0 ? (
+                    <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-4">No upcoming streams scheduled</p>
+                  ) : (
+                    upcoming.map((s) => (
+                      <div key={s.id} className="flex justify-between text-gray-600 dark:text-gray-400">
+                        <span>{new Date(s.scheduled_date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })} - {s.title}</span>
+                        <span className="font-semibold">{s.scheduled_time?.slice(0, 5)}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
-              <div className="space-y-3">
-                {loadingUpcoming ? (
-                  <p className="text-gray-400 text-sm text-center py-4">Loading schedule...</p>
-                ) : upcoming.length === 0 ? (
-                  <p className="text-gray-400 text-sm text-center py-4">No upcoming streams scheduled</p>
-                ) : (
-                  upcoming.map((s) => (
-                    <div key={s.id} className="flex justify-between text-gray-600">
-                      <span>{new Date(s.scheduled_date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })} - {s.title}</span>
-                      <span className="font-semibold">{s.scheduled_time?.slice(0, 5)}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-md flex-1 max-w-md">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
-                  <FaClock className="text-secondary text-xl" />
+              <div className="card p-6 flex-1 max-w-md">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                    <FaClock className="text-secondary text-xl" />
+                  </div>
+                  <h3 className="text-lg font-display font-bold text-primary">Past Streams</h3>
                 </div>
-                <h3 className="text-lg font-bold text-primary">Past Streams</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Missed a service? Watch our archive anytime.
+                </p>
+                <a href="/past-streams" className="text-secondary font-semibold hover:underline">
+                  View Archive →
+                </a>
               </div>
-              <p className="text-gray-600 mb-4">
-                Missed a service? Watch our archive anytime.
-              </p>
-              <a href="/past-streams" className="text-secondary font-semibold hover:underline">
-                View Archive →
-              </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
     </div>
   );
 };

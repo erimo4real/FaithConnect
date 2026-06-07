@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import FadeInSection from '../components/FadeInSection';
 
 const Shop = () => {
   const [cart, setCart] = useState([]);
@@ -85,42 +86,46 @@ const Shop = () => {
 
   return (
     <div>
-      <section className="bg-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Shop</h1>
-          <p className="text-xl">Faith-themed merchandise and resources</p>
-        </div>
-      </section>
+      <FadeInSection>
+        <section className="bg-primary text-white py-20">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold mb-4">Shop</h1>
+            <p className="text-xl">Faith-themed merchandise and resources</p>
+          </div>
+        </section>
+      </FadeInSection>
 
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full aspect-video object-cover"
-                />
-                <div className="p-4">
-                  <span className="text-xs text-gray-500">{product.category}</span>
-                  <h3 className="text-lg font-bold text-primary">{product.name}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{product.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-secondary">${product.price}</span>
-                    <button
-                      onClick={() => addToCart(product)}
-                       className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors"
-                    >
-                      Add to Cart
-                    </button>
+      <FadeInSection>
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <div key={product.id} className="card overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full aspect-video object-cover"
+                  />
+                  <div className="p-4">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{product.category}</span>
+                    <h3 className="text-lg font-bold text-primary">{product.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{product.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl font-bold text-secondary">${product.price}</span>
+                      <button
+                        onClick={() => addToCart(product)}
+                         className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
       <div className="fixed bottom-4 right-4 sm:bottom-20 sm:right-4">
         <button
@@ -199,15 +204,17 @@ const Shop = () => {
         </div>
       )}
 
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-4">Proceeds Support Ministry</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            All purchases from our shop support BETHEL CHURCH's ongoing ministry programs, 
-            including community outreach, young adults programs, and missions. Thank you for your support!
-          </p>
-        </div>
-      </section>
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold font-display text-primary mb-4">Proceeds Support Ministry</h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              All purchases from our shop support BETHEL CHURCH's ongoing ministry programs, 
+              including community outreach, young adults programs, and missions. Thank you for your support!
+            </p>
+          </div>
+        </section>
+      </FadeInSection>
     </div>
   );
 };

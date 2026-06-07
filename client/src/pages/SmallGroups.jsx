@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers } from 'react-icons/fa';
+import FadeInSection from '../components/FadeInSection';
 
 const SmallGroups = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -142,74 +143,80 @@ const SmallGroups = () => {
 
   return (
     <div>
-      <section className="bg-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Small Groups</h1>
-          <p className="text-xl">Connect, grow, and fellowship in a smaller community</p>
-        </div>
-      </section>
-
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-6 py-2 rounded-full font-semibold transition-colors ${
-                  selectedCategory === cat.id
-                    ? 'bg-primary text-white'
-                    : 'bg-white text-gray-700 hover:bg-secondary hover:text-primary'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+      <FadeInSection>
+        <section className="bg-primary text-white py-20">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold mb-4">Small Groups</h1>
+            <p className="text-xl">Connect, grow, and fellowship in a smaller community</p>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredGroups.map((group) => (
-              <div key={group.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img
-                  src={group.image}
-                  alt={group.name}
-                  className="w-full h-40 object-cover"
-                />
-                <div className="p-6">
-                  <span className="bg-primary/10 text-primary text-xs font-semibold px-2 py-1 rounded">
-                    {categories.find(c => c.id === group.category)?.label}
-                  </span>
-                  <h3 className="text-xl font-bold text-primary mt-2 mb-1">{group.name}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{group.description}</p>
-                  
-                  <div className="space-y-1 text-sm text-gray-500 mb-4">
-                    <p className="flex items-center gap-2"><FaCalendarAlt className="text-secondary" /> {group.day} at {group.time}</p>
-                    <p className="flex items-center gap-2"><FaMapMarkerAlt className="text-secondary" /> {group.location}</p>
-                    <p className="flex items-center gap-2"><FaUsers className="text-secondary" /> Leader: {group.leader}</p>
-                    <p className="flex items-center gap-2"><FaUsers className="text-secondary" /> {group.members}/{group.maxMembers} members</p>
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-wrap justify-center gap-3">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+                    selectedCategory === cat.id
+                      ? 'bg-primary text-white'
+                      : 'bg-white text-gray-700 hover:bg-secondary hover:text-primary'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </FadeInSection>
+
+      <FadeInSection>
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredGroups.map((group) => (
+                <div key={group.id} className="card overflow-hidden">
+                  <img
+                    src={group.image}
+                    alt={group.name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-6">
+                    <span className="bg-primary/10 text-primary text-xs font-semibold px-2 py-1 rounded">
+                      {categories.find(c => c.id === group.category)?.label}
+                    </span>
+                    <h3 className="text-xl font-bold text-primary mt-2 mb-1">{group.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{group.description}</p>
+                    
+                    <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      <p className="flex items-center gap-2"><FaCalendarAlt className="text-secondary" /> {group.day} at {group.time}</p>
+                      <p className="flex items-center gap-2"><FaMapMarkerAlt className="text-secondary" /> {group.location}</p>
+                      <p className="flex items-center gap-2"><FaUsers className="text-secondary" /> Leader: {group.leader}</p>
+                      <p className="flex items-center gap-2"><FaUsers className="text-secondary" /> {group.members}/{group.maxMembers} members</p>
+                    </div>
+
+                    <button
+                      onClick={() => handleJoinClick(group)}
+                      disabled={group.members >= group.maxMembers}
+                      className={`w-full py-2 rounded-lg font-semibold transition-colors ${
+                        group.members >= group.maxMembers
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-primary text-white hover:bg-primary/90'
+                      }`}
+                    >
+                      {group.members >= group.maxMembers ? 'Group Full' : 'Join Group'}
+                    </button>
                   </div>
-
-                  <button
-                    onClick={() => handleJoinClick(group)}
-                    disabled={group.members >= group.maxMembers}
-                    className={`w-full py-2 rounded-lg font-semibold transition-colors ${
-                      group.members >= group.maxMembers
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-primary text-white hover:bg-primary/90'
-                    }`}
-                  >
-                    {group.members >= group.maxMembers ? 'Group Full' : 'Join Group'}
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeInSection>
 
       {showJoinForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -270,15 +277,17 @@ const SmallGroups = () => {
         </div>
       )}
 
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-4">Start a New Group</h2>
-          <p className="text-gray-600 mb-6">Feel called to lead? We provide training and support for new small group leaders.</p>
-          <a href="/contact" className="inline-block bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-colors">
-            Contact Us
-          </a>
-        </div>
-      </section>
+      <FadeInSection>
+        <section className="section-padding bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold font-display text-primary mb-4">Start a New Group</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Feel called to lead? We provide training and support for new small group leaders.</p>
+            <a href="/contact" className="inline-block bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-colors">
+              Contact Us
+            </a>
+          </div>
+        </section>
+      </FadeInSection>
     </div>
   );
 };
