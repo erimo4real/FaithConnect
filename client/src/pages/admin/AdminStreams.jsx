@@ -43,18 +43,18 @@ export default function AdminStreams() {
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center gap-4">
+        <div className="px-4 lg:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 shrink-0">{items.length} streams</p>
-          <div className="flex items-center gap-3">
-            <input placeholder="Search..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200 w-48" />
-            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <input placeholder="Search..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="flex-1 sm:w-48 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
+            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium min-h-[44px]">
             <HiOutlinePlus className="w-4 h-4" /> {showForm ? 'Cancel' : 'Add Stream'}
           </button>
           </div>
         </div>
 
         {showForm && (
-          <div className="p-6 border-b border-gray-100 bg-gray-50/50 dark:bg-gray-900/50">
+          <div className="p-4 lg:p-6 border-b border-gray-100 bg-gray-50/50 dark:bg-gray-900/50">
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" required />
@@ -76,39 +76,39 @@ export default function AdminStreams() {
           </div>
         )}
 
-        <div className="p-6">
+        <div className="p-4 lg:p-6">
           {loading ? <p className="text-gray-400 dark:text-gray-500 text-center py-8">Loading...</p> : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                      <th className="pb-3 pr-4">Title</th>
-                      <th className="pb-3 pr-4">Status</th>
-                      <th className="pb-3 pr-4">Date</th>
-                      <th className="pb-3 pr-4">Start</th>
-                      <th className="pb-3 pr-4">End</th>
-                      <th className="pb-3 pr-4">Repeats</th>
+                      <th className="pb-3 pr-2 lg:pr-4">Title</th>
+                      <th className="pb-3 pr-2 lg:pr-4">Status</th>
+                      <th className="pb-3 pr-2 lg:pr-4">Date</th>
+                      <th className="pb-3 pr-2 lg:pr-4">Start</th>
+                      <th className="pb-3 pr-2 lg:pr-4">End</th>
+                      <th className="pb-3 pr-2 lg:pr-4">Repeats</th>
                       <th className="pb-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paged.map((item) => (
                       <tr key={item.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <td className="py-3 pr-4 text-sm font-medium text-gray-800 dark:text-gray-100">{item.title}</td>
-                        <td className="py-3 pr-4">
+                        <td className="py-3 pr-2 lg:pr-4 text-sm font-medium text-gray-800 dark:text-gray-100">{item.title}</td>
+                        <td className="py-3 pr-2 lg:pr-4">
                           <span className={`text-xs px-2 py-1 rounded-lg font-medium ${item.is_live ? 'bg-green-100 dark:bg-green-900/30 text-green-700' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
                             {item.is_live ? 'LIVE' : 'Offline'}
                           </span>
                         </td>
-                        <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{item.scheduled_date || '-'}</td>
-                        <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{item.scheduled_time?.slice(0, 5) || '-'}</td>
-                        <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{item.end_time?.slice(0, 5) || '-'}</td>
-                        <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{item.recurring === 'weekly' ? 'Weekly' : 'Once'}</td>
+                        <td className="py-3 pr-2 lg:pr-4 text-sm text-gray-500 dark:text-gray-400">{item.scheduled_date || '-'}</td>
+                        <td className="py-3 pr-2 lg:pr-4 text-sm text-gray-500 dark:text-gray-400">{item.scheduled_time?.slice(0, 5) || '-'}</td>
+                        <td className="py-3 pr-2 lg:pr-4 text-sm text-gray-500 dark:text-gray-400">{item.end_time?.slice(0, 5) || '-'}</td>
+                        <td className="py-3 pr-2 lg:pr-4 text-sm text-gray-500 dark:text-gray-400">{item.recurring === 'weekly' ? 'Weekly' : 'Once'}</td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <button onClick={() => handleEdit(item)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><HiOutlinePencil className="w-4 h-4" /></button>
-                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
+                            <button onClick={() => handleEdit(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><HiOutlinePencil className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"><HiOutlineTrash className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
