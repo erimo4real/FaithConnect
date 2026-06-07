@@ -101,13 +101,17 @@ import { query } from './src/db.js';
 
 setInterval(async () => {
   try {
+    const tz = "AT TIME ZONE 'Africa/Lagos'";
+    const lagosDate = `(${tz})::date`;
+    const lagosTime = `(${tz})::time`;
+
     const { rows: activated } = await query(
       `UPDATE streams SET is_live = true, manually_stopped = false, last_activated_at = NOW()
        WHERE is_live = false
        AND manually_stopped = false
        AND (
-         (recurring = 'weekly' AND EXTRACT(DOW FROM scheduled_date) = EXTRACT(DOW FROM CURRENT_DATE) AND scheduled_time <= CURRENT_TIME AND (end_time IS NULL OR end_time > CURRENT_TIME))
-         OR (recurring IS NULL AND scheduled_date = CURRENT_DATE AND scheduled_time <= CURRENT_TIME AND (end_time IS NULL OR end_time > CURRENT_TIME))
+         (recurring = 'weekly' AND EXTRACT(DOW FROM scheduled_date) = EXTRACT(DOW FROM NOW() ${lagosDate}) AND scheduled_time <= NOW() ${lagosTime} AND (end_time IS NULL OR end_time > NOW() ${lagosTime}))
+         OR (recurring IS NULL AND scheduled_date = NOW() ${lagosDate} AND scheduled_time <= NOW() ${lagosTime} AND (end_time IS NULL OR end_time > NOW() ${lagosTime}))
        )
        RETURNING title`
     );
@@ -119,8 +123,8 @@ setInterval(async () => {
       `UPDATE streams SET is_live = false
        WHERE is_live = true
        AND (
-         (recurring = 'weekly' AND end_time IS NOT NULL AND end_time <= CURRENT_TIME)
-         OR (recurring IS NULL AND (scheduled_date < CURRENT_DATE OR (scheduled_date = CURRENT_DATE AND end_time IS NOT NULL AND end_time <= CURRENT_TIME)))
+         (recurring = 'weekly' AND end_time IS NOT NULL AND end_time <= NOW() ${lagosTime})
+         OR (recurring IS NULL AND (scheduled_date < NOW() ${lagosDate} OR (scheduled_date = NOW() ${lagosDate} AND end_time IS NOT NULL AND end_time <= NOW() ${lagosTime})))
        )
        RETURNING id, title, youtube_url, last_activated_at`
     );

@@ -27,16 +27,15 @@ router.get('/', async (req, res) => {
 
 router.get('/upcoming', async (req, res) => {
   try {
-    const today = new Date().toISOString().slice(0, 10);
     const result = await query(
       `SELECT * FROM streams
-       WHERE (
-         (recurring IS NULL AND (scheduled_date > $1::DATE OR (scheduled_date = $1::DATE AND scheduled_time > CURRENT_TIME)))
+       WHERE is_live = false
+       AND (
+         (recurring IS NULL AND (scheduled_date > (NOW() AT TIME ZONE 'Africa/Lagos')::date OR (scheduled_date = (NOW() AT TIME ZONE 'Africa/Lagos')::date AND scheduled_time > (NOW() AT TIME ZONE 'Africa/Lagos')::time)))
          OR (recurring = 'weekly')
        )
        ORDER BY scheduled_date, scheduled_time ASC
-       LIMIT 10`,
-      [today]
+       LIMIT 10`
     );
     res.json(result.rows);
   } catch (err) {
