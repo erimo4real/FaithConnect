@@ -11,13 +11,7 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    let result = await query("SELECT * FROM streams WHERE is_live = true ORDER BY created_at DESC LIMIT 1");
-    if (result.rows.length === 0) {
-      result = await query('SELECT * FROM streams WHERE recurring = \'weekly\' ORDER BY scheduled_time ASC LIMIT 1');
-      if (result.rows.length === 0) {
-        result = await query('SELECT * FROM streams ORDER BY scheduled_date DESC, scheduled_time DESC LIMIT 1');
-      }
-    }
+    const result = await query("SELECT * FROM streams WHERE is_live = true ORDER BY created_at DESC LIMIT 1");
     res.json(result.rows[0] || null);
   } catch (err) {
     logger.error({ err }, 'Failed to get stream');

@@ -147,7 +147,7 @@ const Live = () => {
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                   <h2 className="text-xl font-bold text-white">
-                    {stream?.title || (isLive ? 'Live Stream' : 'Next Stream')}
+                    {isLive ? stream?.title || 'Live Stream' : (timeLeft !== null && timeLeft > 0 ? stream?.title || 'Next Stream' : 'Offline')}
                   </h2>
                   <p className="text-gray-400">
                     {isLive ? 'Live now' : (timeLeft !== null && timeLeft > 0 ? `Starting in ${days}d ${hours}h ${mins}m ${secs}s` : 'Offline')}
