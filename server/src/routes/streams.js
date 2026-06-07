@@ -31,10 +31,10 @@ router.get('/upcoming', async (req, res) => {
     const result = await query(
       `SELECT * FROM streams
        WHERE (
-         (recurring IS NULL AND scheduled_date > $1::DATE)
+         (recurring IS NULL AND (scheduled_date > $1::DATE OR (scheduled_date = $1::DATE AND scheduled_time > CURRENT_TIME)))
          OR (recurring = 'weekly')
        )
-       ORDER BY scheduled_time ASC
+       ORDER BY scheduled_date, scheduled_time ASC
        LIMIT 10`,
       [today]
     );
