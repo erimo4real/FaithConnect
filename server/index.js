@@ -101,17 +101,16 @@ import { query } from './src/db.js';
 
 setInterval(async () => {
   try {
-    const tz = "AT TIME ZONE 'Africa/Lagos'";
-    const lagosDate = `(${tz})::date`;
-    const lagosTime = `(${tz})::time`;
+    const lagosDate = "(NOW() AT TIME ZONE 'Africa/Lagos')::date";
+    const lagosTime = "(NOW() AT TIME ZONE 'Africa/Lagos')::time";
 
     const { rows: activated } = await query(
       `UPDATE streams SET is_live = true, manually_stopped = false, last_activated_at = NOW()
        WHERE is_live = false
        AND manually_stopped = false
        AND (
-         (recurring = 'weekly' AND EXTRACT(DOW FROM scheduled_date) = EXTRACT(DOW FROM NOW() ${lagosDate}) AND scheduled_time <= NOW() ${lagosTime} AND (end_time IS NULL OR end_time > NOW() ${lagosTime}))
-         OR (recurring IS NULL AND scheduled_date = NOW() ${lagosDate} AND scheduled_time <= NOW() ${lagosTime} AND (end_time IS NULL OR end_time > NOW() ${lagosTime}))
+         (recurring = 'weekly' AND EXTRACT(DOW FROM scheduled_date) = EXTRACT(DOW FROM ${lagosDate}) AND scheduled_time <= ${lagosTime} AND (end_time IS NULL OR end_time > ${lagosTime}))
+         OR (recurring IS NULL AND scheduled_date = ${lagosDate} AND scheduled_time <= ${lagosTime} AND (end_time IS NULL OR end_time > ${lagosTime}))
        )
        RETURNING title`
     );
@@ -123,8 +122,8 @@ setInterval(async () => {
       `UPDATE streams SET is_live = false
        WHERE is_live = true
        AND (
-         (recurring = 'weekly' AND end_time IS NOT NULL AND end_time <= NOW() ${lagosTime})
-         OR (recurring IS NULL AND (scheduled_date < NOW() ${lagosDate} OR (scheduled_date = NOW() ${lagosDate} AND end_time IS NOT NULL AND end_time <= NOW() ${lagosTime})))
+         (recurring = 'weekly' AND end_time IS NOT NULL AND end_time <= ${lagosTime})
+         OR (recurring IS NULL AND (scheduled_date < ${lagosDate} OR (scheduled_date = ${lagosDate} AND end_time IS NOT NULL AND end_time <= ${lagosTime})))
        )
        RETURNING id, title, youtube_url, last_activated_at`
     );
