@@ -8,10 +8,10 @@ function getEmbedUrl(url) {
   if (!url) return '';
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
     const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-    return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1`;
+    return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1&controls=1&rel=0`;
   }
   if (url.includes('facebook.com')) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&autoplay=1`;
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
   }
   return url;
 }
@@ -88,8 +88,8 @@ const Live = () => {
                     allowFullScreen
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 rounded-full p-3">
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center pointer-events-none">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 rounded-full p-3 group-hover:pointer-events-auto">
                       <FaExpand className="text-white text-2xl" />
                     </div>
                   </div>
