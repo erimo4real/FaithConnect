@@ -255,6 +255,25 @@ const Home = () => {
           </section>
         </FadeInSection>
       )}
+      {sermons.length > 1 && (
+        <FadeInSection>
+          <section className="section-padding bg-gray-50 dark:bg-gray-900">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex justify-between items-center mb-12">
+                <h2 className="text-3xl font-bold text-primary font-display">Recent Sermons</h2>
+                <Link to="/sermons" className="text-orange font-semibold hover:underline flex items-center gap-2">
+                  View All <FaCalendarAlt />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {sermons.slice(0, 3).map((sermon) => (
+                  <SermonCard key={sermon.id} sermon={sermon} />
+                ))}
+              </div>
+            </div>
+          </section>
+        </FadeInSection>
+      )}
       <WhatToExpect />
 
       <FadeInSection>
