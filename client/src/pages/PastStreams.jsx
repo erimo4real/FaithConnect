@@ -133,11 +133,28 @@ export default function PastStreams() {
 
   return (
     <div ref={containerRef} className="h-dvh md:h-screen overflow-hidden bg-black relative select-none">
-      <div className="h-full flex flex-col items-center md:justify-center">
+      {isPlaying ? (
+        <div className="absolute inset-0 bg-black z-20 md:hidden">
+          <iframe
+            src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+            title={s.title}
+            className="w-full h-full"
+            frameBorder="0"
+            allowFullScreen
+            allow="autoplay"
+          />
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
+            <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">More videos</button>
+            <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">Close</button>
+          </div>
+        </div>
+      ) : null}
+
+      <div className={`h-full flex flex-col items-center md:justify-center ${isPlaying ? 'hidden md:flex' : ''}`}>
         <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
           <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10">
             {isPlaying ? (
-              <div className="absolute inset-0 bg-black">
+              <div className="hidden md:block absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
                 <iframe
                   src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
                   title={s.title}
@@ -154,11 +171,11 @@ export default function PastStreams() {
             ) : (
               <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {videoId ? (
-                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover md:object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
+                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
                   />
                 ) : fbThumb ? (
-                  <img src={fbThumb} alt="" className="w-full h-full object-cover md:object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500" />
+                  <img src={fbThumb} alt="" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                     <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-50" />
@@ -175,7 +192,7 @@ export default function PastStreams() {
               </button>
             )}
 
-            <div className={`absolute right-2 md:right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 md:gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+            <div className={`absolute right-2 md:right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 md:gap-5 z-10 ${isPlaying ? 'hidden md:flex' : ''}`}>
               <div className="flex flex-col items-center gap-1.5">
                 <div className="w-12 h-12 md:w-11 md:h-11 rounded-full bg-primary ring-2 ring-white/40 flex items-center justify-center text-white text-sm font-bold shadow-lg">BC</div>
                 <p className="text-white text-[13px] md:text-[11px] font-bold leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] text-center">Bethel Church</p>
