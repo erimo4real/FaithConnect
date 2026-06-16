@@ -10,7 +10,7 @@ import WhatToExpect from '../components/WhatToExpect';
 import SocialFeed from '../components/SocialFeed';
 import GoogleMap from '../components/GoogleMap';
 import FadeInSection from '../components/FadeInSection';
-import { FaPlay, FaCalendarAlt, FaVideo, FaMicrophone } from 'react-icons/fa';
+import { FaPlay, FaCalendarAlt } from 'react-icons/fa';
 import { fetchSermons, fetchEvents, fetchCurrentStream } from '../services/api';
 
 const LIVE_SLIDE_INDEX = 1;
@@ -213,62 +213,28 @@ const Home = () => {
       </section>
 
       {/* <StatsCounter /> */}
-      {featuredSermon && (
+      {sermons.length > 0 && (
         <FadeInSection>
-          <section className="section-padding">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="flex justify-between items-center mb-12">
-                <h2 className="text-3xl font-bold text-primary font-display">Featured Sermon</h2>
-                <Link to="/sermons" className="text-orange font-semibold hover:underline flex items-center gap-2">
-                  View All <FaCalendarAlt />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl">
-                  {featuredSermon.video_url ? (
-                    <iframe src={featuredSermon.video_url.replace('watch?v=', 'embed/')} title={featuredSermon.title} className="w-full h-full" allowFullScreen />
+          <section className="section-padding bg-gray-50 dark:bg-gray-900 text-center">
+            <div className="max-w-2xl mx-auto px-4">
+              <h2 className="text-3xl font-bold font-display text-primary mb-2">Latest Sermon</h2>
+              <p className="text-gray-500 dark:text-gray-400 mb-8">Listen to our most recent message</p>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                  {sermons[0].video_url ? (
+                    <iframe src={sermons[0].video_url.replace('watch?v=', 'embed/')} title={sermons[0].title} className="w-full h-full" allowFullScreen />
                   ) : (
-                    <img src={featuredSermon.image_url || '/churchlogo.png'} alt={featuredSermon.title} className="w-full h-full object-cover" />
+                    <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold font-display mb-2">{featuredSermon.title}</h3>
-                  <p className="text-primary/80 font-medium mb-1">{featuredSermon.speaker}</p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{featuredSermon.date}</p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{featuredSermon.description}</p>
-                  <div className="flex gap-3">
-                    {featuredSermon.video_url && (
-                      <Link to={`/sermons`} className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
-                        <FaVideo /> Watch Now
-                      </Link>
-                    )}
-                    {featuredSermon.audio_url && (
-                      <a href={featuredSermon.audio_url} className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors inline-flex items-center gap-2">
-                        <FaMicrophone /> Listen
-                      </a>
-                    )}
-                  </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-primary font-display">{sermons[0].title}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{sermons[0].speaker}</p>
+                  <p className="text-gray-600 dark:text-gray-300 mt-3 text-sm leading-relaxed">{sermons[0].description || 'No description'}</p>
+                  <Link to="/sermons" className="mt-5 inline-block bg-primary text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-colors min-h-[44px]">
+                    View All Sermons
+                  </Link>
                 </div>
-              </div>
-            </div>
-          </section>
-        </FadeInSection>
-      )}
-      {sermons.length > 1 && (
-        <FadeInSection>
-          <section className="section-padding bg-gray-50 dark:bg-gray-900">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="flex justify-between items-center mb-12">
-                <h2 className="text-3xl font-bold text-primary font-display">Recent Sermons</h2>
-                <Link to="/sermons" className="text-orange font-semibold hover:underline flex items-center gap-2">
-                  View All <FaCalendarAlt />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {sermons.slice(0, 3).map((sermon) => (
-                  <SermonCard key={sermon.id} sermon={sermon} />
-                ))}
               </div>
             </div>
           </section>
