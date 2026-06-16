@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchStreamArchive } from '../services/api';
 import { FaFacebook, FaYoutube } from 'react-icons/fa';
-import { HiHeart, HiOutlineHeart, HiArrowUp } from 'react-icons/hi';
+import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -196,28 +196,17 @@ export default function PastStreams() {
                 </span>
               </div>
 
-              <div className="flex flex-col items-center gap-0.5">
-                <button
-                  onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
-                  className="flex flex-col items-center gap-0.5 text-white"
-                >
-                  {liked[s.id] ? (
-                    <HiHeart className="text-2xl text-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
-                  ) : (
-                    <HiOutlineHeart className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
-                  )}
-                  <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">{liked[s.id] ? '1' : ''}</span>
-                </button>
-              </div>
-              <a
-                href={s.youtube_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
                 className="flex flex-col items-center gap-0.5 text-white"
               >
-                <HiArrowUp className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
-                <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">Share</span>
-              </a>
+                {liked[s.id] ? (
+                  <HiHeart className="text-2xl text-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                ) : (
+                  <HiOutlineHeart className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                )}
+                <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">{liked[s.id] ? '1' : ''}</span>
+              </button>
             </div>
 
             <div className={`absolute left-4 bottom-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
