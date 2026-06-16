@@ -178,7 +178,24 @@ export default function PastStreams() {
               </button>
             )}
 
-            <div className={`absolute right-3 bottom-4 flex flex-col items-center gap-4 z-10 ${isPlaying ? 'hidden' : ''}`}>
+            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-11 h-11 rounded-full bg-primary/90 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shadow-lg">
+                  BC
+                </div>
+                <p className="text-white text-[11px] font-bold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center">Bethel Church</p>
+              </div>
+
+              <div className="flex flex-col items-center gap-0.5 text-center">
+                <p className="text-white/80 text-xs leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] max-w-[120px]">{s.title}</p>
+                <p className="text-white/50 text-[10px]">
+                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+                <span className={`inline-flex items-center gap-1 text-[8px] px-1.5 py-0.5 rounded mt-0.5 ${isFacebook ? 'bg-blue-600/70 text-white' : 'bg-red-600/70 text-white'}`}>
+                  {isFacebook ? <FaFacebook className="text-[8px]" /> : <FaYoutube className="text-[8px]" />}
+                </span>
+              </div>
+
               <div className="flex flex-col items-center gap-0.5">
                 <button
                   onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
@@ -203,26 +220,7 @@ export default function PastStreams() {
               </a>
             </div>
 
-            <div className={`absolute left-4 bottom-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}>
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-primary/90 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg">
-                  BC
-                </div>
-                <div>
-                  <p className="text-white text-sm font-bold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Bethel Church</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-white/70 text-[11px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{s.title}</p>
-                    <span className="text-white/40 text-[10px]">•</span>
-                    <p className="text-white/50 text-[10px]">
-                      {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                    <span className={`inline-flex items-center gap-1 text-[8px] px-1.5 py-0.5 rounded ${isFacebook ? 'bg-blue-600/70 text-white' : 'bg-red-600/70 text-white'}`}>
-                      {isFacebook ? <FaFacebook className="text-[8px]" /> : <FaYoutube className="text-[8px]" />}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div className={`absolute left-4 bottom-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
           </div>
 
           <div className="flex items-center justify-between mt-4 px-1">
