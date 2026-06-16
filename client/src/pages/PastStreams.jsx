@@ -158,11 +158,11 @@ export default function PastStreams() {
                 alt=""
                 className="w-full h-full object-cover"
               />
-            ) : (
-              <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                <FaFacebook className="text-8xl text-blue-500/20" />
-              </div>
-            )}
+                ) : (
+                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                    <img src="/churchlogo.png" alt="" className="w-full h-full object-contain opacity-20" />
+                  </div>
+                )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20"></div>
             <div className="absolute inset-0 bg-gradient-to-l from-black/30 via-transparent to-transparent"></div>
           </button>
