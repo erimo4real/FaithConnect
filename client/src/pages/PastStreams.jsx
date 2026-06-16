@@ -15,16 +15,33 @@ export default function PastStreams() {
   const [items, setItems] = useState([]);
   const [thumbnails, setThumbnails] = useState({});
   const [playingId, setPlayingId] = useState(null);
-  const [liked, setLiked] = useState({});
+  const [liked, setLiked] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('fc_liked') || '{}'); } catch { return {}; }
+  });
   const [index, setIndex] = useState(0);
   const [showMore, setShowMore] = useState(false);
+  const [showHint, setShowHint] = useState(() => !localStorage.getItem('fc_past_hint'));
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
   const touchRef = useRef(null);
   const transitioning = useRef(false);
 
   useEffect(() => {
+    if (showHint) {
+      localStorage.setItem('fc_past_hint', '1');
+      const t = setTimeout(() => setShowHint(false), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [showHint]);
+
+  useEffect(() => {
+    localStorage.setItem('fc_liked', JSON.stringify(liked));
+  }, [liked]);
+
+  useEffect(() => {
     fetchStreamArchive().then(async (data) => {
       setItems(data);
+      setLoading(false);
       const fbItems = data.filter(s => s.youtube_url?.includes('facebook.com'));
       if (fbItems.length === 0) return;
       const results = await Promise.allSettled(
@@ -41,7 +58,8 @@ export default function PastStreams() {
         }
       }
       setThumbnails(map);
-    }).catch(() => {});
+      setLoading(false);
+    }).catch(() => { setLoading(false); });
   }, []);
 
   const goNext = useCallback(() => {
@@ -101,9 +119,18 @@ export default function PastStreams() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [goNext, goPrev]);
 
+  if (loading) {
+    return (
+      <div className="h-dvh md:h-screen bg-black flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+        <p className="text-gray-500 text-sm">Loading streams...</p>
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
-      <div className="h-screen bg-black flex items-center justify-center">
+      <div className="h-dvh md:h-screen bg-black flex items-center justify-center">
         <p className="text-gray-500">No past streams yet</p>
       </div>
     );
@@ -143,16 +170,30 @@ export default function PastStreams() {
             allowFullScreen
             allow="autoplay"
           />
-          <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
-            <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">More videos</button>
-            <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">Close</button>
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
+            <button onClick={() => window.history.back()} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
+              <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
+            </div>
           </div>
         </div>
       ) : null}
 
       <div className={`h-full flex flex-col items-center md:justify-center ${isPlaying ? 'hidden md:flex' : ''}`}>
         <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
-          <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10">
+          <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10 animate-fade-in" key={s.id}>
+            <button onClick={() => window.history.back()} className="absolute top-4 left-4 z-20 text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full md:hidden hover:bg-black/60 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            {showHint && (
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 animate-fade-in pointer-events-none">
+                <svg className="w-6 h-6 text-white/50 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                <p className="text-white/40 text-xs">Swipe up/down</p>
+              </div>
+            )}
             {isPlaying ? (
               <div className="hidden md:block absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
                 <iframe
@@ -164,8 +205,8 @@ export default function PastStreams() {
                   allow="autoplay"
                 />
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
-                  <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">More videos</button>
-                  <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">Close</button>
+                  <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
+                  <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
                 </div>
               </div>
             ) : (
@@ -210,7 +251,7 @@ export default function PastStreams() {
               </button>
             </div>
 
-            <div className={`absolute left-4 bottom-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
+            <div className={`absolute left-4 bottom-4 z-10 text-white/40 text-xs md:hidden ${isPlaying ? 'hidden' : ''}`}>{index + 1} / {items.length}</div>
           </div>
 
           <div className="hidden md:flex items-center justify-between mt-4 px-1">
@@ -224,7 +265,7 @@ export default function PastStreams() {
       {showMore && (
         <div className="absolute inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowMore(false)}></div>
-          <div className="relative w-full max-w-sm bg-gray-900/95 backdrop-blur border-l border-white/10 h-full overflow-y-auto p-4">
+          <div className="relative w-full md:max-w-sm bg-gray-900/95 backdrop-blur border-l border-white/10 h-full overflow-y-auto p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white text-sm font-bold">More Videos</h3>
               <button onClick={() => setShowMore(false)} className="text-white/50 text-xs bg-white/10 px-2 py-1 rounded-full hover:bg-white/20 transition-colors">Close</button>
