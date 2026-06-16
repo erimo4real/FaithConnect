@@ -134,7 +134,7 @@ export default function PastStreams() {
   return (
     <div ref={containerRef} className="h-screen overflow-hidden bg-black relative select-none">
       <div className="h-full flex flex-col items-center md:justify-center">
-        <div className="w-full md:max-w-5xl md:px-4 relative">
+        <div className="w-full md:max-w-5xl md:px-4 relative h-full md:h-auto">
           <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10">
             {isPlaying ? (
               <div className="absolute inset-0 bg-black">
@@ -154,42 +154,42 @@ export default function PastStreams() {
             ) : (
               <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {videoId ? (
-                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover md:group-hover:scale-[1.02] transition-transform duration-500"
+                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover md:object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
                   />
                 ) : fbThumb ? (
-                  <img src={fbThumb} alt="" className="w-full h-full object-cover md:group-hover:scale-[1.02] transition-transform duration-500" />
+                  <img src={fbThumb} alt="" className="w-full h-full object-cover md:object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                     <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-50" />
                     <img src="/churchlogo.png" alt="" className="absolute w-20 h-20 object-contain opacity-40" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-black/20 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-l from-black/40 via-transparent to-transparent"></div>
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
-                    <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <div className="w-20 h-20 md:w-16 md:h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
+                    <svg className="w-8 h-8 md:w-7 md:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                   </div>
                 </div>
               </button>
             )}
 
-            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+            <div className={`absolute right-2 md:right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 md:gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
               <div className="flex flex-col items-center gap-1.5">
-                <div className="w-11 h-11 rounded-full bg-primary/90 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shadow-lg">BC</div>
-                <p className="text-white text-[11px] font-bold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center">Bethel Church</p>
+                <div className="w-12 h-12 md:w-11 md:h-11 rounded-full bg-primary ring-2 ring-white/40 flex items-center justify-center text-white text-sm font-bold shadow-lg">BC</div>
+                <p className="text-white text-[13px] md:text-[11px] font-bold leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] text-center">Bethel Church</p>
               </div>
-              <div className="flex flex-col items-center gap-0.5 text-center">
-                <p className="text-white/80 text-xs leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] max-w-[120px]">{s.title}</p>
-                <p className="text-white/50 text-[10px]">{new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                <span className={`inline-flex items-center gap-1 text-[8px] px-1.5 py-0.5 rounded mt-0.5 ${isFacebook ? 'bg-blue-600/70 text-white' : 'bg-red-600/70 text-white'}`}>
-                  {isFacebook ? <FaFacebook className="text-[8px]" /> : <FaYoutube className="text-[8px]" />}
+              <div className="flex flex-col items-center gap-1 text-center">
+                <p className="text-white text-sm md:text-xs leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] max-w-[130px] font-medium">{s.title}</p>
+                <p className="text-white/70 text-[11px] md:text-[10px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">{new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                <span className={`inline-flex items-center gap-1 text-[10px] md:text-[8px] px-2 py-0.5 rounded mt-0.5 ${isFacebook ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
+                  {isFacebook ? <FaFacebook className="text-[10px]" /> : <FaYoutube className="text-[10px]" />}
                 </span>
               </div>
               <button onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))} className="flex flex-col items-center gap-0.5 text-white">
-                {liked[s.id] ? <HiHeart className="text-2xl text-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" /> : <HiOutlineHeart className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />}
-                <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">{liked[s.id] ? '1' : ''}</span>
+                {liked[s.id] ? <HiHeart className="text-3xl md:text-2xl text-red-500 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]" /> : <HiOutlineHeart className="text-3xl md:text-2xl text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]" />}
+                <span className="text-xs md:text-[10px] font-light text-white/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">{liked[s.id] ? '1' : ''}</span>
               </button>
             </div>
 
