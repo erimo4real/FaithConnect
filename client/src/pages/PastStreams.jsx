@@ -115,109 +115,132 @@ export default function PastStreams() {
   const isPlaying = playingId === s.id;
 
   return (
-    <div ref={containerRef} className="h-screen overflow-hidden bg-black relative select-none">
-      <div
-        className="absolute inset-0 transition-transform duration-300 ease-out"
-        style={{ transform: `translateY(0)` }}
-      >
-        {isPlaying ? (
-          <div className="absolute inset-0 bg-black z-20">
-            <iframe
-              src={videoId
-                ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`
-                : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`
-              }
-              title={s.title}
-              className="w-full h-full"
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay"
-            />
-            <button
-              onClick={() => setPlayingId(null)}
-              className="absolute top-12 right-4 text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full z-30"
-            >
-              Close
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setPlayingId(s.id)}
-            className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none z-10"
-          >
-            {videoId ? (
-              <img
-                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                alt=""
-                className="w-full h-full object-cover"
-                onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
-              />
-            ) : fbThumb ? (
-              <img
-                src={fbThumb}
-                alt=""
-                className="w-full h-full object-cover"
-              />
+    <div ref={containerRef} className="h-screen overflow-hidden bg-gradient-to-b from-gray-900 via-black to-gray-900 relative select-none">
+      <div className="h-full flex flex-col items-center justify-center px-4 md:px-8">
+        <div
+          className="w-full max-w-5xl relative transition-transform duration-300 ease-out"
+          style={{ transform: `translateY(0)` }}
+        >
+          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
+            {isPlaying ? (
+              <div className="absolute inset-0 bg-black">
+                <iframe
+                  src={videoId
+                    ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`
+                    : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`
+                  }
+                  title={s.title}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay"
+                />
+                <button
+                  onClick={() => setPlayingId(null)}
+                  className="absolute top-4 right-4 text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full z-30 hover:bg-black/80 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setPlayingId(s.id)}
+                className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group"
+              >
+                {videoId ? (
+                  <img
+                    src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                    alt=""
+                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                    onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
+                  />
+                ) : fbThumb ? (
+                  <img
+                    src={fbThumb}
+                    alt=""
+                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                  />
                 ) : (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                    <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-40" />
-                    <img src="/churchlogo.png" alt="" className="absolute w-24 h-24 object-contain opacity-30" />
+                  <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                    <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-50" />
+                    <img src="/churchlogo.png" alt="" className="absolute w-20 h-20 object-contain opacity-40" />
                   </div>
                 )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20"></div>
-            <div className="absolute inset-0 bg-gradient-to-l from-black/30 via-transparent to-transparent"></div>
-          </button>
-        )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
+                <div className="absolute inset-0 bg-gradient-to-l from-black/20 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
+                    <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            )}
 
-        <div className={`absolute right-3 bottom-32 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
-          <div className="w-12 h-12 rounded-full bg-white/20 ring-2 ring-white/40 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
-            BC
-          </div>
+            <div className={`absolute right-3 bottom-4 flex flex-col items-center gap-4 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex flex-col items-center gap-0.5">
+                <button
+                  onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
+                  className="flex flex-col items-center gap-0.5 text-white"
+                >
+                  {liked[s.id] ? (
+                    <HiHeart className="text-2xl text-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                  ) : (
+                    <HiOutlineHeart className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                  )}
+                  <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">{liked[s.id] ? '1' : ''}</span>
+                </button>
+              </div>
+              <a
+                href={s.youtube_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-0.5 text-white"
+              >
+                <HiArrowUp className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">Share</span>
+              </a>
+            </div>
 
-          <div className="flex flex-col items-center gap-0.5 text-right">
-            <p className="text-white text-sm font-bold leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">Bethel Church</p>
-            <p className="text-white/80 text-xs leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] text-right">{s.title}</p>
-            <div className="flex flex-col items-center gap-1 mt-1">
-              <p className="text-white/60 text-[10px]">
-                {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
-              <span className={`inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600/80 text-white' : 'bg-red-600/80 text-white'}`}>
-                {isFacebook ? <FaFacebook className="text-[9px]" /> : <FaYoutube className="text-[9px]" />}
-              </span>
+            <div className={`absolute left-4 bottom-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full bg-primary/90 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg">
+                  BC
+                </div>
+                <div>
+                  <p className="text-white text-sm font-bold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Bethel Church</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-white/70 text-[11px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{s.title}</p>
+                    <span className="text-white/40 text-[10px]">•</span>
+                    <p className="text-white/50 text-[10px]">
+                      {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <span className={`inline-flex items-center gap-1 text-[8px] px-1.5 py-0.5 rounded ${isFacebook ? 'bg-blue-600/70 text-white' : 'bg-red-600/70 text-white'}`}>
+                      {isFacebook ? <FaFacebook className="text-[8px]" /> : <FaYoutube className="text-[8px]" />}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-0.5">
-            <button
-              onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
-              className="flex flex-col items-center gap-0.5 text-white"
-            >
-              {liked[s.id] ? (
-                <HiHeart className="text-3xl text-red-500" />
-              ) : (
-                <HiOutlineHeart className="text-3xl text-white" />
-              )}
-              <span className="text-[10px] font-light text-white/80">{liked[s.id] ? '1' : ''}</span>
-            </button>
+          <div className="flex items-center justify-between mt-4 px-1">
+            <p className="text-white/30 text-xs">
+              {index + 1} of {items.length}
+            </p>
+            {index > 0 && (
+              <button onClick={goPrev} className="text-white/30 hover:text-white/60 text-xs transition-colors">
+                ↑ Previous
+              </button>
+            )}
+            {index < items.length - 1 && (
+              <button onClick={goNext} className="text-white/30 hover:text-white/60 text-xs transition-colors">
+                Next ↓
+              </button>
+            )}
           </div>
-          <a
-            href={s.youtube_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-0.5 text-white"
-          >
-            <HiArrowUp className="text-3xl text-white" />
-            <span className="text-[10px] font-light text-white/80">Share</span>
-          </a>
         </div>
-
-        {index > 0 && !isPlaying && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-            <svg className="w-5 h-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7" />
-            </svg>
-          </div>
-        )}
       </div>
     </div>
   );
