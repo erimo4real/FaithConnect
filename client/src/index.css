@@ -205,3 +205,11 @@
   animation: slide-in-right 0.6s ease-out both;
   animation-delay: 10s;
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

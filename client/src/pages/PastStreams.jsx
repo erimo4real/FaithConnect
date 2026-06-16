@@ -49,7 +49,7 @@ export default function PastStreams() {
   }
 
   return (
-    <div ref={containerRef} className="h-screen overflow-y-scroll snap-y snap-mandatory bg-black scroll-smooth">
+    <div ref={containerRef} className="h-screen overflow-y-scroll snap-y snap-mandatory bg-black scroll-smooth scrollbar-hide">
       {items.map((s, i) => {
         const videoId = getYoutubeId(s.youtube_url);
         const isFacebook = s.youtube_url?.includes('facebook.com');
