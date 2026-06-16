@@ -112,26 +112,14 @@ export default function PastStreams() {
               </button>
             )}
 
-            <div className={`absolute bottom-6 left-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}>
-              <div className="flex items-center gap-2 mb-1.5">
-                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex flex-col items-center gap-1">
+                <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shadow-lg">
                   BC
                 </div>
-                <div>
-                  <p className="text-white text-sm font-semibold leading-tight">Bethel Church</p>
-                  <p className="text-gray-400 text-[11px]">
-                    {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
-                </div>
+                <span className="text-[9px] text-white/80 font-medium leading-tight text-center">Bethel<br/>Church</span>
               </div>
-              <h2 className="text-white text-base md:text-lg font-bold leading-tight mb-1">{s.title}</h2>
-              <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
-                {isFacebook ? <FaFacebook /> : <FaYoutube />}
-                {isFacebook ? 'Facebook' : 'YouTube'}
-              </span>
-            </div>
 
-            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-10 ${isPlaying ? 'hidden' : ''}`}>
               <button
                 onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
                 className="flex flex-col items-center gap-1 text-white group"
@@ -141,6 +129,7 @@ export default function PastStreams() {
                 </div>
                 <span className="text-[10px] text-white/70">{liked[s.id] ? '1' : ''}</span>
               </button>
+
               <a
                 href={s.youtube_url}
                 target="_blank"
@@ -152,6 +141,18 @@ export default function PastStreams() {
                 </div>
                 <span className="text-[10px] text-white/70">Open</span>
               </a>
+            </div>
+
+            <div className={`absolute left-4 bottom-6 right-20 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <h2 className="text-white text-base md:text-lg font-bold leading-tight mb-1">{s.title}</h2>
+              <div className="flex items-center gap-2">
+                <p className="text-gray-400 text-xs">
+                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+                <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
+                  {isFacebook ? <FaFacebook /> : <FaYoutube />}
+                </span>
+              </div>
             </div>
 
             {i === 0 && !isPlaying && (
