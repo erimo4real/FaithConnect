@@ -132,10 +132,10 @@ export default function PastStreams() {
   }
 
   return (
-    <div ref={containerRef} className="h-screen overflow-hidden bg-gradient-to-b from-gray-900 via-black to-gray-900 relative select-none">
-      <div className="h-full flex flex-col items-center justify-center px-4 md:px-8">
-        <div className="w-full max-w-5xl relative transition-transform duration-300 ease-out">
-          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
+    <div ref={containerRef} className="h-screen overflow-hidden bg-black relative select-none">
+      <div className="h-full flex flex-col items-center md:justify-center">
+        <div className="w-full md:max-w-5xl md:px-4 relative">
+          <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10">
             {isPlaying ? (
               <div className="absolute inset-0 bg-black">
                 <iframe
@@ -154,11 +154,11 @@ export default function PastStreams() {
             ) : (
               <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {videoId ? (
-                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover md:group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
                   />
                 ) : fbThumb ? (
-                  <img src={fbThumb} alt="" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                  <img src={fbThumb} alt="" className="w-full h-full object-cover md:group-hover:scale-[1.02] transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                     <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-50" />
@@ -167,7 +167,7 @@ export default function PastStreams() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-l from-black/20 via-transparent to-transparent"></div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
                     <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                   </div>
@@ -196,7 +196,7 @@ export default function PastStreams() {
             <div className={`absolute left-4 bottom-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
           </div>
 
-          <div className="flex items-center justify-between mt-4 px-1">
+          <div className="hidden md:flex items-center justify-between mt-4 px-1">
             <p className="text-white/30 text-xs">{index + 1} of {items.length}</p>
             {index > 0 && <button onClick={goPrev} className="text-white/30 hover:text-white/60 text-xs transition-colors">&uarr; Previous</button>}
             {index < items.length - 1 && <button onClick={goNext} className="text-white/30 hover:text-white/60 text-xs transition-colors">Next &darr;</button>}
