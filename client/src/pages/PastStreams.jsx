@@ -132,9 +132,9 @@ export default function PastStreams() {
   }
 
   return (
-    <div ref={containerRef} className="h-screen overflow-hidden bg-black relative select-none">
+    <div ref={containerRef} className="h-dvh md:h-screen overflow-hidden bg-black relative select-none">
       <div className="h-full flex flex-col items-center md:justify-center">
-        <div className="w-full md:max-w-5xl md:px-4 relative h-full md:h-auto">
+        <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
           <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10">
             {isPlaying ? (
               <div className="absolute inset-0 bg-black">
