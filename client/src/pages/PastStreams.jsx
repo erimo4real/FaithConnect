@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchStreamArchive } from '../services/api';
-import { FaPlay, FaFacebook, FaYoutube, FaChevronDown, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaPlay, FaFacebook, FaYoutube, FaHeart, FaShare, FaExternalLinkAlt } from 'react-icons/fa';
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -14,6 +14,8 @@ export default function PastStreams() {
   const [items, setItems] = useState([]);
   const [thumbnails, setThumbnails] = useState({});
   const [playingId, setPlayingId] = useState(null);
+  const [liked, setLiked] = useState({});
+  const containerRef = useRef(null);
 
   useEffect(() => {
     fetchStreamArchive().then(async (data) => {
@@ -39,28 +41,24 @@ export default function PastStreams() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="h-screen bg-black flex items-center justify-center">
         <p className="text-gray-500">No past streams yet</p>
       </div>
     );
   }
 
   return (
-    <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-gray-900">
+    <div ref={containerRef} className="h-screen overflow-y-scroll snap-y snap-mandatory bg-black scroll-smooth">
       {items.map((s, i) => {
-        const isLatest = i === 0;
         const videoId = getYoutubeId(s.youtube_url);
         const isFacebook = s.youtube_url?.includes('facebook.com');
         const fbThumb = thumbnails[s.id];
         const isPlaying = playingId === s.id;
 
         return (
-          <section
-            key={s.id}
-            className="relative w-full h-screen snap-start flex flex-col"
-          >
+          <div key={s.id} className="relative w-full h-screen snap-start overflow-hidden bg-black">
             {isPlaying ? (
-              <div className="absolute inset-0 bg-black">
+              <div className="absolute inset-0 bg-black z-20">
                 <iframe
                   src={videoId
                     ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`
@@ -74,7 +72,7 @@ export default function PastStreams() {
                 />
                 <button
                   onClick={() => setPlayingId(null)}
-                  className="absolute top-4 right-4 text-white/60 hover:text-white text-sm bg-black/40 px-3 py-1 rounded-full transition-colors z-10"
+                  className="absolute top-12 right-4 text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full z-30"
                 >
                   Close
                 </button>
@@ -82,64 +80,80 @@ export default function PastStreams() {
             ) : (
               <button
                 onClick={() => setPlayingId(s.id)}
-                className="absolute inset-0 w-full h-full group cursor-pointer focus:outline-none"
+                className="absolute inset-0 w-full h-full group cursor-pointer focus:outline-none z-10"
               >
                 {videoId ? (
                   <img
                     src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-                    alt={s.title}
+                    alt=""
                     className="w-full h-full object-cover"
-                    loading={isLatest ? 'eager' : 'lazy'}
+                    loading={i === 0 ? 'eager' : 'lazy'}
                   />
                 ) : fbThumb ? (
                   <img
                     src={fbThumb}
-                    alt={s.title}
+                    alt=""
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                    <FaFacebook className="text-8xl text-blue-500/30" />
+                  <div className="w-full h-full bg-gray-900 flex items-center justify-center">
+                    <FaFacebook className="text-8xl text-blue-500/20" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 bg-red-600/90 rounded-full flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
-                    <FaPlay className="text-white text-3xl ml-1.5" />
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
               </button>
             )}
 
-            <div className={`absolute bottom-0 left-0 right-0 p-6 md:p-10 z-10 ${isPlaying ? 'hidden' : ''}`}>
-              <div className="max-w-3xl">
-                <div className="flex items-center gap-2 mb-2">
-                  {isLatest && (
-                    <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Latest</span>
-                  )}
-                  <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full ${isFacebook ? 'bg-blue-600/80 text-white' : 'bg-red-600/80 text-white'}`}>
-                    {isFacebook ? <FaFacebook /> : <FaYoutube />}
-                    {isFacebook ? 'Facebook' : 'YouTube'}
-                  </span>
-                  <span className="text-gray-400 text-xs font-mono">#{items.length - i}</span>
+            <div className={`absolute bottom-6 left-4 right-20 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  BC
                 </div>
-                <h2 className="text-white text-xl md:text-3xl font-bold font-display mb-1">{s.title}</h2>
-                <p className="text-gray-400 text-sm">
-                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-                </p>
+                <div>
+                  <p className="text-white text-sm font-semibold leading-tight">Bethel Church</p>
+                  <p className="text-gray-400 text-[11px]">
+                    {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
+                </div>
               </div>
+              <h2 className="text-white text-base md:text-lg font-bold leading-tight mb-1">{s.title}</h2>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
+                {isFacebook ? <FaFacebook /> : <FaYoutube />}
+                {isFacebook ? 'Facebook' : 'YouTube'}
+              </span>
             </div>
 
-            {isLatest && !isPlaying && (
-              <div className="absolute bottom-28 md:bottom-36 left-1/2 -translate-x-1/2 animate-bounce z-10">
-                <div className="flex flex-col items-center text-white/50">
-                  <span className="text-xs mb-1">Scroll</span>
-                  <FaChevronDown className="text-xl" />
+            <div className={`absolute bottom-6 right-3 flex flex-col items-center gap-4 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <button
+                onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
+                className="flex flex-col items-center gap-0.5 text-white"
+              >
+                <FaHeart className={`text-2xl transition-colors ${liked[s.id] ? 'text-red-500' : 'text-white/70'}`} />
+                <span className="text-[10px]">{liked[s.id] ? '1' : ''}</span>
+              </button>
+              <a
+                href={s.youtube_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-0.5 text-white/70 hover:text-white"
+              >
+                <FaExternalLinkAlt className="text-xl" />
+                <span className="text-[10px]">Open</span>
+              </a>
+            </div>
+
+            {i === 0 && !isPlaying && (
+              <div className="absolute bottom-36 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+                <div className="flex flex-col items-center text-white/30">
+                  <span className="text-[10px] uppercase tracking-widest mb-0.5">Scroll</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
                 </div>
               </div>
             )}
-          </section>
+          </div>
         );
       })}
     </div>

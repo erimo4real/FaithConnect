@@ -74,6 +74,7 @@ function App() {
       <Route path="/admin/media" element={<ProtectedRoute><AdminMedia /></ProtectedRoute>} />
       <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
       <Route path="/admin/*" element={<ProtectedRoute><AdminNotFound /></ProtectedRoute>} />
+      <Route path="/past-streams" element={<PastStreams />} />
       <Route path="/*" element={
         <Layout>
           <Routes>
@@ -88,7 +89,6 @@ function App() {
             <Route path="/blog" element={<Blog />} />
             <Route path="/podcast" element={<Podcast />} />
             <Route path="/testimonials" element={<Testimonials />} />
-            <Route path="/past-streams" element={<PastStreams />} />
             <Route path="/team" element={<Pastors />} />
             <Route path="/staff-directory" element={<StaffDirectory />} />
             <Route path="/small-groups" element={<SmallGroups />} />
