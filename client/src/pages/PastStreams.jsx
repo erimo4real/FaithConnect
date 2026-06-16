@@ -112,12 +112,22 @@ export default function PastStreams() {
               </button>
             )}
 
-            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 max-w-[120px] ${isPlaying ? 'hidden' : ''}`}>
               <div className="flex flex-col items-center gap-1">
                 <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shadow-lg">
                   BC
                 </div>
                 <span className="text-[9px] text-white/80 font-medium leading-tight text-center">Bethel<br/>Church</span>
+              </div>
+
+              <div className="flex flex-col items-center gap-0.5 text-center">
+                <h2 className="text-white text-xs md:text-sm font-bold leading-tight">{s.title}</h2>
+                <p className="text-gray-400 text-[10px]">
+                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+                <span className={`inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded mt-0.5 ${isFacebook ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
+                  {isFacebook ? <FaFacebook /> : <FaYoutube />}
+                </span>
               </div>
 
               <button
@@ -143,17 +153,7 @@ export default function PastStreams() {
               </a>
             </div>
 
-            <div className={`absolute left-4 bottom-6 right-20 z-10 ${isPlaying ? 'hidden' : ''}`}>
-              <h2 className="text-white text-base md:text-lg font-bold leading-tight mb-1">{s.title}</h2>
-              <div className="flex items-center gap-2">
-                <p className="text-gray-400 text-xs">
-                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                </p>
-                <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
-                  {isFacebook ? <FaFacebook /> : <FaYoutube />}
-                </span>
-              </div>
-            </div>
+            <div className={`absolute left-4 bottom-6 right-20 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
 
             {i === 0 && !isPlaying && (
               <div className="absolute bottom-36 left-1/2 -translate-x-1/2 z-10 animate-bounce">
