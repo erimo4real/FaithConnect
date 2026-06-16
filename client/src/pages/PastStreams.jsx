@@ -112,7 +112,7 @@ export default function PastStreams() {
               </button>
             )}
 
-            <div className={`absolute bottom-6 left-4 right-20 z-10 ${isPlaying ? 'hidden' : ''}`}>
+            <div className={`absolute bottom-6 left-4 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}>
               <div className="flex items-center gap-2 mb-1.5">
                 <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shrink-0">
                   BC
@@ -131,22 +131,26 @@ export default function PastStreams() {
               </span>
             </div>
 
-            <div className={`absolute bottom-6 right-3 flex flex-col items-center gap-4 z-10 ${isPlaying ? 'hidden' : ''}`}>
+            <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-10 ${isPlaying ? 'hidden' : ''}`}>
               <button
                 onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
-                className="flex flex-col items-center gap-0.5 text-white"
+                className="flex flex-col items-center gap-1 text-white group"
               >
-                <FaHeart className={`text-2xl transition-colors ${liked[s.id] ? 'text-red-500' : 'text-white/70'}`} />
-                <span className="text-[10px]">{liked[s.id] ? '1' : ''}</span>
+                <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                  <FaHeart className={`text-xl transition-colors ${liked[s.id] ? 'text-red-500' : 'text-white'}`} />
+                </div>
+                <span className="text-[10px] text-white/70">{liked[s.id] ? '1' : ''}</span>
               </button>
               <a
                 href={s.youtube_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center gap-0.5 text-white/70 hover:text-white"
+                className="flex flex-col items-center gap-1 text-white group"
               >
-                <FaExternalLinkAlt className="text-xl" />
-                <span className="text-[10px]">Open</span>
+                <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                  <FaExternalLinkAlt className="text-lg text-white" />
+                </div>
+                <span className="text-[10px] text-white/70">Open</span>
               </a>
             </div>
 
