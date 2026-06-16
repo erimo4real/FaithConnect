@@ -121,7 +121,7 @@ export default function PastStreams() {
 
   if (loading) {
     return (
-      <div className="h-dvh md:h-screen bg-black flex flex-col items-center justify-center gap-4">
+      <div className="h-screen h-dvh md:h-screen bg-black flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
         <p className="text-gray-500 text-sm">Loading streams...</p>
       </div>
@@ -130,7 +130,7 @@ export default function PastStreams() {
 
   if (items.length === 0) {
     return (
-      <div className="h-dvh md:h-screen bg-black flex items-center justify-center">
+      <div className="h-screen h-dvh md:h-screen bg-black flex items-center justify-center">
         <p className="text-gray-500">No past streams yet</p>
       </div>
     );
@@ -159,16 +159,16 @@ export default function PastStreams() {
   }
 
   return (
-    <div ref={containerRef} className="h-dvh md:h-screen overflow-hidden bg-black relative select-none">
+    <div ref={containerRef} className="h-screen h-dvh md:h-screen overflow-hidden bg-black relative select-none">
       {isPlaying ? (
-        <div className="absolute inset-0 bg-black z-20 md:hidden">
+        <div className="fixed inset-0 bg-black z-50 md:hidden">
           <iframe
             src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
             title={s.title}
             className="w-full h-full"
             frameBorder="0"
             allowFullScreen
-            allow="autoplay"
+            allow="autoplay; fullscreen"
           />
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
             <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
