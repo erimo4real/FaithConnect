@@ -213,7 +213,7 @@ const Home = () => {
       </section>
 
       {/* <StatsCounter /> */}
-      {sermons.length > 0 && (
+      {false && sermons.length > 0 && (
         <FadeInSection>
           <section className="section-padding bg-gray-50 dark:bg-gray-900 text-center">
             <div className="max-w-2xl mx-auto px-4">
