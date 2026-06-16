@@ -17,6 +17,7 @@ export default function PastStreams() {
   const [playingId, setPlayingId] = useState(null);
   const [liked, setLiked] = useState({});
   const [index, setIndex] = useState(0);
+  const [showMore, setShowMore] = useState(false);
   const containerRef = useRef(null);
   const touchRef = useRef(null);
   const transitioning = useRef(false);
@@ -114,52 +115,50 @@ export default function PastStreams() {
   const fbThumb = thumbnails[s.id];
   const isPlaying = playingId === s.id;
 
+  function renderThumb(item, thumbMap) {
+    const vid = getYoutubeId(item.youtube_url);
+    const fb = thumbMap[item.id];
+    if (vid) {
+      return <img src={`https://img.youtube.com/vi/${vid}/hqdefault.jpg`} alt="" className="w-full h-full object-cover" loading="lazy" />;
+    }
+    if (fb) {
+      return <img src={fb} alt="" className="w-full h-full object-cover" loading="lazy" />;
+    }
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <img src={`https://picsum.photos/seed/${item.id}/200/150`} alt="" className="w-full h-full object-cover opacity-50" />
+      </div>
+    );
+  }
+
   return (
     <div ref={containerRef} className="h-screen overflow-hidden bg-gradient-to-b from-gray-900 via-black to-gray-900 relative select-none">
       <div className="h-full flex flex-col items-center justify-center px-4 md:px-8">
-        <div
-          className="w-full max-w-5xl relative transition-transform duration-300 ease-out"
-          style={{ transform: `translateY(0)` }}
-        >
+        <div className="w-full max-w-5xl relative transition-transform duration-300 ease-out">
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
             {isPlaying ? (
               <div className="absolute inset-0 bg-black">
                 <iframe
-                  src={videoId
-                    ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`
-                    : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`
-                  }
+                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
                   title={s.title}
                   className="w-full h-full"
                   frameBorder="0"
                   allowFullScreen
                   allow="autoplay"
                 />
-                <button
-                  onClick={() => setPlayingId(null)}
-                  className="absolute top-4 right-4 text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full z-30 hover:bg-black/80 transition-colors"
-                >
-                  Close
-                </button>
+                <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
+                  <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">More videos</button>
+                  <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">Close</button>
+                </div>
               </div>
             ) : (
-              <button
-                onClick={() => setPlayingId(s.id)}
-                className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group"
-              >
+              <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {videoId ? (
-                  <img
-                    src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                    alt=""
-                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
                   />
                 ) : fbThumb ? (
-                  <img
-                    src={fbThumb}
-                    alt=""
-                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                  />
+                  <img src={fbThumb} alt="" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                     <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-50" />
@@ -170,9 +169,7 @@ export default function PastStreams() {
                 <div className="absolute inset-0 bg-gradient-to-l from-black/20 via-transparent to-transparent"></div>
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
-                    <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
+                    <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                   </div>
                 </div>
               </button>
@@ -180,31 +177,18 @@ export default function PastStreams() {
 
             <div className={`absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
               <div className="flex flex-col items-center gap-1.5">
-                <div className="w-11 h-11 rounded-full bg-primary/90 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shadow-lg">
-                  BC
-                </div>
+                <div className="w-11 h-11 rounded-full bg-primary/90 ring-2 ring-white/30 flex items-center justify-center text-white text-xs font-bold shadow-lg">BC</div>
                 <p className="text-white text-[11px] font-bold leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center">Bethel Church</p>
               </div>
-
               <div className="flex flex-col items-center gap-0.5 text-center">
                 <p className="text-white/80 text-xs leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] max-w-[120px]">{s.title}</p>
-                <p className="text-white/50 text-[10px]">
-                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                </p>
+                <p className="text-white/50 text-[10px]">{new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                 <span className={`inline-flex items-center gap-1 text-[8px] px-1.5 py-0.5 rounded mt-0.5 ${isFacebook ? 'bg-blue-600/70 text-white' : 'bg-red-600/70 text-white'}`}>
                   {isFacebook ? <FaFacebook className="text-[8px]" /> : <FaYoutube className="text-[8px]" />}
                 </span>
               </div>
-
-              <button
-                onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
-                className="flex flex-col items-center gap-0.5 text-white"
-              >
-                {liked[s.id] ? (
-                  <HiHeart className="text-2xl text-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
-                ) : (
-                  <HiOutlineHeart className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
-                )}
+              <button onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))} className="flex flex-col items-center gap-0.5 text-white">
+                {liked[s.id] ? <HiHeart className="text-2xl text-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" /> : <HiOutlineHeart className="text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />}
                 <span className="text-[10px] font-light text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">{liked[s.id] ? '1' : ''}</span>
               </button>
             </div>
@@ -213,22 +197,44 @@ export default function PastStreams() {
           </div>
 
           <div className="flex items-center justify-between mt-4 px-1">
-            <p className="text-white/30 text-xs">
-              {index + 1} of {items.length}
-            </p>
-            {index > 0 && (
-              <button onClick={goPrev} className="text-white/30 hover:text-white/60 text-xs transition-colors">
-                ↑ Previous
-              </button>
-            )}
-            {index < items.length - 1 && (
-              <button onClick={goNext} className="text-white/30 hover:text-white/60 text-xs transition-colors">
-                Next ↓
-              </button>
-            )}
+            <p className="text-white/30 text-xs">{index + 1} of {items.length}</p>
+            {index > 0 && <button onClick={goPrev} className="text-white/30 hover:text-white/60 text-xs transition-colors">&uarr; Previous</button>}
+            {index < items.length - 1 && <button onClick={goNext} className="text-white/30 hover:text-white/60 text-xs transition-colors">Next &darr;</button>}
           </div>
         </div>
       </div>
+
+      {showMore && (
+        <div className="absolute inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowMore(false)}></div>
+          <div className="relative w-full max-w-sm bg-gray-900/95 backdrop-blur border-l border-white/10 h-full overflow-y-auto p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white text-sm font-bold">More Videos</h3>
+              <button onClick={() => setShowMore(false)} className="text-white/50 text-xs bg-white/10 px-2 py-1 rounded-full hover:bg-white/20 transition-colors">Close</button>
+            </div>
+            <div className="space-y-3">
+              {items.map((v, i) => (
+                <button key={v.id} onClick={() => { setIndex(i); setPlayingId(v.id); setShowMore(false); }}
+                  className={`w-full flex gap-3 text-left rounded-xl overflow-hidden transition-colors group ${i === index ? 'ring-2 ring-primary' : 'hover:bg-white/5'}`}
+                >
+                  <div className="w-28 shrink-0 relative aspect-video bg-gray-800">
+                    {renderThumb(v, thumbnails)}
+                    {i === index && (
+                      <div className="absolute inset-0 bg-primary/30 flex items-center justify-center">
+                        <span className="text-white text-[10px] font-bold">Playing</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 py-1 pr-2">
+                    <p className="text-white text-xs font-medium truncate">{v.title}</p>
+                    <p className="text-white/40 text-[10px] mt-0.5">{new Date(v.deactivated_at || v.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
