@@ -162,17 +162,14 @@ export default function PastStreams() {
     <div ref={containerRef} className="h-screen h-dvh md:h-screen overflow-hidden bg-black relative select-none">
       {isPlaying ? (
         <div className="fixed inset-0 bg-black z-50 md:hidden">
-          <div className="absolute inset-0 overflow-hidden">
-            <iframe
-              src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
-              title={s.title}
-              className="absolute"
-              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100vw', height: '56.25vw', minHeight: '100vh', minWidth: '177.78vh' }}
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay; fullscreen"
-            />
-          </div>
+          <iframe
+            src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+            title={s.title}
+            className="w-full h-full"
+            frameBorder="0"
+            allowFullScreen
+            allow="autoplay; fullscreen"
+          />
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
             <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
