@@ -112,6 +112,20 @@ export default function PastStreams() {
               <div className="w-12 h-12 rounded-full bg-white/20 ring-2 ring-white/40 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                 BC
               </div>
+
+              <div className="flex flex-col items-center gap-0.5 text-right">
+                <p className="text-white text-sm font-bold leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">Bethel Church</p>
+                <p className="text-white/80 text-xs leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] text-right">{s.title}</p>
+                <div className="flex flex-col items-center gap-1 mt-1">
+                  <p className="text-white/60 text-[10px]">
+                    {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
+                  <span className={`inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600/80 text-white' : 'bg-red-600/80 text-white'}`}>
+                    {isFacebook ? <FaFacebook className="text-[9px]" /> : <FaYoutube className="text-[9px]" />}
+                  </span>
+                </div>
+              </div>
+
               <div className="flex flex-col items-center gap-0.5">
                 <button
                   onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
@@ -136,18 +150,7 @@ export default function PastStreams() {
               </a>
             </div>
 
-            <div className={`absolute left-4 bottom-16 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}>
-              <p className="text-white text-sm font-bold leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">Bethel Church</p>
-              <p className="text-white/80 text-xs leading-tight mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">{s.title}</p>
-              <div className="flex items-center gap-2 mt-1.5">
-                <p className="text-white/60 text-[10px]">
-                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                </p>
-                <span className={`inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600/80 text-white' : 'bg-red-600/80 text-white'}`}>
-                  {isFacebook ? <FaFacebook className="text-[9px]" /> : <FaYoutube className="text-[9px]" />}
-                </span>
-              </div>
-            </div>
+            <div className={`absolute left-4 bottom-16 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
           </div>
         );
       })}
