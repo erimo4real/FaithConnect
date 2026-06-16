@@ -85,10 +85,11 @@ export default function PastStreams() {
               >
                 {videoId ? (
                   <img
-                    src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                    src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
                     alt=""
                     className="w-full h-full object-cover"
                     loading={i === 0 ? 'eager' : 'lazy'}
+                    onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
                   />
                 ) : fbThumb ? (
                   <img
@@ -102,7 +103,8 @@ export default function PastStreams() {
                     <FaFacebook className="text-8xl text-blue-500/20" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-l from-black/30 via-transparent to-transparent"></div>
               </button>
             )}
 
