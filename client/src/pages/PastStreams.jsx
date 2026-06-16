@@ -46,7 +46,7 @@ export default function PastStreams() {
   }
 
   return (
-    <div className="bg-gray-900">
+    <div className="h-screen overflow-y-scroll snap-y snap-mandatory bg-gray-900">
       {items.map((s, i) => {
         const isLatest = i === 0;
         const videoId = getYoutubeId(s.youtube_url);
@@ -57,7 +57,7 @@ export default function PastStreams() {
         return (
           <section
             key={s.id}
-            className={`relative w-full ${isLatest ? 'min-h-screen snap-start' : 'min-h-[90vh] snap-start'} flex flex-col`}
+            className="relative w-full h-screen snap-start flex flex-col"
           >
             {isPlaying ? (
               <div className="absolute inset-0 bg-black">
