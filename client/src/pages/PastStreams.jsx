@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchStreamArchive } from '../services/api';
-import { FaPlay, FaFacebook, FaYoutube, FaHeart, FaShare, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaPlay, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { HiHeart, HiOutlineHeart, HiArrowUp } from 'react-icons/hi';
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -80,7 +81,7 @@ export default function PastStreams() {
             ) : (
               <button
                 onClick={() => setPlayingId(s.id)}
-                className="absolute inset-0 w-full h-full group cursor-pointer focus:outline-none z-10"
+                className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none z-10"
               >
                 {videoId ? (
                   <img
@@ -101,75 +102,50 @@ export default function PastStreams() {
                     <FaFacebook className="text-8xl text-blue-500/20" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center shadow-2xl">
-                    <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
               </button>
             )}
 
-            <div className={`absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-10 w-[100px] ${isPlaying ? 'hidden' : ''}`}>
-              <div className="flex flex-col items-center gap-1.5">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-primary/30 ring-2 ring-white/10">
-                  BC
-                </div>
-                <span className="text-[11px] text-white/90 font-semibold leading-tight text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">Bethel Church</span>
+            <div className={`absolute right-3 bottom-32 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="w-12 h-12 rounded-full bg-white/20 ring-2 ring-white/40 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                BC
               </div>
-
-              <div className="w-8 h-px bg-white/10"></div>
-
-              <div className="flex flex-col items-center gap-1 text-center">
-                <h2 className="text-white text-sm font-bold leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{s.title}</h2>
-                <p className="text-gray-300 text-[11px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                </p>
-                <span className={`inline-flex items-center gap-1.5 text-[10px] px-3 py-1 rounded-full mt-1 font-medium ${isFacebook ? 'bg-blue-600/90 text-white' : 'bg-red-600/90 text-white'} backdrop-blur`}>
-                  {isFacebook ? <FaFacebook className="text-xs" /> : <FaYoutube className="text-xs" />}
-                  {isFacebook ? 'Facebook' : 'YouTube'}
-                </span>
+              <div className="flex flex-col items-center gap-0.5">
+                <button
+                  onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
+                  className="flex flex-col items-center gap-0.5 text-white"
+                >
+                  {liked[s.id] ? (
+                    <HiHeart className="text-3xl text-red-500" />
+                  ) : (
+                    <HiOutlineHeart className="text-3xl text-white" />
+                  )}
+                  <span className="text-[10px] font-light text-white/80">{liked[s.id] ? '1' : ''}</span>
+                </button>
               </div>
-
-              <div className="w-8 h-px bg-white/10"></div>
-
-              <button
-                onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))}
-                className="flex flex-col items-center gap-1.5 text-white group"
-              >
-                <div className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all group-active:scale-90">
-                  <FaHeart className={`text-lg transition-all ${liked[s.id] ? 'text-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'text-white/90'}`} />
-                </div>
-                <span className="text-[10px] text-white/60 font-medium">{liked[s.id] ? '1' : ''}</span>
-              </button>
-
               <a
                 href={s.youtube_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center gap-1.5 text-white group"
+                className="flex flex-col items-center gap-0.5 text-white"
               >
-                <div className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all group-active:scale-90">
-                  <FaExternalLinkAlt className="text-sm text-white/90" />
-                </div>
-                <span className="text-[10px] text-white/60 font-medium">Open</span>
+                <HiArrowUp className="text-3xl text-white" />
+                <span className="text-[10px] font-light text-white/80">Share</span>
               </a>
             </div>
 
-            <div className={`absolute left-4 bottom-6 right-20 z-10 ${isPlaying ? 'hidden' : ''}`}></div>
-
-            {i === 0 && !isPlaying && (
-              <div className="absolute bottom-36 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-                <div className="flex flex-col items-center text-white/30">
-                  <span className="text-[10px] uppercase tracking-widest mb-0.5">Scroll</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                </div>
+            <div className={`absolute left-4 bottom-16 right-16 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <p className="text-white text-sm font-bold leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">Bethel Church</p>
+              <p className="text-white/80 text-xs leading-tight mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">{s.title}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <p className="text-white/60 text-[10px]">
+                  {new Date(s.deactivated_at || s.activated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+                <span className={`inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded ${isFacebook ? 'bg-blue-600/80 text-white' : 'bg-red-600/80 text-white'}`}>
+                  {isFacebook ? <FaFacebook className="text-[9px]" /> : <FaYoutube className="text-[9px]" />}
+                </span>
               </div>
-            )}
+            </div>
           </div>
         );
       })}
