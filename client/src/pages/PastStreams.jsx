@@ -160,7 +160,8 @@ export default function PastStreams() {
               />
                 ) : (
                   <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                    <img src="/churchlogo.png" alt="" className="w-full h-full object-contain opacity-20" />
+                    <img src={`https://picsum.photos/seed/${s.id}/800/600`} alt="" className="w-full h-full object-cover opacity-40" />
+                    <img src="/churchlogo.png" alt="" className="absolute w-24 h-24 object-contain opacity-30" />
                   </div>
                 )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20"></div>
