@@ -148,6 +148,7 @@ export default function Sermons() {
   const isPlaying = playingId === s.id;
 
   const embedUrl = videoInfo?.embedUrl;
+  const embeddable = videoInfo?.embeddable;
   const platformBadge = getVideoIcon(videoInfo?.platform);
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
@@ -159,7 +160,7 @@ export default function Sermons() {
         Home
       </a>
 
-      {isPlaying && isMobile && (
+      {isPlaying && isMobile && embeddable && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             <iframe
@@ -187,7 +188,7 @@ export default function Sermons() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
             </button>
 
-            {isPlaying && !isMobile ? (
+            {isPlaying && !isMobile && embeddable ? (
               <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-10">
                 <iframe
                   src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1' : '?autoplay=1'}` : s.videoUrl}
@@ -202,7 +203,7 @@ export default function Sermons() {
                 </div>
               </div>
             ) : (
-              <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
+              <button onClick={() => { if (embeddable) setPlayingId(s.id); else window.open(s.videoUrl, '_blank'); }} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {thumbUrl ? (
                   <img src={thumbUrl} alt="" loading="lazy" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { e.target.style.display = 'none'; }}
