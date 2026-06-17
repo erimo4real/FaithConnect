@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchSermons } from '../services/api';
-import { FaYoutube } from 'react-icons/fa';
+import { FaYoutube, FaFacebook, FaVimeoV, FaInstagram } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import { getVideoInfo, getVideoIcon, fetchVideoThumbnail } from '../utils/videoUtils';
 
-function getYoutubeId(url) {
-  if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-  return m ? m[1] : null;
-}
+const platformIcons = { FaYoutube, FaFacebook, FaVimeoV, FaInstagram };
+
+const TikTokIcon = () => (
+  <svg className="w-[11px] h-[11px]" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+  </svg>
+);
 
 export default function Sermons() {
   const [items, setItems] = useState([]);
@@ -20,6 +23,7 @@ export default function Sermons() {
   const [speakerFilter, setSpeakerFilter] = useState('all');
   const [yearFilter, setYearFilter] = useState('all');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [thumbnails, setThumbnails] = useState({});
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -39,6 +43,13 @@ export default function Sermons() {
       const videos = data.filter(s => s.video_url).map(s => ({ ...s, videoUrl: s.video_url }));
       setItems(videos);
       setLoading(false);
+      videos.forEach(s => {
+        if (s.videoUrl && !getVideoInfo(s.videoUrl)?.thumbnail) {
+          fetchVideoThumbnail(s.videoUrl).then(t => {
+            if (t) setThumbnails(p => ({ ...p, [s.id]: t }));
+          });
+        }
+      });
     }).catch(() => setLoading(false));
   }, []);
 
@@ -50,6 +61,10 @@ export default function Sermons() {
     if (yearFilter !== 'all' && !s.date?.startsWith(yearFilter)) return false;
     return true;
   });
+
+  useEffect(() => {
+    if (index >= filtered.length && filtered.length > 0) setIndex(0);
+  }, [filtered.length]);
 
   const goNext = useCallback(() => {
     if (transitioning.current) return;
@@ -98,10 +113,6 @@ export default function Sermons() {
   }, [goNext, goPrev]);
 
   useEffect(() => {
-    if (index >= filtered.length) setIndex(0);
-  }, [filtered.length]);
-
-  useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'ArrowDown') goNext();
       if (e.key === 'ArrowUp') goPrev();
@@ -133,8 +144,13 @@ export default function Sermons() {
   }
 
   const s = filtered[index];
-  const videoId = getYoutubeId(s.videoUrl);
+  const videoInfo = getVideoInfo(s.videoUrl);
   const isPlaying = playingId === s.id;
+
+  const embedUrl = videoInfo?.embedUrl;
+  const platformBadge = getVideoIcon(videoInfo?.platform);
+  const BadgeIcon = platformIcons[platformBadge.icon] || null;
+  const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
 
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden bg-black select-none">
@@ -142,11 +158,12 @@ export default function Sermons() {
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
         Home
       </a>
+
       {isPlaying && isMobile && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             <iframe
-              src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : s.videoUrl}
+              src={videoInfo?.embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '&autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl}
               title={s.title}
               className="absolute inset-0 w-full h-full"
               frameBorder="0"
@@ -173,7 +190,7 @@ export default function Sermons() {
             {isPlaying && !isMobile ? (
               <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-10">
                 <iframe
-                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : s.videoUrl}
+                  src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1' : '?autoplay=1'}` : s.videoUrl}
                   title={s.title}
                   className="w-full h-full"
                   frameBorder="0"
@@ -186,9 +203,9 @@ export default function Sermons() {
               </div>
             ) : (
               <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
-                {videoId ? (
-                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" loading="lazy" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
-                    onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
+                {thumbUrl ? (
+                  <img src={thumbUrl} alt="" loading="lazy" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
@@ -213,8 +230,8 @@ export default function Sermons() {
               <div className="flex flex-col items-center gap-1.5 text-center">
                 <p className="text-white font-medium text-sm md:text-sm leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] max-w-[130px]">{s.title}</p>
                 <p className="text-white/60 text-[11px] md:text-[10px] font-light drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">{s.date ? new Date(s.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</p>
-                <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[9px] px-2.5 py-1 rounded-full mt-1 bg-red-600/90 text-white font-medium shadow-lg shadow-red-600/20">
-                  <FaYoutube className="text-[11px]" /> Video
+                <span className={`inline-flex items-center gap-1.5 text-[10px] md:text-[9px] px-2.5 py-1 rounded-full mt-1 text-white font-medium shadow-lg ${platformBadge.color}`}>
+                  {BadgeIcon ? <BadgeIcon className="text-[11px]" /> : <TikTokIcon />} {platformBadge.label}
                 </span>
               </div>
               <button onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))} className="flex flex-col items-center gap-1 text-white group">
