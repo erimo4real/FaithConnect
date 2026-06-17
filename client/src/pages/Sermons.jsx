@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import SermonCard from '../components/SermonCard';
-import Breadcrumbs from '../components/Breadcrumbs';
-import { FaMicrophone, FaVideo, FaFilter, FaFacebook, FaYoutube } from 'react-icons/fa';
-import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { fetchSermons } from '../services/api';
-import FadeInSection from '../components/FadeInSection';
+import { FaYoutube } from 'react-icons/fa';
+import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -13,18 +9,24 @@ function getYoutubeId(url) {
   return m ? m[1] : null;
 }
 
-const Sermons = () => {
-  const [sermons, setSermons] = useState([]);
+export default function Sermons() {
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [speakerFilter, setSpeakerFilter] = useState('all');
-  const [yearFilter, setYearFilter] = useState('all');
-  const [mediaFilter, setMediaFilter] = useState('all');
-  const [showFilters, setShowFilters] = useState(false);
-  const [playingIndex, setPlayingIndex] = useState(null);
+  const [playingId, setPlayingId] = useState(null);
   const [liked, setLiked] = useState(() => {
     try { return JSON.parse(localStorage.getItem('fc_sermon_liked') || '{}'); } catch { return {}; }
   });
+  const [index, setIndex] = useState(0);
+  const [speakerFilter, setSpeakerFilter] = useState('all');
+  const [yearFilter, setYearFilter] = useState('all');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   const touchRef = useRef(null);
   const transitioning = useRef(false);
 
@@ -33,39 +35,37 @@ const Sermons = () => {
   }, [liked]);
 
   useEffect(() => {
-    fetchSermons()
-      .then(data => setSermons(data.map(s => ({ ...s, audioUrl: s.audio_url, videoUrl: s.video_url }))))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    fetchSermons().then(data => {
+      const videos = data.filter(s => s.video_url).map(s => ({ ...s, videoUrl: s.video_url }));
+      setItems(videos);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
-  const speakers = ['all', ...new Set(sermons.map(s => s.speaker))];
-  const years = ['all', ...new Set(sermons.map(s => s.date?.substring(0, 4)))];
+  const speakers = ['all', ...new Set(items.map(s => s.speaker))];
+  const years = ['all', ...new Set(items.map(s => s.date?.substring(0, 4)))];
 
-  const filteredSermons = sermons.filter(sermon => {
-    if (speakerFilter !== 'all' && sermon.speaker !== speakerFilter) return false;
-    if (yearFilter !== 'all' && !sermon.date?.startsWith(yearFilter)) return false;
+  const filtered = items.filter(s => {
+    if (speakerFilter !== 'all' && s.speaker !== speakerFilter) return false;
+    if (yearFilter !== 'all' && !s.date?.startsWith(yearFilter)) return false;
     return true;
   });
-
-  const videoSermons = filteredSermons.filter(s => s.videoUrl);
 
   const goNext = useCallback(() => {
     if (transitioning.current) return;
     transitioning.current = true;
-    setPlayingIndex(i => Math.min(i + 1, videoSermons.length - 1));
+    setIndex(i => Math.min(i + 1, filtered.length - 1));
     setTimeout(() => { transitioning.current = false; }, 400);
-  }, [videoSermons.length]);
+  }, [filtered.length]);
 
   const goPrev = useCallback(() => {
     if (transitioning.current) return;
     transitioning.current = true;
-    setPlayingIndex(i => Math.max(i - 1, 0));
+    setIndex(i => Math.max(i - 1, 0));
     setTimeout(() => { transitioning.current = false; }, 400);
   }, []);
 
   useEffect(() => {
-    if (playingIndex === null) return;
     const el = containerRef.current;
     if (!el) return;
     const onWheel = (e) => {
@@ -76,10 +76,9 @@ const Sermons = () => {
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [goNext, goPrev, playingIndex]);
+  }, [goNext, goPrev]);
 
   useEffect(() => {
-    if (playingIndex === null) return;
     const el = containerRef.current;
     if (!el) return;
     const onTouchStart = (e) => { touchRef.current = e.touches[0].clientY; };
@@ -96,231 +95,167 @@ const Sermons = () => {
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchend', onTouchEnd);
     };
-  }, [goNext, goPrev, playingIndex]);
+  }, [goNext, goPrev]);
 
   useEffect(() => {
-    if (playingIndex === null) return;
+    if (index >= filtered.length) setIndex(0);
+  }, [filtered.length]);
+
+  useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'ArrowDown') goNext();
       if (e.key === 'ArrowUp') goPrev();
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [goNext, goPrev, playingIndex]);
+  }, [goNext, goPrev]);
 
-  const vs = playingIndex !== null ? videoSermons[playingIndex] : null;
-  const videoId = vs ? getYoutubeId(vs.videoUrl) : null;
-  const isFacebook = vs?.videoUrl?.includes('facebook.com');
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+        <p className="text-gray-500 text-sm">Loading sermons...</p>
+      </div>
+    );
+  }
+
+  if (filtered.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4">
+        <p className="text-gray-500">{items.length === 0 ? 'No video sermons yet' : 'No sermons match your filters'}</p>
+        {items.length > 0 && (
+          <button onClick={() => { setSpeakerFilter('all'); setYearFilter('all'); }} className="text-primary text-xs underline hover:text-white transition-colors">
+            Clear filters
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  const s = filtered[index];
+  const videoId = getYoutubeId(s.videoUrl);
+  const isPlaying = playingId === s.id;
 
   return (
-    <div>
-      <div className="relative h-64 bg-gradient-to-r from-primary to-primary/80">
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">Sermons</h1>
-            <p className="text-xl">Watch or listen to our past messages</p>
+    <div ref={containerRef} className="fixed inset-0 overflow-hidden bg-black select-none">
+      <a href="/" className="hidden md:flex absolute top-4 left-4 z-30 text-white/40 hover:text-white text-xs bg-black/40 min-h-[44px] px-3 rounded-full items-center gap-1.5 transition-colors">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+        Home
+      </a>
+      {isPlaying && isMobile && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+            <iframe
+              src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : s.videoUrl}
+              title={s.title}
+              className="absolute inset-0 w-full h-full"
+              frameBorder="0"
+              allowFullScreen
+              allow="autoplay; fullscreen"
+            />
           </div>
-        </div>
-      </div>
-
-      <Breadcrumbs items={[{ label: 'Sermons', link: '/sermons' }]} />
-
-      <FadeInSection>
-        <section className="section-padding bg-gray-50 dark:bg-gray-900 border-b">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  <FaFilter /> Filters
-                </button>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {loading ? 'Loading...' : `Showing ${filteredSermons.length} sermons`}
-                </p>
-              </div>
-              
-              <div className="flex flex-wrap gap-3">
-                <select
-                  value={speakerFilter}
-                  onChange={(e) => setSpeakerFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-800 dark:text-gray-100"
-                >
-                  {speakers.map(speaker => (
-                    <option key={speaker} value={speaker}>
-                      {speaker === 'all' ? 'All Speakers' : speaker}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  value={yearFilter}
-                  onChange={(e) => setYearFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-800 dark:text-gray-100"
-                >
-                  {years.map(year => (
-                    <option key={year} value={year}>
-                      {year === 'all' ? 'All Years' : year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Media Type:</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setMediaFilter('all')}
-                    className={`px-4 py-2 rounded-full transition-colors ${
-                      mediaFilter === 'all' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setMediaFilter('audio')}
-                    className={`px-4 py-2 rounded-full transition-colors flex items-center gap-2 ${
-                      mediaFilter === 'audio' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <FaMicrophone /> Audio
-                  </button>
-                  <button
-                    onClick={() => setMediaFilter('video')}
-                    className={`px-4 py-2 rounded-full transition-colors flex items-center gap-2 ${
-                      mediaFilter === 'video' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <FaVideo /> Video
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-      </FadeInSection>
-
-      <FadeInSection>
-        <section className="section-padding">
-          <div className="max-w-7xl mx-auto px-4">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center gap-4 py-16">
-                <div className="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                <p className="text-gray-400 dark:text-gray-500">Loading sermons...</p>
-              </div>
-            ) : filteredSermons.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredSermons.map((sermon, i) => (
-                  <div key={sermon.id} className="relative">
-                    <SermonCard sermon={sermon} />
-                    {sermon.videoUrl && (
-                      <button
-                        onClick={() => {
-                          const idx = videoSermons.findIndex(s => s.id === sermon.id);
-                          if (idx !== -1) setPlayingIndex(idx);
-                        }}
-                        className="absolute top-2 left-2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors flex items-center gap-1.5"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        Fullscreen
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <p className="text-gray-500 dark:text-gray-400 text-lg">No sermons match your filters.</p>
-                <button
-                  onClick={() => { setSpeakerFilter('all'); setYearFilter('all'); setMediaFilter('all'); }}
-                  className="mt-4 text-primary font-semibold hover:underline"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-      </FadeInSection>
-
-      <FadeInSection>
-        <section className="section-padding bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h2 className="text-2xl font-display font-bold text-primary mb-4">Subscribe to Our Podcast</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Get our sermons delivered to your favorite podcast app</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/podcast" className="bg-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-primary/90 transition-colors">
-                <FaMicrophone /> Listen on Podcast
-              </Link>
-            </div>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {playingIndex !== null && vs && (
-        <div ref={containerRef} className="fixed inset-0 z-50 bg-black">
-          <div className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
-            <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-              <iframe
-                src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(vs.videoUrl)}&show_text=false`}
-                title={vs.title}
-                className="absolute inset-0 w-full h-full"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; fullscreen"
-              />
-            </div>
-            <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
-              <button onClick={() => setPlayingIndex(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
-              </button>
-              <div className="flex items-center gap-2">
-                <p className="text-white/50 text-xs">{playingIndex + 1} / {videoSermons.length}</p>
-                <button onClick={() => setPlayingIndex(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="hidden md:flex h-full items-center justify-center">
-            <div className="relative w-full max-w-5xl px-4">
-              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
-                <iframe
-                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(vs.videoUrl)}&show_text=false`}
-                  title={vs.title}
-                  className="absolute inset-0 w-full h-full"
-                  frameBorder="0"
-                  allowFullScreen
-                  allow="autoplay; fullscreen"
-                />
-                <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
-                  <button onClick={() => setPlayingIndex(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mt-4 px-1">
-                <p className="text-white/30 text-xs">{playingIndex + 1} of {videoSermons.length}</p>
-                <div className="flex items-center gap-4">
-                  <p className="text-white text-sm font-medium">{vs.title}</p>
-                  <p className="text-white/50 text-xs">{vs.speaker}</p>
-                  {playingIndex > 0 && <button onClick={goPrev} className="text-white/30 hover:text-white/60 text-xs transition-colors">&uarr; Previous</button>}
-                  {playingIndex < videoSermons.length - 1 && <button onClick={goNext} className="text-white/30 hover:text-white/60 text-xs transition-colors">Next &darr;</button>}
-                </div>
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setLiked(p => ({ ...p, [vs.id]: !p[vs.id] }))} className="flex flex-col items-center gap-0.5 text-white">
-                    {liked[vs.id] ? <HiHeart className="text-2xl text-red-500" /> : <HiOutlineHeart className="text-2xl text-white/70" />}
-                    <span className="text-[10px] font-light text-white/50">{liked[vs.id] ? '1' : ''}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
+            <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
           </div>
         </div>
       )}
+
+      <div className={`h-full flex flex-col items-center md:justify-center ${isPlaying ? 'hidden md:flex' : ''}`}>
+        <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
+          <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10 animate-fade-in" key={s.id}>
+            <button onClick={() => setPlayingId(null)} className="absolute top-4 left-4 z-20 text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full md:hidden hover:bg-black/60 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            {isPlaying && !isMobile ? (
+              <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-10">
+                <iframe
+                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : s.videoUrl}
+                  title={s.title}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay"
+                />
+                <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
+                  <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
+                {videoId ? (
+                  <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" loading="lazy" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
+                    onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                    <img src="/churchlogo.png" alt="" className="w-20 h-20 object-contain opacity-40" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/10 to-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-20 h-20 md:w-16 md:h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
+                    <svg className="w-8 h-8 md:w-7 md:h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
+                </div>
+              </button>
+            )}
+
+            <div className={`absolute right-2 md:right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-5 z-10 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-14 h-14 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-primary to-accent ring-2 ring-white/30 flex items-center justify-center text-white text-base md:text-sm font-bold shadow-2xl shadow-black/30">BC</div>
+                <p className="text-white/90 text-sm md:text-xs font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] text-center max-w-[100px]">{s.speaker || 'Bethel Church'}</p>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 text-center">
+                <p className="text-white font-medium text-sm md:text-sm leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] max-w-[130px]">{s.title}</p>
+                <p className="text-white/60 text-[11px] md:text-[10px] font-light drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">{s.date ? new Date(s.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</p>
+                <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[9px] px-2.5 py-1 rounded-full mt-1 bg-red-600/90 text-white font-medium shadow-lg shadow-red-600/20">
+                  <FaYoutube className="text-[11px]" /> Video
+                </span>
+              </div>
+              <button onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))} className="flex flex-col items-center gap-1 text-white group">
+                {liked[s.id] ? <HiHeart className="text-3xl md:text-[28px] text-red-500 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition-transform group-active:scale-125" /> : <HiOutlineHeart className="text-3xl md:text-[28px] text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-110 group-active:scale-125" />}
+                <span className="text-[11px] md:text-[10px] font-medium text-white/70 drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">{liked[s.id] ? '1' : ''}</span>
+              </button>
+            </div>
+
+            <div className={`absolute bottom-4 right-3 z-10 flex flex-col gap-1.5 ${isPlaying ? 'hidden' : ''}`}>
+              <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur border border-white/10 rounded-lg px-2.5 py-1.5">
+                <svg className="w-3 h-3 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm4 6a1 1 0 011-1h8a1 1 0 010 2H8a1 1 0 01-1-1zm2 6a1 1 0 011-1h4a1 1 0 010 2h-4a1 1 0 01-1-1z"/></svg>
+                <select value={speakerFilter} onChange={e => { setSpeakerFilter(e.target.value); setIndex(0); }}
+                  className="text-[11px] bg-transparent text-white/80 border-none outline-none appearance-none cursor-pointer pr-3">
+                  {speakers.map(sp => <option key={sp} value={sp} className="text-black">{sp === 'all' ? 'All Speakers' : sp}</option>)}
+                </select>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur border border-white/10 rounded-lg px-2.5 py-1.5">
+                <svg className="w-3 h-3 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <select value={yearFilter} onChange={e => { setYearFilter(e.target.value); setIndex(0); }}
+                  className="text-[11px] bg-transparent text-white/80 border-none outline-none appearance-none cursor-pointer pr-3">
+                  {years.map(y => <option key={y} value={y} className="text-black">{y === 'all' ? 'All Years' : y}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className={`absolute left-4 bottom-4 z-10 text-white/40 text-xs md:hidden ${isPlaying ? 'hidden' : ''}`}>{index + 1} / {filtered.length}</div>
+          </div>
+
+          <div className="hidden md:flex items-center justify-between mt-4 px-1">
+            <p className="text-white/30 text-xs">{index + 1} of {filtered.length}</p>
+            <div className="flex items-center gap-4">
+              <a href="/podcast" className="text-white/30 hover:text-white/60 text-xs transition-colors flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m-4 0h8"/></svg>
+                Podcast
+              </a>
+              {index > 0 && <button onClick={goPrev} className="text-white/30 hover:text-white/60 text-xs transition-colors">&uarr; Previous</button>}
+              {index < filtered.length - 1 && <button onClick={goNext} className="text-white/30 hover:text-white/60 text-xs transition-colors">Next &darr;</button>}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Sermons;
+}
