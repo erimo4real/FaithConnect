@@ -75,12 +75,12 @@ function App() {
       <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
       <Route path="/admin/*" element={<ProtectedRoute><AdminNotFound /></ProtectedRoute>} />
       <Route path="/past-streams" element={<PastStreams />} />
+      <Route path="/sermons" element={<Sermons />} />
       <Route path="/*" element={
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
-            <Route path="/sermons" element={<Sermons />} />
             <Route path="/events" element={<Events />} />
             <Route path="/event-registration" element={<EventRegistration />} />
             <Route path="/live" element={<Live />} />

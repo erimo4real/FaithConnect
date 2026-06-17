@@ -16,10 +16,10 @@ router.get('/', async (req, res) => {
     if (hasPagination) {
       const count = await query('SELECT COUNT(*) FROM sermons');
       const total = parseInt(count.rows[0].count);
-      const result = await query('SELECT * FROM sermons ORDER BY date DESC LIMIT $1 OFFSET $2', [limit, offset]);
+      const result = await query('SELECT * FROM sermons ORDER BY created_at DESC LIMIT $1 OFFSET $2', [limit, offset]);
       return res.json({ data: result.rows, total, page: Math.max(parseInt(req.query.page) || 1, 1), limit });
     }
-    const result = await query('SELECT * FROM sermons ORDER BY date DESC');
+    const result = await query('SELECT * FROM sermons ORDER BY created_at DESC');
     res.json(result.rows);
   } catch (err) {
     logger.error({ err }, 'Failed to list sermons');

@@ -25,8 +25,8 @@ export default function AdminSermons() {
   useEffect(() => { load(); }, []);
 
   const resetForm = () => { setForm({ title: '', speaker: '', date: '', thumbnail: '', audio_url: '', video_url: '', description: '', status: 'published' }); setEditId(null); setShowForm(false); };
-  const handleEdit = (item) => { setForm({ ...item, date: item.date?.slice(0, 10) }); setEditId(item.id); setShowForm(true); };
-  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || null }; try { if (editId) { await adminUpdateSermon(editId, payload); toast.success('Sermon updated'); } else { await adminCreateSermon(payload); toast.success('Sermon created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
+  const handleEdit = (item) => { setForm({ title: item.title || '', speaker: item.speaker || '', date: item.date?.slice(0, 10) || '', thumbnail: item.thumbnail || '', audio_url: item.audio_url || '', video_url: item.video_url || '', description: item.description || '', status: item.status || 'published' }); setEditId(item.id); setShowForm(true); };
+  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || new Date().toISOString().slice(0, 10) }; try { if (editId) { await adminUpdateSermon(editId, payload); toast.success('Sermon updated'); } else { await adminCreateSermon(payload); toast.success('Sermon created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
   const handleDelete = async (id) => { if (!confirm('Delete this sermon?')) return; setDeleting(id); try { await adminDeleteSermon(id); toast.success('Sermon deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
 
   return (

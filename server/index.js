@@ -143,6 +143,26 @@ setInterval(async () => {
   }
 }, 30000);
 
+// Auto-init tables on local PostgreSQL
+(async () => {
+  const dbUrl = process.env.DATABASE_URL || '';
+  if (!dbUrl.includes('localhost') && !dbUrl.includes('127.0.0.1')) return;
+  try {
+    const { readFileSync } = await import('fs');
+    const { join, dirname } = await import('path');
+    const { fileURLToPath } = await import('url');
+    const __d = dirname(fileURLToPath(import.meta.url));
+    const sql = readFileSync(join(__d, 'init.sql'), 'utf8');
+    const stmts = sql.split(';').map(s => s.trim()).filter(s => s && !s.startsWith('--') && !s.startsWith('DROP'));
+    for (const stmt of stmts) {
+      try { await query(stmt + ';'); } catch (e) { /* table may already exist */ }
+    }
+    logger.info('Local tables initialized from init.sql');
+  } catch (err) {
+    logger.warn({ err }, 'Local init skipped');
+  }
+})();
+
 // Auto-seed admin user on first startup
 (async () => {
   try {

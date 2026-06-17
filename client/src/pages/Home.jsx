@@ -213,25 +213,24 @@ const Home = () => {
       </section>
 
       {/* <StatsCounter /> */}
-      {false && sermons.length > 0 && (
+      {sermons.length > 0 && (
         <FadeInSection>
           <section className="section-padding bg-gray-50 dark:bg-gray-900 text-center">
             <div className="max-w-2xl mx-auto px-4">
               <h2 className="text-3xl font-bold font-display text-primary mb-2">Latest Sermon</h2>
               <p className="text-gray-500 dark:text-gray-400 mb-8">Listen to our most recent message</p>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                <div className="relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
-                  {sermons[0].video_url ? (
-                    <iframe src={sermons[0].video_url.replace('watch?v=', 'embed/')} title={sermons[0].title} className="w-full h-full" allowFullScreen />
-                  ) : (
-                    <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-primary font-display">{sermons[0].title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{sermons[0].speaker}</p>
-                  <p className="text-gray-600 dark:text-gray-300 mt-3 text-sm leading-relaxed">{sermons[0].description || 'No description'}</p>
-                  <Link to="/sermons" className="mt-5 inline-block bg-primary text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-colors min-h-[44px]">
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                {sermons[0].video_url ? (
+                  <iframe src={sermons[0].video_url.includes('youtube') ? sermons[0].video_url.replace('watch?v=', 'embed/') : sermons[0].video_url} title={sermons[0].title} className="absolute inset-0 w-full h-full" allowFullScreen />
+                ) : (
+                  <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
+                )}
+                <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+                <div className="absolute inset-0 flex flex-col items-end justify-center text-right pr-8 pl-20 pointer-events-none">
+                  <h3 className="text-white text-2xl font-bold font-display mb-2">{sermons[0].title}</h3>
+                  <p className="text-gray-200 text-sm mb-1">{sermons[0].speaker}</p>
+                  <p className="text-gray-300 text-xs leading-relaxed max-w-xs mb-5">{sermons[0].description || 'No description'}</p>
+                  <Link to="/sermons" className="bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors min-h-[44px] inline-block pointer-events-auto">
                     View All Sermons
                   </Link>
                 </div>
