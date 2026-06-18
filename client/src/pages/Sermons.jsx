@@ -166,7 +166,7 @@ export default function Sermons() {
               <iframe
                 src={embedUrl}
                 title={s.title}
-                className="w-full max-w-xl min-h-[400px]"
+                className="w-full max-w-md min-h-[350px]"
                 frameBorder="0"
                 allowFullScreen
                 allow="autoplay; fullscreen"
@@ -204,7 +204,7 @@ export default function Sermons() {
                   <iframe
                     src={embedUrl}
                     title={s.title}
-                    className="w-full max-w-xl min-h-[400px]"
+                    className="w-full max-w-md min-h-[350px]"
                     style={{ maxHeight: '80vh' }}
                     frameBorder="0"
                     allowFullScreen
