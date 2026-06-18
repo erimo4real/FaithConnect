@@ -222,9 +222,7 @@ const Home = () => {
               <p className="text-gray-500 dark:text-gray-400 mb-8">Listen to our most recent message</p>
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
                 {sermons[0].video_url ? (
-                  <div className="absolute inset-0 overflow-hidden">
-                    <iframe src={getVideoInfo(sermons[0].video_url)?.embedUrl || sermons[0].video_url} title={sermons[0].title} className="absolute top-1/2 left-1/2 w-[130%] h-[130%] -translate-x-1/2 -translate-y-1/2 max-w-none" allowFullScreen />
-                  </div>
+                  <iframe src={getVideoInfo(sermons[0].video_url)?.embedUrl || sermons[0].video_url} title={sermons[0].title} className="absolute inset-0 w-full h-full" allowFullScreen />
                 ) : (
                   <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
                 )}
