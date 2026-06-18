@@ -188,15 +188,17 @@ export default function Sermons() {
             </button>
 
             {isPlaying && !isMobile ? (
-              <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-10">
-                <iframe
-                  src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
-                  title={s.title}
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allowFullScreen
-                  allow="autoplay"
-                />
+              <div className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden bg-black rounded-2xl">
+                <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
+                  <iframe
+                    src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
+                    title={s.title}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allowFullScreen
+                    allow="autoplay"
+                  />
+                </div>
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
                 </div>
@@ -204,7 +206,7 @@ export default function Sermons() {
             ) : (
               <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {thumbUrl ? (
-                  <img src={thumbUrl} alt="" loading="lazy" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
+                  <img src={thumbUrl} alt="" loading="lazy" className="w-full h-full object-contain md:group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 ) : (
