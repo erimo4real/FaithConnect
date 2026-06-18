@@ -163,7 +163,7 @@ export default function Sermons() {
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             <iframe
-              src={videoInfo?.embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '&autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl}
+              src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl}
               title={s.title}
               className="absolute inset-0 w-full h-full"
               frameBorder="0"
@@ -190,7 +190,7 @@ export default function Sermons() {
             {isPlaying && !isMobile ? (
               <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden z-10">
                 <iframe
-                  src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1' : '?autoplay=1'}` : s.videoUrl}
+                  src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
                   title={s.title}
                   className="w-full h-full"
                   frameBorder="0"
