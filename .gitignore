@@ -27,5 +27,15 @@ client/dist
 # Server uploads
 server/uploads/
 
+# Windows reserved names
+nul
+CON
+PRN
+AUX
+COM1
+COM2
+LPT1
+LPT2
+
 # TypeScript
 *.tsbuildinfo
