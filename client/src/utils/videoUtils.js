@@ -16,8 +16,9 @@ export function getVideoInfo(url) {
   const tt = url.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
   if (tt) return { platform: 'tiktok', id: tt[1], embedUrl: `https://www.tiktok.com/embed/v2/${tt[1]}`, thumbnail: null };
 
-  if (url.includes('vt.tiktok.com') || url.includes('tiktok.com')) {
-    return { platform: 'tiktok', id: null, embedUrl: null, externalUrl: url, thumbnail: null };
+  if (url.includes('vt.tiktok.com')) {
+    const match = url.match(/vt\.tiktok\.com\/([\w-]+)/);
+    return { platform: 'tiktok', id: null, embedUrl: null, needsResolve: true, shortCode: match?.[1] || null, rawUrl: url, thumbnail: null };
   }
 
   const ig = url.match(/instagram\.com\/(?:p|reel)\/([^/?#]+)/);
@@ -27,6 +28,25 @@ export function getVideoInfo(url) {
   if (dm) return { platform: 'dailymotion', id: dm[1], embedUrl: `https://www.dailymotion.com/embed/video/${dm[1]}`, thumbnail: null };
 
   return { platform: 'generic', id: null, embedUrl: url, thumbnail: null };
+}
+
+export async function resolveTikTokUrl(url) {
+  try {
+    const res = await fetch(`${API_URL}/streams/resolve-tiktok?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.id) {
+      return { id: data.id, embedUrl: `https://www.tiktok.com/embed/v2/${data.id}` };
+    }
+    if (data.videoUrl) {
+      const match = data.videoUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
+      if (match) {
+        return { id: match[1], embedUrl: `https://www.tiktok.com/embed/v2/${match[1]}` };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export function getVideoIcon(platform) {
