@@ -162,25 +162,14 @@ export default function Sermons() {
       {isPlaying && isMobile && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
           <div className="flex-1 relative flex items-center justify-center overflow-auto">
-            {videoInfo?.platform === 'facebook' ? (
-              <iframe
-                src={embedUrl}
-                title={s.title}
-                className="w-full max-w-[300px] min-h-[350px]"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; fullscreen"
-              />
-            ) : (
-              <iframe
-                src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl}
-                title={s.title}
-                className="w-full h-full"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; fullscreen"
-              />
-            )}
+            <iframe
+              src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl}
+              title={s.title}
+              className="w-full h-full"
+              frameBorder="0"
+              allowFullScreen
+              allow="autoplay; fullscreen"
+            />
           </div>
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
             <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
@@ -199,27 +188,15 @@ export default function Sermons() {
             </button>
 
             {isPlaying && !isMobile ? (
-              <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative flex items-center justify-center">
-                {videoInfo?.platform === 'facebook' ? (
-                  <iframe
-                    src={embedUrl}
-                    title={s.title}
-                    className="w-full max-w-[300px] min-h-[350px]"
-                    style={{ maxHeight: '80vh' }}
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="autoplay"
-                  />
-                ) : (
-                  <iframe
-                    src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
-                    title={s.title}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="autoplay"
-                  />
-                )}
+              <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative">
+                <iframe
+                  src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
+                  title={s.title}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay"
+                />
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
                 </div>
