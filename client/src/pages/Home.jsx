@@ -12,7 +12,6 @@ import GoogleMap from '../components/GoogleMap';
 import FadeInSection from '../components/FadeInSection';
 import { FaPlay, FaCalendarAlt } from 'react-icons/fa';
 import { fetchSermons, fetchEvents, fetchCurrentStream } from '../services/api';
-import { getVideoInfo } from '../utils/videoUtils';
 
 const LIVE_SLIDE_INDEX = 1;
 
@@ -220,22 +219,19 @@ const Home = () => {
             <div className="max-w-2xl mx-auto px-4">
               <h2 className="text-3xl font-bold font-display text-primary mb-2">Latest Sermon</h2>
               <p className="text-gray-500 dark:text-gray-400 mb-8">Listen to our most recent message</p>
-              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
-                {sermons[0].video_url ? (
-                  <iframe src={getVideoInfo(sermons[0].video_url)?.embedUrl || sermons[0].video_url} title={sermons[0].title} className="absolute inset-0 w-full h-full" allowFullScreen />
-                ) : (
-                  <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
-                )}
-                <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
-                <div className="absolute inset-0 flex flex-col items-end justify-center text-right pr-8 pl-20 pointer-events-none">
-                  <h3 className="text-white text-2xl font-bold font-display mb-2">{sermons[0].title}</h3>
-                  <p className="text-gray-200 text-sm mb-1">{sermons[0].speaker}</p>
-                  <p className="text-gray-300 text-xs leading-relaxed max-w-xs mb-5">{sermons[0].description || 'No description'}</p>
-                  <Link to="/sermons" className="bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors min-h-[44px] inline-block pointer-events-auto">
-                    View All Sermons
-                  </Link>
+              <Link to="/sermons" className="block relative aspect-video rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 group">
+                <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-12 opacity-30 group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform">
+                    <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
                 </div>
-              </div>
+                <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none">
+                  <h3 className="text-white text-lg font-bold font-display">{sermons[0].title}</h3>
+                  <p className="text-gray-300 text-sm">{sermons[0].speaker}</p>
+                </div>
+              </Link>
             </div>
           </section>
         </FadeInSection>
