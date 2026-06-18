@@ -53,8 +53,17 @@ const authLimiter = rateLimit({
   max: 20,
   message: { error: 'Too many login attempts, try again later' },
 });
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: { error: 'Too many uploads, try again later' },
+});
+
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/forgot-password', authLimiter);
+app.use('/api/auth/reset-password', authLimiter);
+app.use('/api/uploads', uploadLimiter);
 app.use('/api/', limiter);
 
 // Auth routes

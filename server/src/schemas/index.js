@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   name: z.string().min(1, 'Name required'),
   email: z.string().email('Valid email required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
 export const eventSchema = z.object({
@@ -73,7 +73,7 @@ export const profileSchema = z.object({
 
 export const passwordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password required'),
-  newPassword: z.string().min(6, 'New password must be at least 6 characters'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -82,7 +82,7 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
 export const userUpdateSchema = z.object({
@@ -90,6 +90,20 @@ export const userUpdateSchema = z.object({
   email: z.string().email('Valid email required'),
   role: z.enum(['admin', 'editor', 'viewer']).optional(),
   avatar_url: z.string().nullable().optional(),
+});
+
+export const donationSchema = z.object({
+  name: z.string().min(1, 'Name required'),
+  email: z.string().email('Valid email required'),
+  phone: z.string().nullable().optional(),
+  amount: z.number().positive('Amount must be positive'),
+  type: z.enum(['one-time', 'monthly', 'tithe']).optional(),
+  cause: z.string().optional(),
+  message: z.string().nullable().optional(),
+});
+
+export const subscriberSchema = z.object({
+  email: z.string().email('Valid email required'),
 });
 
 export const contactMessageSchema = z.object({

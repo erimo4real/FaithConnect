@@ -3,18 +3,19 @@ import { query } from '../db.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { paginate } from '../paginate.js';
 import { auditLog } from '../middleware/audit.js';
+import { validate } from '../middleware/validate.js';
+import { donationSchema } from '../schemas/index.js';
 import logger from '../config/logger.js';
 
 const router = Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validate(donationSchema), async (req, res) => {
   const { name, email, phone, amount, type, cause, message } = req.body;
-  if (!name || !email || !amount) return res.status(400).json({ error: 'Name, email, and amount are required' });
   try {
     const result = await query(
       `INSERT INTO donations (name, email, phone, amount, type, cause, message)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [name, email, phone, amount, type || 'one-time', cause || 'general', message]
+      [name, email, phone, String(amount), type || 'one-time', cause || 'general', message]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {

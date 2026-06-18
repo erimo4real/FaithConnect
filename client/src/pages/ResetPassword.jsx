@@ -45,7 +45,7 @@ export default function ResetPassword() {
           <p className="text-gray-500 text-sm mt-1">Enter your new password</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="password" placeholder="New password (6+ chars)" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
+          <input type="password" placeholder="New password (8+ chars)" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
           <input type="password" placeholder="Confirm new password" value={confirm} onChange={e => setConfirm(e.target.value)} required className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
           {error && <p className="text-red-500 text-sm">{error}</p>}
           {message && <p className="text-green-600 text-sm">{message}</p>}

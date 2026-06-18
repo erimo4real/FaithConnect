@@ -3,13 +3,14 @@ import { query } from '../db.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { paginate } from '../paginate.js';
 import { auditLog } from '../middleware/audit.js';
+import { validate } from '../middleware/validate.js';
+import { subscriberSchema } from '../schemas/index.js';
 import logger from '../config/logger.js';
 
 const router = Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validate(subscriberSchema), async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
   try {
     const existing = await query('SELECT id FROM subscribers WHERE email = $1', [email]);
     if (existing.rows.length > 0) {

@@ -1,44 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-function getCookie(name) {
-  const m = document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
-  return m ? decodeURIComponent(m[1]) : null;
-}
-function setCookie(name, value, days = 7) {
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${days * 24 * 60 * 60}; SameSite=Lax`;
-}
-function removeCookie(name) {
-  document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
-}
-
-function getToken() {
-  return localStorage.getItem('fc_token') || getCookie('client_token') || getCookie('app_token');
-}
-export function setToken(token) {
-  if (token) localStorage.setItem('fc_token', token);
-}
-function clearToken() {
-  localStorage.removeItem('fc_token');
-}
-
-export function getStoredUser() {
-  const raw = getCookie('auth_user');
-  return raw ? JSON.parse(raw) : null;
-}
-export function setStoredUser(user) {
-  if (user) setCookie('auth_user', JSON.stringify(user));
-}
-export function clearStoredUser() {
-  removeCookie('auth_user');
-  removeCookie('client_token');
-  removeCookie('app_token');
-  clearToken();
-}
-
 async function apiFetch(url, options = {}) {
-  const headers = { 'Content-Type': 'application/json' };
-  const token = getToken();
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
 
   try {
     const res = await fetch(`${API_URL}${url}`, {
@@ -100,7 +63,7 @@ export async function fetchCurrentStream() { return apiFetch('/streams'); }
 export async function fetchUpcomingStreams() { return apiFetch('/streams/upcoming'); }
 export async function fetchStreamArchive() { return apiFetch('/streams/archive'); }
 
-// Admin
+// Admin CRUD
 export async function adminFetchSermons() { return apiFetch('/sermons'); }
 export async function adminCreateSermon(data) { return apiFetch('/sermons', { method: 'POST', body: JSON.stringify(data) }); }
 export async function adminUpdateSermon(id, data) { return apiFetch(`/sermons/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
@@ -151,7 +114,6 @@ export async function adminDeleteUser(id) { return apiFetch(`/users/${id}`, { me
 
 export async function adminUpdateProfile(data) { return apiFetch('/users/profile', { method: 'PUT', body: JSON.stringify(data) }); }
 export async function adminChangePassword(data) { return apiFetch('/users/password', { method: 'PUT', body: JSON.stringify(data) }); }
-
 export async function adminUpdateAvatar(avatar_url) { return apiFetch('/users/profile', { method: 'PUT', body: JSON.stringify({ avatar_url }) }); }
 
 export async function forgotPassword(email) { return apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }); }
@@ -164,6 +126,7 @@ export async function uploadFile(file) {
   const res = await fetch(`${API_URL}/uploads`, {
     method: 'POST',
     credentials: 'include',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
     body: formData,
   });
   if (!res.ok) {
@@ -179,6 +142,7 @@ export async function uploadMultipleFiles(files) {
   const res = await fetch(`${API_URL}/uploads/multiple`, {
     method: 'POST',
     credentials: 'include',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
     body: formData,
   });
   if (!res.ok) {

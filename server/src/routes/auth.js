@@ -11,32 +11,20 @@ const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 12;
 
-const SAME_SITE = process.env.NODE_ENV === 'production' ? 'none' : 'lax';
-
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: SAME_SITE,
+  sameSite: 'lax',
   path: '/',
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-};
-
-const CLIENT_COOKIE_OPTIONS = {
-  httpOnly: false,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: SAME_SITE,
-  path: '/',
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  maxAge: 24 * 60 * 60 * 1000,
 };
 
 function setTokenCookie(res, token) {
   res.cookie('token', token, COOKIE_OPTIONS);
-  res.cookie('client_token', token, CLIENT_COOKIE_OPTIONS);
 }
 
 function clearTokenCookie(res) {
   res.clearCookie('token', { path: '/' });
-  res.clearCookie('client_token', { path: '/' });
 }
 
 router.post('/register', validate(registerSchema), async (req, res) => {
@@ -54,7 +42,7 @@ router.post('/register', validate(registerSchema), async (req, res) => {
       [name, email, hash]
     );
     const user = result.rows[0];
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     setTokenCookie(res, token);
     res.status(201).json({ token, user });
   } catch (err) {
@@ -76,7 +64,7 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     if (!match) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     setTokenCookie(res, token);
     res.json({
       token,

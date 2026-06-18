@@ -1,11 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginAdmin as loginApi, fetchMe as fetchMeApi, registerAdmin as registerApi, getStoredUser, setStoredUser, clearStoredUser, setToken } from '../services/api';
+import { loginAdmin as loginApi, fetchMe as fetchMeApi, registerAdmin as registerApi } from '../services/api';
 
 export const login = createAsyncThunk('auth/login', async ({ email, password }, { rejectWithValue }) => {
   try {
     const data = await loginApi(email, password);
-    if (data.token) setToken(data.token);
-    if (data.user) setStoredUser(data.user);
     return data.user;
   } catch (err) {
     return rejectWithValue(err.message);
@@ -15,7 +13,6 @@ export const login = createAsyncThunk('auth/login', async ({ email, password }, 
 export const register = createAsyncThunk('auth/register', async ({ name, email, password }, { rejectWithValue }) => {
   try {
     const data = await registerApi(name, email, password);
-    if (data.user) setStoredUser(data.user);
     return data.user;
   } catch (err) {
     return rejectWithValue(err.message);
@@ -24,14 +21,13 @@ export const register = createAsyncThunk('auth/register', async ({ name, email, 
 
 export const checkAuth = createAsyncThunk('auth/checkAuth', async () => {
   const user = await fetchMeApi();
-  if (user) setStoredUser(user);
   return user;
 });
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: getStoredUser(),
+    user: null,
     loading: true,
     error: null,
   },
@@ -43,7 +39,6 @@ const authSlice = createSlice({
       state.user = null;
       state.loading = false;
       state.error = null;
-      clearStoredUser();
     },
     clearError(state) {
       state.error = null;
@@ -79,7 +74,6 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(checkAuth.rejected, (state) => {
-        state.user = getStoredUser() || null;
         state.loading = false;
       });
   },

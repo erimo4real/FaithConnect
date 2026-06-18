@@ -32,6 +32,6 @@ exportCSV.get('/:resource', authenticate, requireAdmin, async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${req.params.resource}-${Date.now()}.csv"`);
     res.send(`${headers}\n${rows}`);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Export failed' });
   }
 });

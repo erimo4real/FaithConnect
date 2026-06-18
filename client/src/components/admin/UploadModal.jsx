@@ -10,7 +10,7 @@ export default function UploadModal({ open, onClose, onUploaded }) {
   const [results, setResults] = useState([]);
   const inputRef = useRef(null);
 
-  const ALLOWED = '.jpg,.jpeg,.png,.gif,.webp,.svg,.mp4,.webm,.mov,.avi,.mkv,.mp3,.wav,.ogg,.aac,.flac,.m4a,.pdf,.doc,.docx';
+  const ALLOWED = '.jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.mov,.avi,.mkv,.mp3,.wav,.ogg,.aac,.flac,.m4a,.pdf,.doc,.docx';
 
   const handleSelect = (e) => {
     const selected = Array.from(e.target.files || []);

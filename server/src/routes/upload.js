@@ -4,7 +4,19 @@ import cloudinary from '../config/cloudinary.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import logger from '../config/logger.js';
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/flac', 'audio/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIMES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`File type ${file.mimetype} not allowed`));
+    }
+  },
+});
 const router = Router();
 
 const folder = 'bethel-church';
@@ -43,7 +55,7 @@ function uploadToCloudinary(buffer, filename) {
   });
 }
 
-router.post('/', authenticate, async (req, res) => {
+router.post('/', authenticate, requireAdmin, async (req, res) => {
   upload.single('file')(req, res, async (err) => {
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE')
       return res.status(413).json({ error: 'File too large — max 20MB' });
@@ -88,7 +100,7 @@ router.post('/multiple', authenticate, requireAdmin, async (req, res) => {
   });
 });
 
-router.get('/', authenticate, async (req, res) => {
+router.get('/', authenticate, requireAdmin, async (req, res) => {
   try {
     const types = ['image', 'video', 'raw'];
     const all = await Promise.all(types.map(resource_type =>

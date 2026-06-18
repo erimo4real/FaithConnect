@@ -31,8 +31,13 @@ export default function RichTextEditor({ content, onChange }) {
   const setLink = () => {
     const url = window.prompt('URL', editor.getAttributes('link').href || 'https://');
     if (url === null) return;
-    if (url) editor.chain().focus().setLink({ href: url }).run();
-    else editor.chain().focus().unsetLink().run();
+    if (url && /^https?:\/\//i.test(url)) {
+      editor.chain().focus().setLink({ href: url }).run();
+    } else if (url) {
+      window.alert('Only http:// and https:// URLs are allowed');
+    } else {
+      editor.chain().focus().unsetLink().run();
+    }
   };
 
   return (
