@@ -160,12 +160,12 @@ export default function Sermons() {
       </a>
 
       {isPlaying && isMobile && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="flex-1 relative flex items-center justify-center">
             <iframe
               src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl}
               title={s.title}
-              className="absolute inset-0 w-full h-full"
+              className="w-full h-full"
               frameBorder="0"
               allowFullScreen
               allow="autoplay; fullscreen"
