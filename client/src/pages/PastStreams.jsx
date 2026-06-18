@@ -160,6 +160,10 @@ export default function PastStreams() {
 
   return (
     <div ref={containerRef} className="h-screen h-dvh md:h-screen overflow-hidden bg-black relative select-none">
+      <a href="/" className="hidden md:flex absolute top-4 left-4 z-30 text-white/40 hover:text-white text-xs bg-black/40 min-h-[44px] px-3 rounded-full items-center gap-1.5 transition-colors">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+        Home
+      </a>
       {isPlaying ? (
         <div className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>

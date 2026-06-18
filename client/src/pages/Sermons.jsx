@@ -96,6 +96,19 @@ export default function Sermons() {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    const onWheel = (e) => {
+      if (transitioning.current) { e.preventDefault(); return; }
+      e.preventDefault();
+      if (e.deltaY > 0) goNext();
+      else if (e.deltaY < 0) goPrev();
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [goNext, goPrev]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
     const onTouchStart = (e) => { touchRef.current = e.touches[0].clientY; };
     const onTouchEnd = (e) => {
       if (!touchRef.current) return;
