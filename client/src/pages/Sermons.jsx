@@ -182,23 +182,21 @@ export default function Sermons() {
 
       <div className={`h-full flex flex-col items-center md:justify-center ${isPlaying ? 'hidden md:flex' : ''}`}>
         <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
-          <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10 animate-fade-in" key={s.id}>
+          <div className={`relative w-full h-full md:h-auto md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10 animate-fade-in ${isPlaying ? 'md:min-h-[50vh]' : 'md:aspect-video'}`} key={s.id}>
             <button onClick={() => setPlayingId(null)} className="absolute top-4 left-4 z-20 text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full md:hidden hover:bg-black/60 transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
             </button>
 
             {isPlaying && !isMobile ? (
-              <div className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden bg-black rounded-2xl">
-                <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
-                  <iframe
-                    src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
-                    title={s.title}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="autoplay"
-                  />
-                </div>
+              <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative">
+                <iframe
+                  src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl}
+                  title={s.title}
+                  className="w-full h-full min-h-[50vh]"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay"
+                />
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
                 </div>
