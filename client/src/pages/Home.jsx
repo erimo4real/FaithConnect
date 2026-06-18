@@ -12,7 +12,6 @@ import GoogleMap from '../components/GoogleMap';
 import FadeInSection from '../components/FadeInSection';
 import { FaPlay, FaCalendarAlt } from 'react-icons/fa';
 import { fetchSermons, fetchEvents, fetchCurrentStream } from '../services/api';
-import { getVideoInfo } from '../utils/videoUtils';
 
 const LIVE_SLIDE_INDEX = 1;
 
@@ -139,10 +138,6 @@ const Home = () => {
   };
 
   const featuredSermon = sermons[0];
-  const embedSrc = featuredSermon?.video_url ? (() => {
-    const u = getVideoInfo(featuredSermon.video_url)?.embedUrl || featuredSermon.video_url;
-    return u + (u.includes('?') ? '&' : '?') + 'autoplay=1';
-  })() : null;
   const upcomingEvents = events.slice(0, 3);
 
   return (
@@ -223,20 +218,19 @@ const Home = () => {
           <section className="section-padding bg-gray-50 dark:bg-gray-900 text-center">
             <div className="max-w-2xl mx-auto px-4">
               <h2 className="text-3xl font-bold font-display text-primary mb-2">Latest Sermon</h2>
-              <p className="text-gray-500 dark:text-gray-400 mb-8">Watch our most recent message</p>
-              <div className="rounded-2xl overflow-hidden shadow-lg bg-black">
-                <div className="relative aspect-video bg-gradient-to-br from-gray-800 to-gray-900">
-                  {sermons[0].video_url ? (
-                    <iframe src={embedSrc} title={sermons[0].title} className="absolute inset-0 w-full h-full" allowFullScreen allow="autoplay" />
-                  ) : (
-                    <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
-                  )}
-                </div>
-                <div className="p-5 text-left bg-white dark:bg-gray-800">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{sermons[0].title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{sermons[0].speaker} &middot; {sermons[0].date ? new Date(sermons[0].date).toLocaleDateString() : ''}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">{sermons[0].description || ''}</p>
-                  <Link to="/sermons" className="bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors min-h-[44px] inline-block">
+              <p className="text-gray-500 dark:text-gray-400 mb-8">Listen to our most recent message</p>
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                {sermons[0].video_url ? (
+                  <iframe src={sermons[0].video_url.includes('youtube') ? sermons[0].video_url.replace('watch?v=', 'embed/') : sermons[0].video_url} title={sermons[0].title} className="absolute inset-0 w-full h-full" allowFullScreen />
+                ) : (
+                  <img src={sermons[0].thumbnail || '/churchlogo.png'} alt={sermons[0].title} className="w-full h-full object-contain p-8 opacity-40" />
+                )}
+                <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+                <div className="absolute inset-0 flex flex-col items-end justify-center text-right pr-8 pl-20 pointer-events-none">
+                  <h3 className="text-white text-2xl font-bold font-display mb-2">{sermons[0].title}</h3>
+                  <p className="text-gray-200 text-sm mb-1">{sermons[0].speaker}</p>
+                  <p className="text-gray-300 text-xs leading-relaxed max-w-xs mb-5">{sermons[0].description || 'No description'}</p>
+                  <Link to="/sermons" className="bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors min-h-[44px] inline-block pointer-events-auto">
                     View All Sermons
                   </Link>
                 </div>
