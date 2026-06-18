@@ -50,6 +50,22 @@ router.get('/archive', async (req, res) => {
   }
 });
 
+router.get('/resolve-tiktok', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).json({ error: 'Missing url param' });
+    if (!url.includes('tiktok.com')) return res.json({ videoUrl: null });
+    const resp = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
+    const finalUrl = resp.url || url;
+    const match = finalUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
+    if (match) return res.json({ videoUrl: finalUrl, id: match[1] });
+    res.json({ videoUrl: finalUrl, id: null });
+  } catch (err) {
+    logger.error({ err }, 'Failed to resolve TikTok URL');
+    res.json({ videoUrl: null });
+  }
+});
+
 router.get('/thumbnail', async (req, res) => {
   try {
     const { url } = req.query;

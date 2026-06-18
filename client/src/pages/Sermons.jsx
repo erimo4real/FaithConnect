@@ -162,7 +162,19 @@ export default function Sermons() {
       {isPlaying && isMobile && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
           <div className="flex-1 relative flex items-center justify-center overflow-auto">
-            <iframe src={embedUrl ? `${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}` : s.videoUrl} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+            {videoInfo?.externalUrl ? (
+              <div className="text-center p-8">
+                <p className="text-white/60 text-sm mb-4">TikTok videos cannot be embedded. Open in TikTok to watch.</p>
+                <a href={videoInfo.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors text-sm">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.67 2.89 2.89 0 01-2.88-2.89 2.89 2.89 0 012.88-2.89c.45 0 .88.1 1.26.28V8.47a6.3 6.3 0 00-1.26-.14A6.36 6.36 0 003.2 14.6a6.36 6.36 0 006.14 6.51 6.36 6.36 0 006.14-6.51V9.75a8.3 8.3 0 004.1 1.9V8.25a4.86 4.86 0 01-3.99-1.56z"/></svg>
+                  Open in TikTok
+                </a>
+              </div>
+            ) : embedUrl ? (
+              <iframe src={`${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+            ) : (
+              <p className="text-white/40 text-sm">Video unavailable for embedding</p>
+            )}
           </div>
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
             <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
@@ -182,7 +194,19 @@ export default function Sermons() {
 
             {isPlaying && !isMobile ? (
               <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative flex items-center justify-center">
-                <iframe src={embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}` : s.videoUrl} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay" />
+                {videoInfo?.externalUrl ? (
+                  <div className="text-center p-8">
+                    <p className="text-white/60 text-sm mb-4">TikTok videos cannot be embedded. Open in TikTok to watch.</p>
+                    <a href={videoInfo.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors text-sm">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.67 2.89 2.89 0 01-2.88-2.89 2.89 2.89 0 012.88-2.89c.45 0 .88.1 1.26.28V8.47a6.3 6.3 0 00-1.26-.14A6.36 6.36 0 003.2 14.6a6.36 6.36 0 006.14 6.51 6.36 6.36 0 006.14-6.51V9.75a8.3 8.3 0 004.1 1.9V8.25a4.86 4.86 0 01-3.99-1.56z"/></svg>
+                      Open in TikTok
+                    </a>
+                  </div>
+                ) : embedUrl ? (
+                  <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay" />
+                ) : (
+                  <p className="text-white/40 text-sm">Video unavailable for embedding</p>
+                )}
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
                 </div>

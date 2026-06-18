@@ -16,6 +16,10 @@ export function getVideoInfo(url) {
   const tt = url.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
   if (tt) return { platform: 'tiktok', id: tt[1], embedUrl: `https://www.tiktok.com/embed/v2/${tt[1]}`, thumbnail: null };
 
+  if (url.includes('vt.tiktok.com') || url.includes('tiktok.com')) {
+    return { platform: 'tiktok', id: null, embedUrl: null, externalUrl: url, thumbnail: null };
+  }
+
   const ig = url.match(/instagram\.com\/(?:p|reel)\/([^/?#]+)/);
   if (ig) return { platform: 'instagram', id: ig[1], embedUrl: `https://www.instagram.com/p/${ig[1]}/embed`, thumbnail: null };
 
