@@ -161,6 +161,7 @@ export default function Sermons() {
   const isPlaying = playingId === s.id;
 
   const embedUrl = videoInfo?.embedUrl || resolvedTikTok[s.id]?.embedUrl;
+  const isFacebook = s.videoUrl?.includes('facebook.com');
   const platformBadge = getVideoIcon(videoInfo?.platform);
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
@@ -174,9 +175,17 @@ export default function Sermons() {
 
       {isPlaying && isMobile && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          <div className="flex-1 relative flex items-center justify-center overflow-auto">
-            {embedUrl ? (
+              <div className="flex-1 relative flex items-center justify-center overflow-auto">
+            {embedUrl && !isFacebook ? (
               <iframe src={`${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+            ) : embedUrl && isFacebook ? (
+              <div className="flex flex-col items-center gap-4 px-4">
+                <iframe src={`${embedUrl}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '400px' }} frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+                <p className="text-white/50 text-xs text-center">Facebook may block embedded playback. Watch directly:</p>
+                <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
+                  <FaFacebook className="w-4 h-4" /> Watch on Facebook
+                </a>
+              </div>
             ) : videoInfo?.needsResolve ? (
               <div className="flex items-center gap-2 text-white/40 text-sm">
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -204,8 +213,16 @@ export default function Sermons() {
 
             {isPlaying && !isMobile ? (
               <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative flex items-center justify-center">
-                {embedUrl ? (
+                {embedUrl && !isFacebook ? (
                   <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay" />
+                ) : embedUrl && isFacebook ? (
+                  <div className="flex flex-col items-center gap-4 px-4">
+                    <iframe src={`${embedUrl}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '400px' }} frameBorder="0" allowFullScreen allow="autoplay" />
+                    <p className="text-white/50 text-xs text-center">Facebook may block embedded playback. Watch directly:</p>
+                    <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
+                      <FaFacebook className="w-4 h-4" /> Watch on Facebook
+                    </a>
+                  </div>
                 ) : videoInfo?.needsResolve ? (
                   <div className="flex items-center gap-2 text-white/40 text-sm">
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>

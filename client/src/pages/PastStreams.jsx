@@ -164,17 +164,35 @@ export default function PastStreams() {
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
         Home
       </a>
-      {isPlaying ? (
+      {isPlaying && (
         <div className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-            <iframe
-              src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
-              title={s.title}
-              className="absolute inset-0 w-full h-full"
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay; fullscreen"
-            />
+            {videoId ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0`}
+                title={s.title}
+                className="absolute inset-0 w-full h-full"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; fullscreen"
+              />
+            ) : isFacebook ? (
+              <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
+                <p className="text-white/50 text-xs">Facebook may block embedded playback. Watch directly:</p>
+                <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
+                  <FaFacebook className="w-4 h-4" /> Watch on Facebook
+                </a>
+              </div>
+            ) : (
+              <iframe
+                src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
+                title={s.title}
+                className="absolute inset-0 w-full h-full"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; fullscreen"
+              />
+            )}
           </div>
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
             <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
@@ -186,7 +204,7 @@ export default function PastStreams() {
             </div>
           </div>
         </div>
-      ) : null}
+      )}
 
       <div className={`h-full flex flex-col items-center md:justify-center ${isPlaying ? 'hidden md:flex' : ''}`}>
         <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
@@ -202,14 +220,32 @@ export default function PastStreams() {
             )}
             {isPlaying ? (
               <div className="hidden md:block absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
-                <iframe
-                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
-                  title={s.title}
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allowFullScreen
-                  allow="autoplay"
-                />
+                {videoId ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`}
+                    title={s.title}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allowFullScreen
+                    allow="autoplay"
+                  />
+                ) : isFacebook ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
+                    <p className="text-white/50 text-xs">Facebook may block embedded playback. Watch directly:</p>
+                    <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
+                      <FaFacebook className="w-4 h-4" /> Watch on Facebook
+                    </a>
+                  </div>
+                ) : (
+                  <iframe
+                    src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
+                    title={s.title}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allowFullScreen
+                    allow="autoplay"
+                  />
+                )}
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
                   <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
