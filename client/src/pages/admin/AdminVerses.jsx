@@ -62,7 +62,7 @@ export default function AdminVerses() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scheduled Date</label>
                 <input type="date" value={form.scheduled_date} onChange={e => setForm({ ...form, scheduled_date: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
-                <p className="text-xs text-gray-400 mt-1">Leave blank for auto-schedule (Wed/Sun)</p>
+                <p className="text-xs text-gray-400 mt-1">Leave blank for auto-schedule (Tue/Thu)</p>
               </div>
               <div className="flex items-end pb-2">
                 <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
@@ -104,7 +104,7 @@ export default function AdminVerses() {
                   <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-200">{item.reference}</td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-400 max-w-xs truncate">{item.verse_text}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{item.version}</td>
-                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{item.scheduled_date ? new Date(item.scheduled_date).toLocaleDateString() : <span className="text-gray-400 italic text-xs">Auto (Wed/Sun)</span>}</td>
+                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{item.scheduled_date ? new Date(item.scheduled_date).toLocaleDateString() : <span className="text-gray-400 italic text-xs">Auto (Tue/Thu)</span>}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.is_published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
                       {item.is_published ? 'Published' : 'Scheduled'}

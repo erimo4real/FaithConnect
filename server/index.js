@@ -155,7 +155,7 @@ setInterval(async () => {
   }
 }, 30000);
 
-// Auto-publish bible verses by scheduled date + auto-schedule on Wed/Sun (Option C)
+// Auto-publish bible verses by scheduled date + auto-schedule on Tue/Thu (Option C)
 setInterval(async () => {
   try {
     const lagosDate = "(NOW() AT TIME ZONE 'Africa/Lagos')::date";
@@ -171,7 +171,7 @@ setInterval(async () => {
       logger.info({ verses: published.map(r => r.reference) }, 'Auto-published bible verses by scheduled date');
     }
 
-    // On Wednesdays (3) and Sundays (0), auto-assign the next unscheduled verse
+    // On Tuesdays (2) and Thursdays (4), auto-assign the next unscheduled verse
     const { rows: autoScheduled } = await query(
       `UPDATE bible_verses SET scheduled_date = ${lagosDate}, is_published = true
        WHERE id = (
@@ -180,7 +180,7 @@ setInterval(async () => {
          ORDER BY created_at ASC
          LIMIT 1
        )
-       AND ${lagosDow} IN (0, 3)
+       AND ${lagosDow} IN (2, 4)
        AND NOT EXISTS (
          SELECT 1 FROM bible_verses
          WHERE is_published = true AND scheduled_date = ${lagosDate}
