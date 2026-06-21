@@ -3,6 +3,7 @@ import { fetchCurrentStream, fetchUpcomingStreams } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { FaBroadcastTower, FaCalendarAlt, FaClock, FaTimes, FaExpand, FaRedo, FaExclamationTriangle, FaYoutube, FaFacebook } from 'react-icons/fa';
 import FadeInSection from '../components/FadeInSection';
+import { normalizeFacebookUrl } from '../utils/videoUtils';
 
 function getEmbedUrl(url) {
   if (!url) return '';
@@ -11,7 +12,8 @@ function getEmbedUrl(url) {
     return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1&controls=1&rel=0`;
   }
   if (url.includes('facebook.com')) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+    const cleanUrl = normalizeFacebookUrl(url);
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(cleanUrl)}&show_text=false`;
   }
   return url;
 }

@@ -1,5 +1,13 @@
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+export function normalizeFacebookUrl(url) {
+  if (!url || !url.includes('facebook.com')) return url;
+  let clean = url.replace(/^https?:\/\/web\.facebook\.com/, 'https://www.facebook.com');
+  const match = clean.match(/[?&]v=(\d+)/);
+  if (match) return `https://www.facebook.com/watch/?v=${match[1]}`;
+  return clean;
+}
+
 export function getVideoInfo(url) {
   if (!url) return null;
 
@@ -7,7 +15,8 @@ export function getVideoInfo(url) {
   if (yt) return { platform: 'youtube', id: yt[1], embedUrl: `https://www.youtube.com/embed/${yt[1]}`, thumbnail: `https://img.youtube.com/vi/${yt[1]}/maxresdefault.jpg` };
 
   if (url.includes('facebook.com') || url.includes('fb.watch')) {
-    return { platform: 'facebook', id: null, embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`, thumbnail: null };
+    const cleanUrl = normalizeFacebookUrl(url);
+    return { platform: 'facebook', id: null, embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(cleanUrl)}&show_text=false`, thumbnail: null };
   }
 
   const vm = url.match(/vimeo\.com\/(\d+)/);

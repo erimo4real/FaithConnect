@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchStreamArchive } from '../services/api';
 import { FaFacebook, FaYoutube } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import { normalizeFacebookUrl } from '../utils/videoUtils';
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -179,7 +180,7 @@ export default function PastStreams() {
             ) : (
               <div className="absolute inset-0 w-full h-full">
                 <iframe
-                  src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(normalizeFacebookUrl(s.youtube_url))}&show_text=false`}
                   title={s.title}
                   className="absolute inset-0 w-full h-full"
                   frameBorder="0"
@@ -230,7 +231,7 @@ export default function PastStreams() {
                 ) : (
                   <div className="relative w-full h-full">
                     <iframe
-                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+                  src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(normalizeFacebookUrl(s.youtube_url))}&show_text=false`}
                       title={s.title}
                       className="absolute inset-0 w-full h-full"
                       frameBorder="0"
