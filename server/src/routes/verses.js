@@ -34,7 +34,7 @@ router.get('/today', async (req, res) => {
   try {
     const lagosDate = "(NOW() AT TIME ZONE 'Africa/Lagos')::date";
     const result = await query(
-      `SELECT * FROM bible_verses WHERE is_published = true AND scheduled_date <= ${lagosDate} ORDER BY scheduled_date DESC LIMIT 1`
+      `SELECT * FROM bible_verses WHERE is_published = true AND (scheduled_date <= ${lagosDate} OR scheduled_date IS NULL) ORDER BY scheduled_date DESC NULLS LAST, created_at DESC LIMIT 1`
     );
     if (result.rows.length === 0) return res.json(null);
     res.json(result.rows[0]);
