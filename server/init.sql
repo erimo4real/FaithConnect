@@ -189,6 +189,16 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS bible_verses (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  verse_text TEXT NOT NULL,
+  reference TEXT NOT NULL,
+  version TEXT DEFAULT 'NIV',
+  scheduled_date DATE,
+  is_published BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS audit_logs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,

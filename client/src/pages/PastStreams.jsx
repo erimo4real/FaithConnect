@@ -168,7 +168,7 @@ export default function PastStreams() {
         <div className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             <iframe
-              src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+              src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0` : `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
               title={s.title}
               className="absolute inset-0 w-full h-full"
               frameBorder="0"
@@ -203,7 +203,7 @@ export default function PastStreams() {
             {isPlaying ? (
               <div className="hidden md:block absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
                 <iframe
-                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+                  src={videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1` : `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
                   title={s.title}
                   className="w-full h-full"
                   frameBorder="0"

@@ -12,7 +12,6 @@ export default function AdminStreams() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ title: '', youtube_url: '', scheduled_date: '', scheduled_time: '', end_time: '', recurring: '', is_live: false });
-  const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
@@ -25,7 +24,7 @@ export default function AdminStreams() {
 
   const load = async () => { try { setItems(await adminFetchStreams()); } catch (err) { toast.error(err.message); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
-  const resetForm = () => { setForm({ title: '', url: '', description: '', status: 'upcoming' }); setEditId(null); setShowForm(false); };
+  const resetForm = () => { setForm({ title: '', youtube_url: '', scheduled_date: '', scheduled_time: '', end_time: '', recurring: '', is_live: false }); setEditId(null); setShowForm(false); };
   const handleEdit = (item) => { setForm(item); setEditId(item.id); setShowForm(true); };
   const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); try { if (editId) { await adminUpdateStream(editId, form); toast.success('Stream updated'); } else { await adminCreateStream(form); toast.success('Stream created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
   const handleDelete = async (id) => { if (!confirm('Delete this stream?')) return; setDeleting(id); try { await adminDeleteStream(id); toast.success('Stream deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
@@ -71,7 +70,7 @@ export default function AdminStreams() {
                   <span>Live now</span>
                 </label>
               </div>
-              <button type="submit" disabled={submitting} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]">{submitting ? 'Saving...' : editId ? 'Update' : 'Create'}</button>
+              <button type="submit" disabled={saving} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]">{saving ? 'Saving...' : editId ? 'Update' : 'Create'}</button>
             </form>
           </div>
         )}

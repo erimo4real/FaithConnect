@@ -27,6 +27,7 @@ import ordersRouter from './src/routes/orders.js';
 import subscribersRouter from './src/routes/subscribers.js';
 import uploadRouter from './src/routes/upload.js';
 import usersRouter from './src/routes/users.js';
+import versesRouter from './src/routes/verses.js';
 import { exportCSV } from './src/export.js';
 
 const app = express();
@@ -87,6 +88,8 @@ app.use('/api/uploads', uploadRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // CSV Export
+app.use('/api/verses', versesRouter);
+
 app.use('/api/export', exportCSV);
 
 // Health check
@@ -151,6 +154,46 @@ setInterval(async () => {
     logger.error({ err }, 'Stream auto-activation error');
   }
 }, 30000);
+
+// Auto-publish bible verses by scheduled date + auto-schedule on Wed/Sun (Option C)
+setInterval(async () => {
+  try {
+    const lagosDate = "(NOW() AT TIME ZONE 'Africa/Lagos')::date";
+    const lagosDow = "EXTRACT(DOW FROM (NOW() AT TIME ZONE 'Africa/Lagos'))";
+
+    // Publish verses whose scheduled date has arrived
+    const { rows: published } = await query(
+      `UPDATE bible_verses SET is_published = true
+       WHERE is_published = false AND scheduled_date <= ${lagosDate}
+       RETURNING reference`
+    );
+    if (published.length) {
+      logger.info({ verses: published.map(r => r.reference) }, 'Auto-published bible verses by scheduled date');
+    }
+
+    // On Wednesdays (3) and Sundays (0), auto-assign the next unscheduled verse
+    const { rows: autoScheduled } = await query(
+      `UPDATE bible_verses SET scheduled_date = ${lagosDate}, is_published = true
+       WHERE id = (
+         SELECT id FROM bible_verses
+         WHERE is_published = false AND scheduled_date IS NULL
+         ORDER BY created_at ASC
+         LIMIT 1
+       )
+       AND ${lagosDow} IN (0, 3)
+       AND NOT EXISTS (
+         SELECT 1 FROM bible_verses
+         WHERE is_published = true AND scheduled_date = ${lagosDate}
+       )
+       RETURNING reference`
+    );
+    if (autoScheduled.length) {
+      logger.info({ verses: autoScheduled.map(r => r.reference) }, 'Auto-scheduled bible verses for today');
+    }
+  } catch (err) {
+    logger.error({ err }, 'Verse auto-publish error');
+  }
+}, 60000);
 
 // Auto-init tables on local PostgreSQL
 (async () => {

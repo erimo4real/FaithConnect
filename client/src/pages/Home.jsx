@@ -10,8 +10,8 @@ import WhatToExpect from '../components/WhatToExpect';
 import SocialFeed from '../components/SocialFeed';
 import GoogleMap from '../components/GoogleMap';
 import FadeInSection from '../components/FadeInSection';
-import { FaPlay, FaCalendarAlt } from 'react-icons/fa';
-import { fetchSermons, fetchEvents, fetchCurrentStream } from '../services/api';
+import { FaPlay, FaCalendarAlt, FaBookOpen } from 'react-icons/fa';
+import { fetchSermons, fetchEvents, fetchCurrentStream, fetchVerseOfTheDay } from '../services/api';
 
 const LIVE_SLIDE_INDEX = 1;
 
@@ -80,12 +80,14 @@ const Home = () => {
   const [stream, setStream] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [verseOfDay, setVerseOfDay] = useState(null);
 
   useEffect(() => {
     fetchSermons().then(data => {
       setSermons(data.map(s => ({ ...s, audioUrl: s.audio_url, videoUrl: s.video_url })));
     }).catch(() => {});
     fetchEvents().then(setEvents).catch(() => {}).finally(() => setLoading(false));
+    fetchVerseOfTheDay().then(setVerseOfDay).catch(() => {});
     const poll = () => fetchCurrentStream().then(setStream).catch(() => {});
     poll();
     const pollId = setInterval(poll, 30000);
@@ -213,6 +215,30 @@ const Home = () => {
       </section>
 
       {/* <StatsCounter /> */}
+
+      {verseOfDay && (
+        <FadeInSection>
+          <section className="section-padding bg-white dark:bg-gray-800">
+            <div className="max-w-3xl mx-auto px-4 text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 dark:bg-primary/20 rounded-full text-primary text-sm font-medium mb-6">
+                <FaBookOpen className="w-4 h-4" />
+                Verse of the Day
+              </div>
+              <blockquote className="text-xl md:text-2xl text-gray-700 dark:text-gray-200 leading-relaxed italic mb-4">
+                &ldquo;{verseOfDay.verse_text}&rdquo;
+              </blockquote>
+              <cite className="text-primary font-semibold not-italic text-lg">{verseOfDay.reference}</cite>
+              <span className="text-gray-400 text-sm ml-2">{verseOfDay.version}</span>
+              <div className="mt-6">
+                <Link to="/verses" className="text-primary hover:underline font-medium text-sm">
+                  View All Verses &rarr;
+                </Link>
+              </div>
+            </div>
+          </section>
+        </FadeInSection>
+      )}
+
       {sermons.length > 0 && (
         <FadeInSection>
           <section className="section-padding bg-gray-50 dark:bg-gray-900 text-center">

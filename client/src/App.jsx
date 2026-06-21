@@ -25,6 +25,7 @@ import EventRegistration from './pages/EventRegistration';
 import Podcast from './pages/Podcast';
 import StaffDirectory from './pages/StaffDirectory';
 import PastStreams from './pages/PastStreams';
+import Verses from './pages/Verses';
 import AdminLogin from './pages/AdminLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -43,6 +44,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminProfile from './pages/AdminProfile';
 import AdminNotFound from './pages/admin/AdminNotFound';
 import AdminMedia from './pages/admin/AdminMedia';
+import AdminVerses from './pages/admin/AdminVerses';
 
 function App() {
   const dispatch = useDispatch();
@@ -72,6 +74,7 @@ function App() {
       <Route path="/admin/contact" element={<ProtectedRoute><AdminContact /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
       <Route path="/admin/media" element={<ProtectedRoute><AdminMedia /></ProtectedRoute>} />
+      <Route path="/admin/verses" element={<ProtectedRoute><AdminVerses /></ProtectedRoute>} />
       <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
       <Route path="/admin/*" element={<ProtectedRoute><AdminNotFound /></ProtectedRoute>} />
       <Route path="/past-streams" element={<PastStreams />} />
@@ -81,6 +84,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/verses" element={<Verses />} />
             <Route path="/events" element={<Events />} />
             <Route path="/event-registration" element={<EventRegistration />} />
             <Route path="/live" element={<Live />} />

@@ -31,6 +31,7 @@ const adminLinks = [
   { to: '/admin/streams', label: 'Streams', icon: HiOutlineVideoCamera },
   { to: '/admin/prayer', label: 'Prayer', icon: HiOutlineHeart },
   { to: '/admin/contact', label: 'Contact', icon: HiOutlineMail },
+  { to: '/admin/verses', label: 'Verses', icon: HiOutlineBookOpen },
   { to: '/admin/donations', label: 'Donations', icon: HiOutlineCurrencyDollar },
   { to: '/admin/orders', label: 'Orders', icon: HiOutlineShoppingCart },
   { to: '/admin/subscribers', label: 'Subscribers', icon: HiOutlineInbox },
@@ -42,6 +43,7 @@ const adminLinks = [
 const editorLinks = [
   { to: '/admin', label: 'Dashboard', icon: HiOutlineViewGrid },
   { to: '/admin/sermons', label: 'Sermons', icon: HiOutlineBookOpen },
+  { to: '/admin/verses', label: 'Verses', icon: HiOutlineBookOpen },
   { to: '/admin/events', label: 'Events', icon: HiOutlineCalendar },
   { to: '/admin/blog', label: 'Blog', icon: HiOutlinePencil },
   { to: '/admin/gallery', label: 'Gallery', icon: HiOutlinePhotograph },

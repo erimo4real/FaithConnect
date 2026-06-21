@@ -116,6 +116,14 @@ export async function adminUpdateProfile(data) { return apiFetch('/users/profile
 export async function adminChangePassword(data) { return apiFetch('/users/password', { method: 'PUT', body: JSON.stringify(data) }); }
 export async function adminUpdateAvatar(avatar_url) { return apiFetch('/users/profile', { method: 'PUT', body: JSON.stringify({ avatar_url }) }); }
 
+export async function fetchVerses() { return apiFetch('/verses/published'); }
+export async function fetchVerseOfTheDay() { return apiFetch('/verses/today'); }
+
+export async function adminFetchVerses() { return apiFetch('/verses'); }
+export async function adminCreateVerse(data) { return apiFetch('/verses', { method: 'POST', body: JSON.stringify(data) }); }
+export async function adminUpdateVerse(id, data) { return apiFetch(`/verses/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
+export async function adminDeleteVerse(id) { return apiFetch(`/verses/${id}`, { method: 'DELETE' }); }
+
 export async function forgotPassword(email) { return apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }); }
 export async function resetPassword(token, password) { return apiFetch('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }); }
 

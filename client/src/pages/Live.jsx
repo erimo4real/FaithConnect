@@ -11,7 +11,7 @@ function getEmbedUrl(url) {
     return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1&controls=1&rel=0`;
   }
   if (url.includes('facebook.com')) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+    return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true`;
   }
   return url;
 }

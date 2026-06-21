@@ -114,6 +114,14 @@ export const contactMessageSchema = z.object({
   message: z.string().min(1, 'Message required'),
 });
 
+export const bibleVerseSchema = z.object({
+  verse_text: z.string().min(1, 'Verse text required'),
+  reference: z.string().min(1, 'Reference required'),
+  version: z.string().optional(),
+  scheduled_date: z.string().nullable().optional(),
+  is_published: z.boolean().optional(),
+});
+
 export const contactStatusSchema = z.object({
   status: z.enum(['unread', 'read', 'replied']),
 });
