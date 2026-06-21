@@ -58,10 +58,10 @@ export const gallerySchema = z.object({
 
 export const streamSchema = z.object({
   title: z.string().min(1, 'Title required'),
-  youtube_url: z.string().nullable().optional(),
-  scheduled_date: z.string().nullable().optional(),
-  scheduled_time: z.string().nullable().optional(),
-  end_time: z.string().nullable().optional(),
+  youtube_url: z.string().min(1, 'Video URL required'),
+  scheduled_date: z.string().min(1, 'Date required'),
+  scheduled_time: z.string().min(1, 'Start time required'),
+  end_time: z.string().min(1, 'End time required'),
   recurring: z.string().nullable().optional(),
   is_live: z.boolean().optional(),
 });
