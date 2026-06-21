@@ -176,15 +176,14 @@ export default function Sermons() {
       {isPlaying && isMobile && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
               <div className="flex-1 relative flex items-center justify-center overflow-auto">
-            {embedUrl && !isFacebook ? (
-              <iframe src={`${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
-            ) : embedUrl && isFacebook ? (
-              <div className="flex flex-col items-center gap-4 px-4">
-                <iframe src={`${embedUrl}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '400px' }} frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
-                <p className="text-white/50 text-xs text-center">Facebook may block embedded playback. Watch directly:</p>
-                <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
-                  <FaFacebook className="w-4 h-4" /> Watch on Facebook
-                </a>
+            {embedUrl ? (
+              <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
+                <iframe src={`${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+                {isFacebook && (
+                  <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
+                    Open on Facebook
+                  </a>
+                )}
               </div>
             ) : videoInfo?.needsResolve ? (
               <div className="flex items-center gap-2 text-white/40 text-sm">
@@ -213,15 +212,14 @@ export default function Sermons() {
 
             {isPlaying && !isMobile ? (
               <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative flex items-center justify-center">
-                {embedUrl && !isFacebook ? (
-                  <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '540px' }} frameBorder="0" allowFullScreen allow="autoplay" />
-                ) : embedUrl && isFacebook ? (
-                  <div className="flex flex-col items-center gap-4 px-4">
-                    <iframe src={`${embedUrl}`} title={s.title} className="w-full max-w-[300px]" style={{ height: '400px' }} frameBorder="0" allowFullScreen allow="autoplay" />
-                    <p className="text-white/50 text-xs text-center">Facebook may block embedded playback. Watch directly:</p>
-                    <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
-                      <FaFacebook className="w-4 h-4" /> Watch on Facebook
-                    </a>
+                {embedUrl ? (
+                  <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
+                    <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" />
+                    {isFacebook && (
+                      <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
+                        Open on Facebook
+                      </a>
+                    )}
                   </div>
                 ) : videoInfo?.needsResolve ? (
                   <div className="flex items-center gap-2 text-white/40 text-sm">

@@ -7,7 +7,7 @@ export function getVideoInfo(url) {
   if (yt) return { platform: 'youtube', id: yt[1], embedUrl: `https://www.youtube.com/embed/${yt[1]}`, thumbnail: `https://img.youtube.com/vi/${yt[1]}/maxresdefault.jpg` };
 
   if (url.includes('facebook.com') || url.includes('fb.watch')) {
-    return { platform: 'facebook', id: null, embedUrl: `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true`, thumbnail: null };
+    return { platform: 'facebook', id: null, embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`, thumbnail: null };
   }
 
   const vm = url.match(/vimeo\.com\/(\d+)/);

@@ -176,22 +176,20 @@ export default function PastStreams() {
                 allowFullScreen
                 allow="autoplay; fullscreen"
               />
-            ) : isFacebook ? (
-              <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
-                <p className="text-white/50 text-xs">Facebook may block embedded playback. Watch directly:</p>
-                <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
-                  <FaFacebook className="w-4 h-4" /> Watch on Facebook
+            ) : (
+              <div className="absolute inset-0 w-full h-full">
+                <iframe
+                  src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+                  title={s.title}
+                  className="absolute inset-0 w-full h-full"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay; fullscreen"
+                />
+                <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors z-10">
+                  Open on Facebook
                 </a>
               </div>
-            ) : (
-              <iframe
-                src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
-                title={s.title}
-                className="absolute inset-0 w-full h-full"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; fullscreen"
-              />
             )}
           </div>
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
@@ -229,22 +227,20 @@ export default function PastStreams() {
                     allowFullScreen
                     allow="autoplay"
                   />
-                ) : isFacebook ? (
-                  <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
-                    <p className="text-white/50 text-xs">Facebook may block embedded playback. Watch directly:</p>
-                    <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium">
-                      <FaFacebook className="w-4 h-4" /> Watch on Facebook
+                ) : (
+                  <div className="relative w-full h-full">
+                    <iframe
+                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(s.youtube_url)}&show_text=false`}
+                      title={s.title}
+                      className="absolute inset-0 w-full h-full"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="autoplay"
+                    />
+                    <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors z-10">
+                      Open on Facebook
                     </a>
                   </div>
-                ) : (
-                  <iframe
-                    src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(s.youtube_url)}&show_text=true`}
-                    title={s.title}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="autoplay"
-                  />
                 )}
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
