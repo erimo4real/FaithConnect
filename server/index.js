@@ -161,6 +161,9 @@ setInterval(async () => {
       logger.info({ streams: deactivated.map(r => r.title) }, 'Auto-deactivated streams');
       for (const s of deactivated) {
         await query(
+          `DELETE FROM stream_logs WHERE stream_id = $1 AND deactivated_at::date = (NOW() AT TIME ZONE 'Africa/Lagos')::date`
+        , [s.id]);
+        await query(
           `INSERT INTO stream_logs (stream_id, title, youtube_url, activated_at, deactivated_at)
            VALUES ($1, $2, $3, COALESCE($4, NOW()), NOW())`,
           [s.id, s.title, s.youtube_url, s.last_activated_at]
