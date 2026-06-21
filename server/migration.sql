@@ -42,6 +42,13 @@ CREATE TABLE IF NOT EXISTS stream_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Remove duplicate stream_log entries (same stream, same day) keeping latest
+DELETE FROM stream_logs a
+USING stream_logs b
+WHERE a.id < b.id
+  AND a.stream_id = b.stream_id
+  AND a.deactivated_at::date = b.deactivated_at::date;
+
 -- Audit Logs
 CREATE TABLE IF NOT EXISTS audit_logs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

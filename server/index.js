@@ -120,9 +120,18 @@ setInterval(async () => {
       `UPDATE streams SET is_live = true, manually_stopped = false, last_activated_at = NOW()
        WHERE is_live = false
        AND manually_stopped = false
+       AND (last_activated_at IS NULL OR last_activated_at::date < ${lagosDate})
        AND (
-         (recurring = 'weekly' AND EXTRACT(DOW FROM scheduled_date) = EXTRACT(DOW FROM ${lagosDate}) AND scheduled_time <= ${lagosTime} AND (end_time IS NULL OR end_time > ${lagosTime}))
-         OR (recurring IS NULL AND scheduled_date = ${lagosDate} AND scheduled_time <= ${lagosTime} AND (end_time IS NULL OR end_time > ${lagosTime}))
+         (recurring = 'weekly' AND EXTRACT(DOW FROM scheduled_date) = EXTRACT(DOW FROM ${lagosDate}) AND scheduled_time <= ${lagosTime} AND (
+           end_time IS NULL
+           OR (end_time > scheduled_time AND end_time > ${lagosTime})
+           OR (end_time <= scheduled_time AND ${lagosTime} <= '23:59'::time)
+         ))
+         OR ((recurring IS NULL OR recurring = '') AND scheduled_date = ${lagosDate} AND scheduled_time <= ${lagosTime} AND (
+           end_time IS NULL
+           OR (end_time > scheduled_time AND end_time > ${lagosTime})
+           OR (end_time <= scheduled_time AND ${lagosTime} <= '23:59'::time)
+         ))
        )
        RETURNING title`
     );
@@ -133,9 +142,17 @@ setInterval(async () => {
     const { rows: deactivated } = await query(
       `UPDATE streams SET is_live = false
        WHERE is_live = true
+       AND end_time IS NOT NULL
        AND (
-         (recurring = 'weekly' AND end_time IS NOT NULL AND end_time <= ${lagosTime})
-         OR (recurring IS NULL AND (scheduled_date < ${lagosDate} OR (scheduled_date = ${lagosDate} AND end_time IS NOT NULL AND end_time <= ${lagosTime})))
+         (recurring = 'weekly' AND (
+           (end_time > scheduled_time AND end_time <= ${lagosTime})
+           OR (end_time <= scheduled_time AND end_time <= ${lagosTime} AND ${lagosTime} < scheduled_time AND scheduled_time - ${lagosTime} > INTERVAL '12 hours')
+         ))
+         OR ((recurring IS NULL OR recurring = '') AND (
+           (end_time > scheduled_time AND scheduled_date < ${lagosDate})
+           OR (scheduled_date = ${lagosDate} AND end_time > scheduled_time AND end_time <= ${lagosTime})
+           OR (scheduled_date = ${lagosDate} - INTERVAL '1 day' AND end_time <= scheduled_time AND end_time <= ${lagosTime} AND ${lagosTime} < scheduled_time AND scheduled_time - ${lagosTime} > INTERVAL '12 hours')
+         ))
        )
        RETURNING id, title, youtube_url, last_activated_at`
     );
