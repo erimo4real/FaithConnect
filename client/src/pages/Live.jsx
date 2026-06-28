@@ -54,7 +54,7 @@ const Live = () => {
         }
         if (!s && prevLiveRef.current) {
           setEndedStream({ title: lastLiveRef.current?.title || '' });
-          setTimeout(() => setEndedStream(null), 60000);
+          setTimeout(() => setEndedStream(null), 3600000);
         }
         if (s?.is_live) lastLiveRef.current = s;
         prevLiveRef.current = s?.is_live || false;
