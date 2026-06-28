@@ -16,6 +16,7 @@ export default function PastStreams() {
   const [items, setItems] = useState([]);
   const [thumbnails, setThumbnails] = useState({});
   const [playingId, setPlayingId] = useState(null);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const [liked, setLiked] = useState(() => {
     try { return JSON.parse(localStorage.getItem('fc_liked') || '{}'); } catch { return {}; }
   });
@@ -26,6 +27,12 @@ export default function PastStreams() {
   const containerRef = useRef(null);
   const touchRef = useRef(null);
   const transitioning = useRef(false);
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     if (showHint) {
@@ -217,8 +224,8 @@ export default function PastStreams() {
                 <p className="text-white/40 text-xs">Swipe up/down</p>
               </div>
             )}
-            {isPlaying ? (
-              <div className="hidden md:block absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
+            {isPlaying && isDesktop ? (
+              <div className="absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
                 {videoId ? (
                   <iframe
                     src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`}
