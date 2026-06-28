@@ -6,7 +6,7 @@ import { normalizeFacebookUrl } from '../utils/videoUtils';
 
 function getYoutubeId(url) {
   if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+  const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|live\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
   return m ? m[1] : null;
 }
 

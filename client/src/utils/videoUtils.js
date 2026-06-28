@@ -11,7 +11,7 @@ export function normalizeFacebookUrl(url) {
 export function getVideoInfo(url) {
   if (!url) return null;
 
-  const yt = url.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
+  const yt = url.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|live\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
   if (yt) return { platform: 'youtube', id: yt[1], embedUrl: `https://www.youtube.com/embed/${yt[1]}`, thumbnail: `https://img.youtube.com/vi/${yt[1]}/maxresdefault.jpg` };
 
   if (url.includes('facebook.com') || url.includes('fb.watch')) {

@@ -8,7 +8,7 @@ import { normalizeFacebookUrl } from '../utils/videoUtils';
 function getEmbedUrl(url) {
   if (!url) return '';
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|live\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
     return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1&controls=1&rel=0`;
   }
   if (url.includes('facebook.com')) {
