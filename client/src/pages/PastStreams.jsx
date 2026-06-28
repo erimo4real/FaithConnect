@@ -16,7 +16,18 @@ export default function PastStreams() {
   const [items, setItems] = useState([]);
   const [thumbnails, setThumbnails] = useState({});
   const [playingId, setPlayingId] = useState(null);
+  const [playingUrl, setPlayingUrl] = useState('');
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  const playVideo = useCallback((id, item) => {
+    const vid = getYoutubeId(item.youtube_url);
+    const url = vid
+      ? `https://www.youtube.com/embed/${vid}?autoplay=1&controls=1`
+      : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(normalizeFacebookUrl(item.youtube_url))}&show_text=false`;
+    setPlayingUrl(url);
+    setPlayingId(id);
+  }, []);
+  const closePlayer = useCallback(() => { setPlayingUrl(''); setTimeout(() => setPlayingId(null), 150); }, []);
   const [liked, setLiked] = useState(() => {
     try { return JSON.parse(localStorage.getItem('fc_liked') || '{}'); } catch { return {}; }
   });
@@ -173,27 +184,20 @@ export default function PastStreams() {
         Home
       </a>
       {isPlaying && (
-        <div className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
+        <div key={s.id} className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-            {videoId ? (
+            {playingUrl && (
               <iframe
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0`}
+                key={playingUrl}
+                src={playingUrl}
                 title={s.title}
                 className="absolute inset-0 w-full h-full"
                 frameBorder="0"
                 allowFullScreen
                 allow="autoplay; fullscreen"
               />
-            ) : (
-              <div className="absolute inset-0 w-full h-full">
-                <iframe
-                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(normalizeFacebookUrl(s.youtube_url))}&show_text=false`}
-                  title={s.title}
-                  className="absolute inset-0 w-full h-full"
-                  frameBorder="0"
-                  allowFullScreen
-                  allow="autoplay; fullscreen"
-                />
+            )}
+            {!getYoutubeId(s.youtube_url) && s.youtube_url?.includes('facebook.com') && (
                 <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors z-10">
                   Open on Facebook
                 </a>
@@ -201,12 +205,12 @@ export default function PastStreams() {
             )}
           </div>
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
-            <button onClick={() => setPlayingId(null)} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
+            <button onClick={closePlayer} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
             </button>
             <div className="flex items-center gap-2">
               <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
-              <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
+              <button onClick={closePlayer} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
             </div>
           </div>
         </div>
@@ -215,7 +219,7 @@ export default function PastStreams() {
       <div className={`h-full flex flex-col items-center md:justify-center ${isPlaying ? 'hidden md:flex' : ''}`}>
         <div className="w-full md:max-w-5xl md:px-4 relative flex-1 md:flex-none md:h-auto">
           <div className="relative w-full h-full md:h-auto md:aspect-video md:rounded-2xl md:overflow-hidden md:shadow-2xl md:shadow-black/50 md:ring-1 md:ring-white/10 animate-fade-in" key={s.id}>
-            <button onClick={() => setPlayingId(null)} className="absolute top-4 left-4 z-20 text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full md:hidden hover:bg-black/60 transition-colors">
+            <button onClick={closePlayer} className="absolute top-4 left-4 z-20 text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full md:hidden hover:bg-black/60 transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
             </button>
             {showHint && (
@@ -225,38 +229,25 @@ export default function PastStreams() {
               </div>
             )}
             {isPlaying && isDesktop ? (
-              <div className="absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
-                {videoId ? (
+              <div key={`desktop-${s.id}`} className="absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
+                {playingUrl && (
                   <iframe
-                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`}
+                    key={playingUrl}
+                    src={playingUrl}
                     title={s.title}
                     className="w-full h-full"
                     frameBorder="0"
                     allowFullScreen
                     allow="autoplay"
                   />
-                ) : (
-                  <div className="relative w-full h-full">
-                    <iframe
-                  src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(normalizeFacebookUrl(s.youtube_url))}&show_text=false`}
-                      title={s.title}
-                      className="absolute inset-0 w-full h-full"
-                      frameBorder="0"
-                      allowFullScreen
-                      allow="autoplay"
-                    />
-                    <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors z-10">
-                      Open on Facebook
-                    </a>
-                  </div>
                 )}
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-30">
                   <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
-                  <button onClick={() => setPlayingId(null)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
+                  <button onClick={closePlayer} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
                 </div>
               </div>
             ) : (
-              <button onClick={() => setPlayingId(s.id)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
+              <button onClick={() => playVideo(s.id, s)} className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none group">
                 {videoId ? (
                   <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover object-center md:group-hover:scale-[1.02] transition-transform duration-500"
                     onError={(e) => { if (e.target.src.includes('maxresdefault')) e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
@@ -318,7 +309,7 @@ export default function PastStreams() {
             </div>
             <div className="space-y-3">
               {items.map((v, i) => (
-                <button key={v.id} onClick={() => { setIndex(i); setPlayingId(v.id); setShowMore(false); }}
+                <button key={v.id} onClick={() => { setIndex(i); playVideo(v.id, v); setShowMore(false); }}
                   className={`w-full flex gap-3 text-left rounded-xl overflow-hidden transition-colors group ${i === index ? 'ring-2 ring-primary' : 'hover:bg-white/5'}`}
                 >
                   <div className="w-28 shrink-0 relative aspect-video bg-gray-800">
