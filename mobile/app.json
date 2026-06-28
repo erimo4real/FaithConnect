@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Bethel Church",
+    "slug": "bethel-church",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.bethelchurch.mobile" },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1a4b8c",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.bethelchurch.mobile"
+    },
+    "web": { "favicon": "./assets/favicon.png", "name": "Bethel Church" },
+    "extra": { "apiUrl": "https://bethel-church-f1kp.onrender.com" }
+  }
+}
