@@ -16,6 +16,9 @@ export default function AdminStreams() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [page, setPage] = useState(1);
+  const [extendModal, setExtendModal] = useState(null);
+  const [extendMinutes, setExtendMinutes] = useState(30);
+  const [dismissedEndId, setDismissedEndId] = useState(null);
   const pageSize = 10;
 
   const filtered = items.filter(item => { if (!search) return true; const q = search.toLowerCase(); return Object.values(item).some(v => String(v).toLowerCase().includes(q)); });
@@ -29,6 +32,59 @@ export default function AdminStreams() {
   const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); try { if (editId) { await adminUpdateStream(editId, form); toast.success('Stream updated'); } else { await adminCreateStream(form); toast.success('Stream created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
   const handleDelete = async (id) => { if (!confirm('Delete this stream?')) return; setDeleting(id); try { await adminDeleteStream(id); toast.success('Stream deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
 
+  useEffect(() => {
+    if (!current || !current.is_live || !current.end_time) { setExtendModal(null); return; }
+    if (dismissedEndId === current.id) return;
+
+    const check = () => {
+      const endTime = current.end_time.length === 5 ? current.end_time + ':00' : current.end_time;
+      const endDate = new Date(`${current.scheduled_date}T${endTime}+01:00`);
+      const diffMs = endDate.getTime() - Date.now();
+      if (diffMs <= 0) { setExtendModal({ expired: true, minsLeft: 0 }); return; }
+      const minsLeft = Math.floor(diffMs / 60000);
+      if (minsLeft <= 20) {
+        setExtendModal(last => last?.showPicker ? last : { minsLeft, showPicker: false });
+      } else {
+        setExtendModal(last => last && !last.showPicker ? null : last);
+      }
+    };
+
+    check();
+    const interval = setInterval(check, 15000);
+    return () => clearInterval(interval);
+  }, [current, dismissedEndId]);
+
+  const handleExtend = async () => {
+    if (!current) return;
+    try {
+      const [h, m] = current.end_time.split(':').map(Number);
+      const total = h * 60 + m + extendMinutes;
+      const newH = Math.floor(total / 60) % 24;
+      const newM = total % 60;
+      const newEnd = `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+      await adminUpdateStream(current.id, {
+        title: current.title,
+        youtube_url: current.youtube_url,
+        scheduled_date: current.scheduled_date,
+        scheduled_time: current.scheduled_time,
+        end_time: newEnd,
+        recurring: current.recurring,
+        is_live: true,
+      });
+      toast.success(`Extended to ${newEnd}`);
+      setExtendModal(null);
+      setDismissedEndId(null);
+      load();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleDismissExtend = () => {
+    if (current) setDismissedEndId(current.id);
+    setExtendModal(null);
+  };
+
   return (
     <AdminLayout title="Live Streams">
       {current && (
@@ -38,6 +94,48 @@ export default function AdminStreams() {
             <span className="font-semibold text-sm">{current.is_live ? 'Currently Live' : 'Currently Offline'}</span>
             {current.title && <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">— {current.title}</span>}
           </div>
+        </div>
+      )}
+
+      {extendModal && (
+        <div className="mb-6 p-4 rounded-xl border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
+          {!extendModal.showPicker ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p className="font-semibold text-sm text-yellow-800 dark:text-yellow-200">
+                  {extendModal.expired ? 'Stream should have ended' : 'Live stream ending soon'}
+                </p>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                  {extendModal.expired
+                    ? 'The end time has passed. Do you want to extend or end the stream?'
+                    : `The stream ends in ${extendModal.minsLeft} minute${extendModal.minsLeft !== 1 ? 's' : ''}. Extend the time or let it end?`}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={handleDismissExtend} className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px]">Let it end</button>
+                <button onClick={() => setExtendModal({ ...extendModal, showPicker: true })} className="px-4 py-2 text-sm font-medium rounded-xl bg-primary text-white hover:bg-accent transition-colors min-h-[44px]">Extend</button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="font-semibold text-sm text-yellow-800 dark:text-yellow-200 mb-3">Extend stream by:</p>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                {[10, 20, 30, 60, 90].map(n => (
+                  <button key={n} onClick={() => setExtendMinutes(n)}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl border transition-colors min-h-[44px] ${extendMinutes === n ? 'bg-primary text-white border-primary' : 'border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+                    {n} min
+                  </button>
+                ))}
+                <input type="number" value={extendMinutes} onChange={e => setExtendMinutes(Math.max(1, parseInt(e.target.value) || 0))}
+                  className="w-20 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm dark:bg-gray-800 dark:text-gray-200" min="1" />
+                <span className="text-sm text-gray-500 dark:text-gray-400">min</span>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setExtendModal({ ...extendModal, showPicker: false })} className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px]">Back</button>
+                <button onClick={handleExtend} className="px-4 py-2 text-sm font-medium rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors min-h-[44px]">Apply extension</button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

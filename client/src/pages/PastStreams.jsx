@@ -183,8 +183,8 @@ export default function PastStreams() {
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
         Home
       </a>
-      {isPlaying && (
-        <div key={s.id} className="fixed inset-0 bg-black z-50 md:hidden flex items-center justify-center">
+      {isPlaying && !isDesktop && (
+        <div key={s.id} className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             {playingUrl && (
               <iframe
@@ -198,21 +198,16 @@ export default function PastStreams() {
               />
             )}
             {!getYoutubeId(s.youtube_url) && s.youtube_url?.includes('facebook.com') && (
-                <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors z-10">
-                  Open on Facebook
-                </a>
-              </div>
+              <a href={s.youtube_url} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors z-10">
+                Open on Facebook
+              </a>
             )}
           </div>
-          <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-30">
-            <button onClick={closePlayer} className="text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowMore(true)} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">More videos</button>
-              <button onClick={closePlayer} className="text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors">Close</button>
-            </div>
-          </div>
+          <button onClick={closePlayer} className="absolute top-4 left-4 text-white/70 bg-black/40 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/60 transition-colors z-30">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button onClick={() => setShowMore(true)} className="absolute top-4 right-20 text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors z-30">More videos</button>
+          <button onClick={closePlayer} className="absolute top-4 right-4 text-white/70 text-xs bg-black/60 min-h-[44px] px-4 rounded-full hover:bg-black/80 transition-colors z-30">Close</button>
         </div>
       )}
 
