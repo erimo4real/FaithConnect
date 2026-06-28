@@ -38,7 +38,9 @@ const Live = () => {
   const [error, setError] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [justWentLive, setJustWentLive] = useState(false);
+  const [endedStream, setEndedStream] = useState(null);
   const prevLiveRef = useRef(false);
+  const lastLiveRef = useRef(null);
 
   useEffect(() => {
     let stopped = false;
@@ -50,6 +52,11 @@ const Live = () => {
           setJustWentLive(true);
           setTimeout(() => setJustWentLive(false), 6000);
         }
+        if (!s && prevLiveRef.current) {
+          setEndedStream({ title: lastLiveRef.current?.title || '' });
+          setTimeout(() => setEndedStream(null), 60000);
+        }
+        if (s?.is_live) lastLiveRef.current = s;
         prevLiveRef.current = s?.is_live || false;
         setStream(s);
         setError(null);
@@ -177,10 +184,19 @@ const Live = () => {
                     alt=""
                     className="absolute inset-0 w-full h-full object-contain opacity-10"
                   />
-                  <div className="relative text-center text-white">
-                    <img src="/churchlogo.png" alt="Bethel Church" className="h-20 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold mb-2">Stream Offline</h2>
-                    <p className="text-gray-400">We're not live right now</p>
+                  <div className="relative text-center text-white px-4">
+                    <img src="/churchlogo.png" alt="Bethel Church" className="h-16 mx-auto mb-3" />
+                    <h2 className="text-2xl font-bold mb-2">{endedStream ? 'Live Stream Has Ended' : 'Stream Offline'}</h2>
+                    <p className="text-gray-400 max-w-lg mx-auto">
+                      {endedStream
+                        ? `${endedStream.title ? `"${endedStream.title}" has ended. ` : ''}Scroll down to view today's, last week's, and all past live streams.`
+                        : "We're not live right now. Check the schedule below for upcoming streams."}
+                    </p>
+                    {endedStream && (
+                      <a href="/past-streams" className="inline-block mt-5 px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium">
+                        View Past Streams
+                      </a>
+                    )}
                   </div>
                 </div>
               )}
@@ -217,10 +233,10 @@ const Live = () => {
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                   <h2 className="text-xl font-bold text-white">
-                    {isLive ? stream?.title || 'Live Stream' : (timeLeft !== null && timeLeft > 0 ? stream?.title || 'Next Stream' : 'Offline')}
+                    {isLive ? stream?.title || 'Live Stream' : (timeLeft !== null && timeLeft > 0 ? stream?.title || 'Next Stream' : endedStream ? 'Stream Ended' : 'Offline')}
                   </h2>
                   <p className="text-gray-400">
-                    {isLive ? 'Live now' : (timeLeft !== null && timeLeft > 0 ? `Starting in ${days}d ${hours}h ${mins}m ${secs}s` : 'Check our schedule for upcoming streams')}
+                    {isLive ? 'Live now' : (timeLeft !== null && timeLeft > 0 ? `Starting in ${days}d ${hours}h ${mins}m ${secs}s` : endedStream ? 'Watch the replay in past streams' : 'Check our schedule for upcoming streams')}
                   </p>
                 </div>
                 {isLive && streamUrl && (
