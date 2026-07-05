@@ -88,8 +88,8 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full aspect-video bg-gray-800 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <div className="w-full aspect-video bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                      <span className="text-white/40 text-lg font-bold">{v.title?.charAt(0)?.toUpperCase() || '?'}</span>
                     </div>
                   )}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-1.5 pt-4 pb-1">

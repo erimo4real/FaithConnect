@@ -58,6 +58,27 @@ export default function PastStreams() {
     localStorage.setItem('fc_liked', JSON.stringify(liked));
   }, [liked]);
 
+  function fetchFacebookThumbnailOembed(url) {
+    return new Promise((resolve) => {
+      const cb = '_fbo_' + Date.now();
+      window[cb] = (d) => { delete window[cb]; sh(); resolve(d.thumbnail_url || d.thumbnail || null); };
+      const sh = () => { try { document.head.removeChild(s); } catch {} };
+      const s = document.createElement('script');
+      s.src = `https://www.facebook.com/plugins/video/oembed.json?url=${encodeURIComponent(url)}&format=json&callback=${cb}`;
+      s.onerror = () => { delete window[cb]; sh(); resolve(null); };
+      document.head.appendChild(s);
+    });
+  }
+
+  async function fetchFacebookThumbnail(url) {
+    const res = await fetch(`${API_URL}/streams/thumbnail?url=${encodeURIComponent(url)}`);
+    if (res.ok) {
+      const d = await res.json();
+      if (d.thumbnail) return d.thumbnail;
+    }
+    return fetchFacebookThumbnailOembed(url);
+  }
+
   useEffect(() => {
     fetchStreamArchive().then(async (data) => {
       setItems(data);
@@ -65,11 +86,7 @@ export default function PastStreams() {
       const fbItems = data.filter(s => s.youtube_url?.includes('facebook.com'));
       if (fbItems.length === 0) return;
       const results = await Promise.allSettled(
-        fbItems.map(s =>
-          fetch(`${API_URL}/streams/thumbnail?url=${encodeURIComponent(s.youtube_url)}`)
-            .then(r => r.json())
-            .then(d => ({ id: s.id, url: d.thumbnail }))
-        )
+        fbItems.map(s => fetchFacebookThumbnail(s.youtube_url).then(url => ({ id: s.id, url })))
       );
       const map = {};
       for (const r of results) {
