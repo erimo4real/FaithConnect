@@ -26,13 +26,25 @@ export default function Sermons() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [thumbnails, setThumbnails] = useState({});
   const [resolvedTikTok, setResolvedTikTok] = useState({});
+  const [nonYtOverlay, setNonYtOverlay] = useState(false);
   const containerRef = useRef(null);
+  const nonYtTimerRef = useRef(null);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  useEffect(() => {
+    return () => clearTimeout(nonYtTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    setNonYtOverlay(false);
+    clearTimeout(nonYtTimerRef.current);
+  }, [playingId]);
+
   const touchRef = useRef(null);
   const transitioning = useRef(false);
 
@@ -167,6 +179,27 @@ export default function Sermons() {
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
 
+  const relatedVideos = filtered.filter((_, i) => i !== index).map(v => {
+    const vi = getVideoInfo(v.videoUrl);
+    return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
+  });
+
+  const handleSelectRelated = useCallback((v) => {
+    const idx = filtered.findIndex(item => item.id === v.id);
+    if (idx >= 0) { setIndex(idx); setPlayingId(v.id); }
+  }, [filtered]);
+
+  const handleNonYtResume = useCallback(() => {
+    setNonYtOverlay(false);
+    clearTimeout(nonYtTimerRef.current);
+    nonYtTimerRef.current = setTimeout(() => setNonYtOverlay(true), 30000);
+  }, []);
+
+  const handleNonYtOverlay = useCallback(() => {
+    setNonYtOverlay(true);
+    clearTimeout(nonYtTimerRef.current);
+  }, []);
+
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden bg-black select-none">
       <a href="/" className="hidden md:flex absolute top-4 left-4 z-30 text-white/40 hover:text-white text-xs bg-black/40 min-h-[44px] px-3 rounded-full items-center gap-1.5 transition-colors">
@@ -182,20 +215,44 @@ export default function Sermons() {
                 <div className="relative w-full h-full">
                   <YouTubePlayer
                     videoId={videoInfo.id}
-                    relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
-                      const vi = getVideoInfo(v.videoUrl);
-                      return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
-                    })}
-                    onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
+                    relatedVideos={relatedVideos}
+                    onSelectRelated={handleSelectRelated}
                   />
                 </div>
               ) : (
                 <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                  <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
-                  {isFacebook && (
-                    <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
-                      Open on Facebook
-                    </a>
+                  <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
+                  {!nonYtOverlay ? (
+                    <div className="absolute inset-0 z-10 cursor-pointer" onClick={handleNonYtOverlay} />
+                  ) : (
+                    <div className="absolute inset-0 bg-black/90 z-20 flex flex-col rounded-lg overflow-hidden">
+                      <div className="flex-1 flex flex-col items-center justify-center px-4">
+                        <button onClick={handleNonYtResume} className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors" aria-label="Continue watching">
+                          <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <p className="text-white/60 text-xs mt-4">Continue watching</p>
+                      </div>
+                      <div className="px-3 pb-3">
+                        <p className="text-white text-[11px] font-semibold mb-2 px-1">More videos</p>
+                        <div className="flex gap-2 overflow-x-auto pb-1">
+                          {relatedVideos.map((v, i) => (
+                            <button key={v.id || i} onClick={() => handleSelectRelated(v)} className="flex-shrink-0 w-28 rounded-lg overflow-hidden hover:ring-2 hover:ring-white/40 transition-all group text-left relative">
+                              {v.thumbnail || v.videoId ? (
+                                <img src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`} alt="" className="w-full aspect-video object-cover" loading="lazy" />
+                              ) : (
+                                <div className="w-full aspect-video bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                                  <span className="text-white/40 text-lg font-bold">{v.title?.charAt(0)?.toUpperCase() || '?'}</span>
+                                </div>
+                              )}
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-1.5 pt-4 pb-1">
+                                <p className="text-white text-[10px] font-medium leading-tight truncate">{v.title}</p>
+                                {v.subtitle && <p className="text-white/60 text-[8px] mt-0.5">{v.subtitle}</p>}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )
@@ -231,20 +288,44 @@ export default function Sermons() {
                     <div className="relative w-full h-full">
                       <YouTubePlayer
                         videoId={videoInfo.id}
-                    relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
-                      const vi = getVideoInfo(v.videoUrl);
-                      return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
-                    })}
-                    onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
+                    relatedVideos={relatedVideos}
+                    onSelectRelated={handleSelectRelated}
                   />
                 </div>
                   ) : (
                     <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                      <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" />
-                      {isFacebook && (
-                        <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
-                          Open on Facebook
-                        </a>
+                      <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
+                      {!nonYtOverlay ? (
+                        <div className="absolute inset-0 z-10 cursor-pointer" onClick={handleNonYtOverlay} />
+                      ) : (
+                        <div className="absolute inset-0 bg-black/90 z-20 flex flex-col rounded-lg overflow-hidden">
+                          <div className="flex-1 flex flex-col items-center justify-center px-4">
+                            <button onClick={handleNonYtResume} className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors" aria-label="Continue watching">
+                              <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                            <p className="text-white/60 text-xs mt-4">Continue watching</p>
+                          </div>
+                          <div className="px-3 pb-3">
+                            <p className="text-white text-[11px] font-semibold mb-2 px-1">More videos</p>
+                            <div className="flex gap-2 overflow-x-auto pb-1">
+                              {relatedVideos.map((v, i) => (
+                                <button key={v.id || i} onClick={() => handleSelectRelated(v)} className="flex-shrink-0 w-28 rounded-lg overflow-hidden hover:ring-2 hover:ring-white/40 transition-all group text-left relative">
+                                  {v.thumbnail || v.videoId ? (
+                                    <img src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`} alt="" className="w-full aspect-video object-cover" loading="lazy" />
+                                  ) : (
+                                    <div className="w-full aspect-video bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                                      <span className="text-white/40 text-lg font-bold">{v.title?.charAt(0)?.toUpperCase() || '?'}</span>
+                                    </div>
+                                  )}
+                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-1.5 pt-4 pb-1">
+                                    <p className="text-white text-[10px] font-medium leading-tight truncate">{v.title}</p>
+                                    {v.subtitle && <p className="text-white/60 text-[8px] mt-0.5">{v.subtitle}</p>}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )
