@@ -3,6 +3,7 @@ import { fetchSermons } from '../services/api';
 import { FaYoutube, FaFacebook, FaVimeoV, FaInstagram } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { getVideoInfo, getVideoIcon, fetchVideoThumbnail, resolveTikTokUrl } from '../utils/videoUtils';
+import YouTubePlayer from '../components/YouTubePlayer';
 
 const platformIcons = { FaYoutube, FaFacebook, FaVimeoV, FaInstagram };
 
@@ -177,14 +178,27 @@ export default function Sermons() {
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
               <div className="flex-1 relative flex items-center justify-center overflow-auto">
             {embedUrl ? (
-              <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                <iframe src={`${embedUrl}${videoInfo.platform === 'youtube' ? '?autoplay=1&controls=1&rel=0' : ''}`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
-                {isFacebook && (
-                  <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
-                    Open on Facebook
-                  </a>
-                )}
-              </div>
+              videoInfo.platform === 'youtube' ? (
+                <div className="relative w-full h-full">
+                  <YouTubePlayer
+                    videoId={videoInfo.id}
+                    relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
+                      const vi = getVideoInfo(v.videoUrl);
+                      return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
+                    }).filter(v => v.videoId || v.thumbnail)}
+                    onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
+                  />
+                </div>
+              ) : (
+                <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
+                  <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+                  {isFacebook && (
+                    <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
+                      Open on Facebook
+                    </a>
+                  )}
+                </div>
+              )
             ) : videoInfo?.needsResolve ? (
               <div className="flex items-center gap-2 text-white/40 text-sm">
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -213,14 +227,27 @@ export default function Sermons() {
             {isPlaying && !isMobile ? (
               <div className="w-full h-full bg-black rounded-2xl overflow-hidden relative flex items-center justify-center">
                 {embedUrl ? (
-                  <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                    <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1${videoInfo.platform === 'youtube' ? '&controls=1' : ''}`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" />
-                    {isFacebook && (
-                      <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
-                        Open on Facebook
-                      </a>
-                    )}
-                  </div>
+                  videoInfo.platform === 'youtube' ? (
+                    <div className="relative w-full h-full">
+                      <YouTubePlayer
+                        videoId={videoInfo.id}
+                        relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
+                          const vi = getVideoInfo(v.videoUrl);
+                          return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
+                        }).filter(v => v.videoId || v.thumbnail)}
+                        onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
+                      <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" />
+                      {isFacebook && (
+                        <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 text-[10px] text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded transition-colors">
+                          Open on Facebook
+                        </a>
+                      )}
+                    </div>
+                  )
                 ) : videoInfo?.needsResolve ? (
                   <div className="flex items-center gap-2 text-white/40 text-sm">
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
