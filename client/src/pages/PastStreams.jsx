@@ -3,6 +3,7 @@ import { fetchStreamArchive } from '../services/api';
 import { FaFacebook, FaYoutube } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { normalizeFacebookUrl } from '../utils/videoUtils';
+import YouTubePlayer from '../components/YouTubePlayer';
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -225,7 +226,21 @@ export default function PastStreams() {
             )}
             {isPlaying && isDesktop ? (
               <div key={`desktop-${s.id}`} className="absolute inset-0 bg-black md:rounded-2xl overflow-hidden z-10">
-                {playingUrl && (
+                {playingUrl && !isFacebook ? (
+                  <YouTubePlayer
+                    videoId={videoId}
+                    relatedVideos={items.filter((_, i) => i !== index).map(v => ({
+                      id: v.id,
+                      title: v.title,
+                      videoId: getYoutubeId(v.youtube_url),
+                      subtitle: new Date(v.deactivated_at || v.activated_at).toLocaleDateString(),
+                    })).filter(v => v.videoId)}
+                    onSelectRelated={(v) => {
+                      const idx = items.findIndex(item => item.id === v.id);
+                      if (idx >= 0) { setIndex(idx); playVideo(v.id, items[idx]); }
+                    }}
+                  />
+                ) : playingUrl && (
                   <iframe
                     key={playingUrl}
                     src={playingUrl}

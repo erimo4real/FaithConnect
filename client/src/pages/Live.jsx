@@ -1,15 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchCurrentStream, fetchUpcomingStreams } from '../services/api';
+import { fetchCurrentStream, fetchUpcomingStreams, fetchStreamArchive } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { FaBroadcastTower, FaCalendarAlt, FaClock, FaRedo, FaExclamationTriangle, FaYoutube, FaFacebook } from 'react-icons/fa';
 import FadeInSection from '../components/FadeInSection';
 import { normalizeFacebookUrl } from '../utils/videoUtils';
+import YouTubePlayer from '../components/YouTubePlayer';
+
+function getYoutubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|live\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+  return m ? m[1] : null;
+}
 
 function getEmbedUrl(url) {
   if (!url) return '';
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|live\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-    return `https://www.youtube.com/embed/${m ? m[1] : url}?autoplay=1&controls=1&rel=0`;
+    const id = getYoutubeId(url);
+    return `https://www.youtube.com/embed/${id || url}?autoplay=1&controls=1&rel=0`;
   }
   if (url.includes('facebook.com')) {
     const cleanUrl = normalizeFacebookUrl(url);
@@ -38,6 +45,7 @@ const Live = () => {
   const [error, setError] = useState(null);
   const [justWentLive, setJustWentLive] = useState(false);
   const [endedStream, setEndedStream] = useState(null);
+  const [pastStreams, setPastStreams] = useState([]);
   const prevLiveRef = useRef(false);
   const lastLiveRef = useRef(null);
 
@@ -68,6 +76,7 @@ const Live = () => {
     poll();
     const id = setInterval(poll, 5000);
     fetchUpcomingStreams().then(setUpcoming).catch(() => {}).finally(() => setLoadingUpcoming(false));
+    fetchStreamArchive().then(setPastStreams).catch(() => {});
     return () => { stopped = true; clearInterval(id); };
   }, []);
 
@@ -143,14 +152,29 @@ const Live = () => {
                 </div>
               ) : isLive && streamUrl ? (
                 <div className="aspect-video bg-black relative">
-                  <iframe
-                    src={getEmbedUrl(streamUrl)}
-                    title="Live Stream"
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+                  {!isFacebook ? (
+                    <YouTubePlayer
+                      videoId={getYoutubeId(streamUrl)}
+                      relatedVideos={pastStreams.filter(p => p.youtube_url && !p.youtube_url.includes('facebook.com')).map(p => ({
+                        id: p.id,
+                        title: p.title,
+                        videoId: getYoutubeId(p.youtube_url),
+                        subtitle: new Date(p.deactivated_at).toLocaleDateString(),
+                      })).filter(v => v.videoId).slice(0, 10)}
+                      onSelectRelated={(v) => {
+                        window.location.href = '/past-streams';
+                      }}
+                    />
+                  ) : (
+                    <iframe
+                      src={getEmbedUrl(streamUrl)}
+                      title="Live Stream"
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  )}
                 </div>
               ) : timeLeft !== null && timeLeft > 0 ? (
                 <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
