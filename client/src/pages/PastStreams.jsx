@@ -235,7 +235,7 @@ export default function PastStreams() {
                       videoId: getYoutubeId(v.youtube_url),
                       thumbnail: thumbnails[v.id],
                       subtitle: new Date(v.deactivated_at || v.activated_at).toLocaleDateString(),
-                    })).filter(v => v.videoId || v.thumbnail)}
+                    }))}
                     onSelectRelated={(v) => {
                       const idx = items.findIndex(item => item.id === v.id);
                       if (idx >= 0) { setIndex(idx); playVideo(v.id, items[idx]); }

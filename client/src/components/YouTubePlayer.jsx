@@ -78,12 +78,18 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
                   onClick={() => onSelectRelated?.(v)}
                   className="w-full flex gap-3 text-left rounded-lg overflow-hidden hover:bg-white/10 transition-colors group"
                 >
-                  <img
-                    src={v.thumbnail || (v.videoId ? `https://img.youtube.com/vi/${v.videoId}/default.jpg` : '')}
-                    alt=""
-                    className="w-24 shrink-0 aspect-video object-cover rounded"
-                    loading="lazy"
-                  />
+                  {v.thumbnail || v.videoId ? (
+                    <img
+                      src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/default.jpg`}
+                      alt=""
+                      className="w-24 shrink-0 aspect-video object-cover rounded"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-24 shrink-0 aspect-video rounded bg-gray-800 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0 py-1 pr-2">
                     <p className="text-white text-xs font-medium truncate">{v.title}</p>
                     {v.subtitle && <p className="text-white/50 text-[10px] mt-0.5">{v.subtitle}</p>}
