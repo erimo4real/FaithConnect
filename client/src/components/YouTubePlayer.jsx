@@ -82,7 +82,7 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
                 >
                   {v.thumbnail || v.videoId ? (
                     <img
-                      src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/default.jpg`}
+                      src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`}
                       alt=""
                       className="w-full aspect-video object-cover"
                       loading="lazy"
