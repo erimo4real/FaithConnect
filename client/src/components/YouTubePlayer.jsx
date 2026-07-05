@@ -60,39 +60,41 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
         style={{ display: showOverlay ? 'none' : 'block' }}
       />
       {showOverlay && (
-        <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
-          <div className="flex flex-col items-center w-full max-w-lg max-h-full p-6">
+        <div className="absolute inset-0 bg-black flex flex-col z-20">
+          <div className="flex-1 flex flex-col items-center justify-center px-4">
             <button
               onClick={handleResume}
-              className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors mb-5 group"
+              className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors group"
               aria-label={isEnded ? 'Play again' : 'Resume'}
             >
               <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
-            <p className="text-white/60 text-xs mb-5">{isEnded ? 'Video ended' : 'Paused'}</p>
-            <p className="text-white text-sm font-semibold mb-3">More videos</p>
-            <div className="w-full max-h-[50vh] overflow-y-auto space-y-2">
+            <p className="text-white/60 text-xs mt-4">{isEnded ? 'Video ended' : 'Paused'}</p>
+          </div>
+          <div className="px-3 pb-3">
+            <p className="text-white text-[11px] font-semibold mb-2 px-1">More videos</p>
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {relatedVideos.map((v, i) => (
                 <button
                   key={v.id || i}
                   onClick={() => onSelectRelated?.(v)}
-                  className="w-full flex gap-3 text-left rounded-lg overflow-hidden hover:bg-white/10 transition-colors group"
+                  className="flex-shrink-0 w-28 rounded-lg overflow-hidden hover:ring-2 hover:ring-white/40 transition-all group text-left relative"
                 >
                   {v.thumbnail || v.videoId ? (
                     <img
                       src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/default.jpg`}
                       alt=""
-                      className="w-24 shrink-0 aspect-video object-cover rounded"
+                      className="w-full aspect-video object-cover"
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-24 shrink-0 aspect-video rounded bg-gray-800 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <div className="w-full aspect-video bg-gray-800 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
                   )}
-                  <div className="flex-1 min-w-0 py-1 pr-2">
-                    <p className="text-white text-xs font-medium truncate">{v.title}</p>
-                    {v.subtitle && <p className="text-white/50 text-[10px] mt-0.5">{v.subtitle}</p>}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-1.5 pt-4 pb-1">
+                    <p className="text-white text-[10px] font-medium leading-tight truncate">{v.title}</p>
+                    {v.subtitle && <p className="text-white/60 text-[8px] mt-0.5">{v.subtitle}</p>}
                   </div>
                 </button>
               ))}
