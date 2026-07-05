@@ -189,16 +189,6 @@ export default function Sermons() {
                     onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
                   />
                 </div>
-              ) : videoInfo.platform === 'tiktok' ? (
-                <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-lg gap-4 p-6">
-                    {thumbUrl ? <img src={thumbUrl} alt="" className="w-full aspect-video object-cover rounded-lg" /> : <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><TikTokIcon /></div>}
-                    <p className="text-white/70 text-xs text-center line-clamp-2">{s.title}</p>
-                    <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs min-h-[44px] px-6 rounded-full transition-colors">
-                      <TikTokIcon className="w-4 h-4" /> Watch on TikTok
-                    </a>
-                  </div>
-                </div>
               ) : (
                 <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                   <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
@@ -209,17 +199,7 @@ export default function Sermons() {
                   )}
                 </div>
               )
-              ) : videoInfo?.platform === 'tiktok' ? (
-              <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-lg gap-4 p-6">
-                  {thumbUrl ? <img src={thumbUrl} alt="" className="w-full aspect-video object-cover rounded-lg" /> : <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><TikTokIcon /></div>}
-                  <p className="text-white/70 text-xs text-center line-clamp-2">{s.title}</p>
-                  <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs min-h-[44px] px-6 rounded-full transition-colors">
-                    <TikTokIcon className="w-4 h-4" /> Watch on TikTok
-                  </a>
-                </div>
-              </div>
-            ) : videoInfo?.needsResolve ? (
+              ) : videoInfo?.needsResolve ? (
               <div className="flex items-center gap-2 text-white/40 text-sm">
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                 Loading video...
@@ -258,16 +238,6 @@ export default function Sermons() {
                         onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
                       />
                     </div>
-                  ) : videoInfo.platform === 'tiktok' ? (
-                    <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-lg gap-4 p-6">
-                        {thumbUrl ? <img src={thumbUrl} alt="" className="w-full aspect-video object-cover rounded-lg" /> : <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><TikTokIcon /></div>}
-                        <p className="text-white/70 text-xs text-center line-clamp-2">{s.title}</p>
-                        <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs min-h-[44px] px-6 rounded-full transition-colors">
-                          <TikTokIcon className="w-4 h-4" /> Watch on TikTok
-                        </a>
-                      </div>
-                    </div>
                   ) : (
                     <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                       <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" />
@@ -278,16 +248,6 @@ export default function Sermons() {
                       )}
                     </div>
                   )
-                ) : videoInfo?.platform === 'tiktok' ? (
-                  <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-lg gap-4 p-6">
-                      {thumbUrl ? <img src={thumbUrl} alt="" className="w-full aspect-video object-cover rounded-lg" /> : <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><TikTokIcon /></div>}
-                      <p className="text-white/70 text-xs text-center line-clamp-2">{s.title}</p>
-                      <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs min-h-[44px] px-6 rounded-full transition-colors">
-                        <TikTokIcon className="w-4 h-4" /> Watch on TikTok
-                      </a>
-                    </div>
-                  </div>
                 ) : videoInfo?.needsResolve ? (
                   <div className="flex items-center gap-2 text-white/40 text-sm">
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>

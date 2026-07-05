@@ -39,6 +39,18 @@ export function getVideoInfo(url) {
   return { platform: 'generic', id: null, embedUrl: url, thumbnail: null };
 }
 
+function resolveTikTokOembed(url) {
+  return new Promise((resolve) => {
+    const cb = '_tto_' + Date.now();
+    window[cb] = (d) => { delete window[cb]; sh(); const id = d?.thumbnail_url?.match(/\/video\/(\d+)/)?.[1] || d?.author_url?.match(/\/video\/(\d+)/)?.[1]; resolve(id ? { id, embedUrl: `https://www.tiktok.com/embed/v2/${id}` } : null); };
+    const sh = () => { try { document.head.removeChild(s); } catch {} };
+    const s = document.createElement('script');
+    s.src = `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}&callback=${cb}`;
+    s.onerror = () => { delete window[cb]; sh(); resolve(null); };
+    document.head.appendChild(s);
+  });
+}
+
 export async function resolveTikTokUrl(url) {
   try {
     const res = await fetch(`${API_URL}/streams/resolve-tiktok?url=${encodeURIComponent(url)}`);
@@ -52,10 +64,8 @@ export async function resolveTikTokUrl(url) {
         return { id: match[1], embedUrl: `https://www.tiktok.com/embed/v2/${match[1]}` };
       }
     }
-    return null;
-  } catch {
-    return null;
-  }
+  } catch {}
+  return resolveTikTokOembed(url);
 }
 
 export function getVideoIcon(platform) {
