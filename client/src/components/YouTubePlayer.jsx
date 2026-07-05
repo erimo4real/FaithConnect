@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 let apiReady = null;
 function ensureAPI() {
@@ -23,6 +23,7 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
   const [playerState, setPlayerState] = useState(states.UNSTARTED);
   const isPaused = playerState === states.PAUSED;
   const isEnded = playerState === states.ENDED;
+  const showOverlay = (isPaused || isEnded) && relatedVideos.length > 0;
 
   useEffect(() => {
     if (!videoId || !containerRef.current) return;
@@ -44,16 +45,33 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
     };
   }, [videoId]);
 
-  const showOverlay = (isPaused || isEnded) && relatedVideos.length > 0;
+  const handleResume = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    if (isEnded) player.seekTo(0);
+    player.playVideo();
+  }, [isEnded]);
 
   return (
     <div className="relative w-full h-full">
-      <div ref={containerRef} className="w-full h-full" />
+      <div
+        ref={containerRef}
+        className="w-full h-full"
+        style={{ display: showOverlay ? 'none' : 'block' }}
+      />
       {showOverlay && (
-        <div className="absolute inset-0 bg-black/85 flex items-center justify-center z-20 p-4">
-          <div className="w-full max-w-md max-h-full overflow-y-auto">
+        <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
+          <div className="flex flex-col items-center w-full max-w-lg max-h-full p-6">
+            <button
+              onClick={handleResume}
+              className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors mb-5 group"
+              aria-label={isEnded ? 'Play again' : 'Resume'}
+            >
+              <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <p className="text-white/60 text-xs mb-5">{isEnded ? 'Video ended' : 'Paused'}</p>
             <p className="text-white text-sm font-semibold mb-3">More videos</p>
-            <div className="space-y-2">
+            <div className="w-full max-h-[50vh] overflow-y-auto space-y-2">
               {relatedVideos.map((v, i) => (
                 <button
                   key={v.id || i}
@@ -61,7 +79,7 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
                   className="w-full flex gap-3 text-left rounded-lg overflow-hidden hover:bg-white/10 transition-colors group"
                 >
                   <img
-                    src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/default.jpg`}
+                    src={v.thumbnail || (v.videoId ? `https://img.youtube.com/vi/${v.videoId}/default.jpg` : '')}
                     alt=""
                     className="w-24 shrink-0 aspect-video object-cover rounded"
                     loading="lazy"

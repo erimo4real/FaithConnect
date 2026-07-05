@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchCurrentStream, fetchUpcomingStreams, fetchStreamArchive } from '../services/api';
+import { fetchCurrentStream, fetchUpcomingStreams } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { FaBroadcastTower, FaCalendarAlt, FaClock, FaRedo, FaExclamationTriangle, FaYoutube, FaFacebook } from 'react-icons/fa';
 import FadeInSection from '../components/FadeInSection';
@@ -45,7 +45,6 @@ const Live = () => {
   const [error, setError] = useState(null);
   const [justWentLive, setJustWentLive] = useState(false);
   const [endedStream, setEndedStream] = useState(null);
-  const [pastStreams, setPastStreams] = useState([]);
   const prevLiveRef = useRef(false);
   const lastLiveRef = useRef(null);
 
@@ -76,7 +75,6 @@ const Live = () => {
     poll();
     const id = setInterval(poll, 5000);
     fetchUpcomingStreams().then(setUpcoming).catch(() => {}).finally(() => setLoadingUpcoming(false));
-    fetchStreamArchive().then(setPastStreams).catch(() => {});
     return () => { stopped = true; clearInterval(id); };
   }, []);
 
@@ -155,15 +153,7 @@ const Live = () => {
                   {!isFacebook ? (
                     <YouTubePlayer
                       videoId={getYoutubeId(streamUrl)}
-                      relatedVideos={pastStreams.filter(p => p.youtube_url && !p.youtube_url.includes('facebook.com')).map(p => ({
-                        id: p.id,
-                        title: p.title,
-                        videoId: getYoutubeId(p.youtube_url),
-                        subtitle: new Date(p.deactivated_at).toLocaleDateString(),
-                      })).filter(v => v.videoId).slice(0, 10)}
-                      onSelectRelated={(v) => {
-                        window.location.href = '/past-streams';
-                      }}
+                      relatedVideos={[]}
                     />
                   ) : (
                     <iframe
