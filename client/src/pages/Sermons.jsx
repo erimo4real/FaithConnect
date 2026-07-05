@@ -185,7 +185,7 @@ export default function Sermons() {
                     relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
                       const vi = getVideoInfo(v.videoUrl);
                       return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
-                    }).filter(v => v.videoId || v.thumbnail)}
+                    })}
                     onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
                   />
                 </div>
@@ -231,13 +231,13 @@ export default function Sermons() {
                     <div className="relative w-full h-full">
                       <YouTubePlayer
                         videoId={videoInfo.id}
-                        relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
-                          const vi = getVideoInfo(v.videoUrl);
-                          return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
-                        }).filter(v => v.videoId || v.thumbnail)}
-                        onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
-                      />
-                    </div>
+                    relatedVideos={filtered.filter((_, i) => i !== index).map(v => {
+                      const vi = getVideoInfo(v.videoUrl);
+                      return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
+                    })}
+                    onSelectRelated={(v) => { const idx = filtered.findIndex(item => item.id === v.id); if (idx >= 0) { setIndex(idx); setPlayingId(v.id); } }}
+                  />
+                </div>
                   ) : (
                     <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                       <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" />
