@@ -38,6 +38,13 @@ export default function Sermons() {
   const transitioning = useRef(false);
 
   useEffect(() => {
+    if (playingId) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [playingId]);
+
+  useEffect(() => {
     localStorage.setItem('fc_sermon_liked', JSON.stringify(liked));
   }, [liked]);
 

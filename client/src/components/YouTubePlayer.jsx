@@ -73,7 +73,7 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
           </div>
           <div className="px-3 pb-3">
             <p className="text-white text-[11px] font-semibold mb-2 px-1">More videos</p>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {relatedVideos.map((v, i) => (
                 <button
                   key={v.id || i}
