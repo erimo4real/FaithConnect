@@ -187,7 +187,7 @@ export default function Sermons() {
 
       {isPlaying && isMobile && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
-              <div className="flex-1 relative flex items-center justify-center overflow-auto">
+              <div className="flex-1 relative flex items-center justify-center overflow-hidden">
             {embedUrl ? (
               videoInfo.platform === 'youtube' ? (
                 <div className="relative w-full h-full">
