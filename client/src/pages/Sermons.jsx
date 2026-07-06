@@ -39,8 +39,11 @@ export default function Sermons() {
 
   useEffect(() => {
     if (playingId) {
+      document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = ''; };
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
     }
   }, [playingId]);
 
