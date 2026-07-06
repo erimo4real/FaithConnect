@@ -147,6 +147,27 @@ export default function Sermons() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [goNext, goPrev]);
 
+  const relatedVideos = filtered.filter((_, i) => i !== index).map(v => {
+    const vi = getVideoInfo(v.videoUrl);
+    return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
+  });
+
+  const handleSelectRelated = useCallback((v) => {
+    const idx = filtered.findIndex(item => item.id === v.id);
+    if (idx >= 0) { setIndex(idx); setPlayingId(v.id); }
+  }, [filtered]);
+
+  const handleNonYtResume = useCallback(() => {
+    setNonYtOverlay(false);
+    clearTimeout(nonYtTimerRef.current);
+    nonYtTimerRef.current = setTimeout(() => setNonYtOverlay(true), 30000);
+  }, []);
+
+  const handleNonYtOverlay = useCallback(() => {
+    setNonYtOverlay(true);
+    clearTimeout(nonYtTimerRef.current);
+  }, []);
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4">
@@ -178,27 +199,6 @@ export default function Sermons() {
   const platformBadge = getVideoIcon(videoInfo?.platform);
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
-
-  const relatedVideos = filtered.filter((_, i) => i !== index).map(v => {
-    const vi = getVideoInfo(v.videoUrl);
-    return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
-  });
-
-  const handleSelectRelated = useCallback((v) => {
-    const idx = filtered.findIndex(item => item.id === v.id);
-    if (idx >= 0) { setIndex(idx); setPlayingId(v.id); }
-  }, [filtered]);
-
-  const handleNonYtResume = useCallback(() => {
-    setNonYtOverlay(false);
-    clearTimeout(nonYtTimerRef.current);
-    nonYtTimerRef.current = setTimeout(() => setNonYtOverlay(true), 30000);
-  }, []);
-
-  const handleNonYtOverlay = useCallback(() => {
-    setNonYtOverlay(true);
-    clearTimeout(nonYtTimerRef.current);
-  }, []);
 
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden bg-black select-none">
