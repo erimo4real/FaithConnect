@@ -95,11 +95,11 @@ export const userUpdateSchema = z.object({
 export const donationSchema = z.object({
   name: z.string().min(1, 'Name required'),
   email: z.string().email('Valid email required'),
-  phone: z.string().nullable().optional(),
-  amount: z.number().positive('Amount must be positive'),
-  type: z.enum(['one-time', 'monthly', 'tithe']).optional(),
+  phone: z.string().min(1, 'Phone required'),
+  amount: z.number().min(100, 'Minimum donation is ₦100').positive('Amount must be positive'),
+  type: z.enum(['one-time', 'tithe', 'weekly', 'monthly', 'yearly']).optional(),
   cause: z.string().optional(),
-  message: z.string().nullable().optional(),
+  message: z.string().min(1, 'Message required'),
 });
 
 export const subscriberSchema = z.object({

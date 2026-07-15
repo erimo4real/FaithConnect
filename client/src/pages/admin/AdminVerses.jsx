@@ -82,55 +82,57 @@ export default function AdminVerses() {
           </form>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 dark:bg-gray-900/50">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Reference</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Verse</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Version</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Scheduled</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {loading ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
-              ) : paged.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No verses found.</td></tr>
-              ) : paged.map(item => (
-                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-200">{item.reference}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 max-w-xs truncate">{item.verse_text}</td>
-                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{item.version}</td>
-                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{item.scheduled_date ? new Date(item.scheduled_date).toLocaleDateString() : <span className="text-gray-400 italic text-xs">Auto (Tue/Thu)</span>}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.is_published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
-                      {item.is_published ? 'Published' : 'Scheduled'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-primary transition-colors" title="Edit"><HiOutlinePencil className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Delete"><HiOutlineTrash className="w-4 h-4" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="p-6">
+          {loading ? <p className="text-gray-400 dark:text-gray-500 text-center py-8">Loading...</p> : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                      <th className="pb-3 pr-4">Reference</th>
+                      <th className="pb-3 pr-4">Verse</th>
+                      <th className="pb-3 pr-4">Version</th>
+                      <th className="pb-3 pr-4">Scheduled</th>
+                      <th className="pb-3 pr-4">Status</th>
+                      <th className="pb-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paged.map(item => (
+                      <tr key={item.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td className="py-3 pr-4 text-sm font-medium text-gray-800 dark:text-gray-200">{item.reference}</td>
+                        <td className="py-3 pr-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">{item.verse_text}</td>
+                        <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{item.version}</td>
+                        <td className="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{item.scheduled_date ? new Date(item.scheduled_date).toLocaleDateString() : <span className="text-gray-400 italic text-xs">Auto (Tue/Thu)</span>}</td>
+                        <td className="py-3 pr-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.is_published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
+                            {item.is_published ? 'Published' : 'Scheduled'}
+                          </span>
+                        </td>
+                        <td className="py-3">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-primary transition-colors" title="Edit"><HiOutlinePencil className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Delete"><HiOutlineTrash className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {filtered.length === 0 && <tr><td colSpan="6" className="py-8 text-center text-gray-400 dark:text-gray-500 text-sm">{items.length === 0 ? 'No verses yet' : 'No matching results'}</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 mt-4">
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Page {page} of {totalPages}</p>
+                  <div className="flex gap-2">
+                    <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Prev</button>
+                    <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Next</button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
-
-        {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Page {page} of {totalPages}</span>
-            <div className="flex gap-2">
-              <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700">Prev</button>
-              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700">Next</button>
-            </div>
-          </div>
-        )}
       </div>
     </AdminLayout>
   );

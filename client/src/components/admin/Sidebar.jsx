@@ -22,6 +22,8 @@ import {
   HiOutlineX,
 } from 'react-icons/hi';
 
+const enableDonations = import.meta.env.VITE_ENABLE_DONATIONS === 'true';
+
 const adminLinks = [
   { to: '/admin', label: 'Dashboard', icon: HiOutlineViewGrid },
   { to: '/admin/sermons', label: 'Sermons', icon: HiOutlineBookOpen },
@@ -32,7 +34,7 @@ const adminLinks = [
   { to: '/admin/prayer', label: 'Prayer', icon: HiOutlineHeart },
   { to: '/admin/contact', label: 'Contact', icon: HiOutlineMail },
   { to: '/admin/verses', label: 'Verses', icon: HiOutlineBookOpen },
-  { to: '/admin/donations', label: 'Donations', icon: HiOutlineCurrencyDollar },
+  ...(enableDonations ? [{ to: '/admin/donations', label: 'Donations', icon: HiOutlineCurrencyDollar }] : []),
   { to: '/admin/orders', label: 'Orders', icon: HiOutlineShoppingCart },
   { to: '/admin/subscribers', label: 'Subscribers', icon: HiOutlineInbox },
   { to: '/admin/media', label: 'Media', icon: HiOutlineFolder },

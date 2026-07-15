@@ -19,10 +19,10 @@ async function apiFetch(url, options = {}) {
 }
 
 // Auth
-export async function loginAdmin(email, password) {
+export async function loginAdmin(email, password, remember = false) {
   return apiFetch('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, remember }),
   });
 }
 
@@ -97,9 +97,18 @@ export async function adminFetchContactMessages() { return apiFetch('/contact');
 export async function adminUpdateContactMessage(id, data) { return apiFetch(`/contact/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 export async function adminDeleteContactMessage(id) { return apiFetch(`/contact/${id}`, { method: 'DELETE' }); }
 
-export async function adminFetchDonations() { return apiFetch('/donations'); }
+export async function adminFetchDonations(page = 1, limit = 10, search = '', status = '') {
+  const params = new URLSearchParams({ page, limit });
+  if (search) params.set('search', search);
+  if (status) params.set('status', status);
+  return apiFetch(`/donations?${params}`);
+}
 export async function adminUpdateDonation(id, data) { return apiFetch(`/donations/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 export async function adminDeleteDonation(id) { return apiFetch(`/donations/${id}`, { method: 'DELETE' }); }
+export async function adminCancelSubscription(id) { return apiFetch(`/donations/${id}/cancel-subscription`, { method: 'POST' }); }
+export async function adminRefundDonation(id) { return apiFetch(`/donations/${id}/refund`, { method: 'POST' }); }
+export async function adminResendReceipt(id) { return apiFetch(`/donations/${id}/resend-receipt`, { method: 'POST' }); }
+export async function verifyDonation(reference) { return apiFetch(`/donations/verify-public/${reference}`); }
 
 export async function adminFetchOrders() { return apiFetch('/orders'); }
 export async function adminUpdateOrder(id, data) { return apiFetch(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }

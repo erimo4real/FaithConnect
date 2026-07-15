@@ -60,3 +60,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   details JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Paystack subscription tracking
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS subscription_code TEXT;
+ALTER TABLE donations ADD COLUMN IF NOT EXISTS paystack_customer_code TEXT;

@@ -15,12 +15,15 @@ export default function Navbar() {
       location.pathname === path ? 'text-white' : 'text-white/70 hover:text-white'
     }`;
 
+  const enableDonations = import.meta.env.VITE_ENABLE_DONATIONS === 'true';
+
   const links = [
     { to: '/', label: 'Home' },
     { to: '/about', label: 'About' },
     { to: '/sermons', label: 'Sermons' },
     { to: '/events', label: 'Events' },
     { to: '/live', label: 'Live' },
+    ...(enableDonations ? [{ to: '/donations', label: 'Give' }] : []),
     { to: '/contact', label: 'Contact' },
   ];
 

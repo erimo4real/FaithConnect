@@ -14,6 +14,7 @@ import Events from './pages/Events';
 import Live from './pages/Live';
 import Contact from './pages/Contact';
 import Donations from './pages/Donations';
+import DonationSuccess from './pages/DonationSuccess';
 import Gallery from './pages/Gallery';
 import Blog from './pages/Blog';
 import Testimonials from './pages/Testimonials';
@@ -48,6 +49,7 @@ import AdminVerses from './pages/admin/AdminVerses';
 
 function App() {
   const dispatch = useDispatch();
+  const enableDonations = import.meta.env.VITE_ENABLE_DONATIONS === 'true';
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -61,13 +63,14 @@ function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/forgot-password" element={<ForgotPassword />} />
       <Route path="/admin/reset-password" element={<ResetPassword />} />
+      {enableDonations && <Route path="/donation/success" element={<DonationSuccess />} />}
       <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/sermons" element={<ProtectedRoute><AdminSermons /></ProtectedRoute>} />
       <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
       <Route path="/admin/blog" element={<ProtectedRoute><AdminBlog /></ProtectedRoute>} />
       <Route path="/admin/gallery" element={<ProtectedRoute><AdminGallery /></ProtectedRoute>} />
       <Route path="/admin/streams" element={<ProtectedRoute><AdminStreams /></ProtectedRoute>} />
-      <Route path="/admin/donations" element={<ProtectedRoute><AdminDonations /></ProtectedRoute>} />
+      {enableDonations && <Route path="/admin/donations" element={<ProtectedRoute><AdminDonations /></ProtectedRoute>} />}
       <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
       <Route path="/admin/subscribers" element={<ProtectedRoute><AdminSubscribers /></ProtectedRoute>} />
       <Route path="/admin/prayer" element={<ProtectedRoute><AdminPrayer /></ProtectedRoute>} />
@@ -88,7 +91,7 @@ function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/event-registration" element={<EventRegistration />} />
             <Route path="/live" element={<Live />} />
-            <Route path="/donations" element={<Donations />} />
+            {enableDonations && <Route path="/donations" element={<Donations />} />}
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/podcast" element={<Podcast />} />

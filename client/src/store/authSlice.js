@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { loginAdmin as loginApi, fetchMe as fetchMeApi, registerAdmin as registerApi } from '../services/api';
 
-export const login = createAsyncThunk('auth/login', async ({ email, password }, { rejectWithValue }) => {
+export const login = createAsyncThunk('auth/login', async ({ email, password, remember }, { rejectWithValue }) => {
   try {
-    const data = await loginApi(email, password);
+    const data = await loginApi(email, password, remember);
     return data.user;
   } catch (err) {
     return rejectWithValue(err.message);

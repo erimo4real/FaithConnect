@@ -19,8 +19,13 @@ const COOKIE_OPTIONS = {
   maxAge: 24 * 60 * 60 * 1000,
 };
 
-function setTokenCookie(res, token) {
-  res.cookie('token', token, COOKIE_OPTIONS);
+const COOKIE_OPTIONS_REMEMBER = {
+  ...COOKIE_OPTIONS,
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+};
+
+function setTokenCookie(res, token, remember = false) {
+  res.cookie('token', token, remember ? COOKIE_OPTIONS_REMEMBER : COOKIE_OPTIONS);
 }
 
 function clearTokenCookie(res) {
@@ -43,7 +48,7 @@ router.post('/register', validate(registerSchema), async (req, res) => {
     );
     const user = result.rows[0];
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-    setTokenCookie(res, token);
+    setTokenCookie(res, token, false);
     res.status(201).json({ token, user });
   } catch (err) {
     logger.error({ err }, 'Registration failed');
@@ -52,7 +57,7 @@ router.post('/register', validate(registerSchema), async (req, res) => {
 });
 
 router.post('/login', validate(loginSchema), async (req, res) => {
-  const { password } = req.body;
+  const { password, remember } = req.body;
   const email = req.body.email?.trim();
   try {
     const result = await query('SELECT * FROM users WHERE email = $1', [email]);
@@ -64,8 +69,9 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     if (!match) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-    setTokenCookie(res, token);
+    const expiresIn = remember ? '30d' : '24h';
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn });
+    setTokenCookie(res, token, remember);
     res.json({
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, avatar_url: user.avatar_url, created_at: user.created_at },

@@ -123,6 +123,8 @@ CREATE TABLE IF NOT EXISTS donations (
   message TEXT,
   reference TEXT,
   status TEXT DEFAULT 'pending',
+  subscription_code TEXT,
+  paystack_customer_code TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -207,5 +209,13 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   resource TEXT NOT NULL,
   resource_id TEXT,
   details JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS event_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  reference TEXT,
+  payload JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

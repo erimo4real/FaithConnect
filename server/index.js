@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logger from './src/config/logger.js';
@@ -40,6 +41,96 @@ app.use(cors({
   origin: [clientUrl, 'https://bethel-church-wonder-city.netlify.app', 'https://bethelchurchng.com', 'https://www.bethelchurchng.com', 'http://localhost:5173'],
   credentials: true,
 }));
+
+// Paystack webhook — raw body needed for HMAC verification (must be before express.json)
+app.post('/api/donations/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const signature = req.headers['x-paystack-signature'];
+  if (!signature) return res.status(401).json({ error: 'Missing signature' });
+
+  const hash = crypto.createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
+    .update(req.body).digest('hex');
+  if (hash !== signature) return res.status(401).json({ error: 'Invalid signature' });
+
+  try {
+    const event = JSON.parse(req.body.toString());
+    const { data } = event;
+
+    // Log every webhook event for debugging
+    await query(
+      `INSERT INTO event_logs (event_type, reference, payload) VALUES ($1, $2, $3)`,
+      [event.event, data?.reference || data?.subscription_code || 'unknown', JSON.stringify(event)]
+    ).catch(() => {});
+
+    if (event.event === 'charge.success') {
+      // Idempotency check — skip if already completed
+      const existing = await query("SELECT status, subscription_code FROM donations WHERE reference=$1", [data.reference]);
+      if (existing.rows.length > 0 && existing.rows[0].status === 'completed') {
+        logger.info({ reference: data.reference }, 'charge.success already processed, skipping');
+        return res.status(200).end();
+      }
+
+      // Save subscription_code if present (may arrive before subscription.create)
+      if (data.subscription_code || data.customer?.customer_code) {
+        await query(
+          "UPDATE donations SET status='completed', subscription_code=COALESCE($1, subscription_code), paystack_customer_code=COALESCE($2, paystack_customer_code) WHERE reference=$3",
+          [data.subscription_code, data.customer?.customer_code, data.reference]
+        );
+      } else {
+        await query("UPDATE donations SET status='completed' WHERE reference=$1", [data.reference]);
+      }
+      logger.info({ reference: data.reference, amount: data.amount, subscription: data.subscription_code || 'none' }, 'Donation completed via webhook');
+
+      const { rows } = await query("SELECT * FROM donations WHERE reference=$1", [data.reference]);
+      const donation = rows[0];
+      if (donation?.email && process.env.SMTP_USER) {
+        try {
+          const { sendDonationReceipt } = await import('./src/config/email.js');
+          await sendDonationReceipt(donation);
+        } catch (emailErr) {
+          logger.error({ err: emailErr }, 'Failed to send receipt email');
+        }
+      }
+    }
+
+    if (event.event === 'subscription.create') {
+      await query(
+        "UPDATE donations SET subscription_code=$1, paystack_customer_code=$2 WHERE reference=$3",
+        [data.subscription_code, data.customer?.customer_code, data.reference]
+      );
+      logger.info({ subscription: data.subscription_code }, 'Subscription created');
+    }
+
+    // Track recurring billing events
+    if (event.event === 'invoice.create' || event.event === 'invoice.update') {
+      logger.info({ invoice: data.reference, subscription: data.subscription?.subscription_code }, `Invoice ${event.event}`);
+    }
+
+    // Handle payment failure
+    if (event.event === 'invoice.payment_failed') {
+      const subCode = data.subscription?.subscription_code;
+      if (subCode) {
+        await query("UPDATE donations SET status='failed' WHERE subscription_code=$1", [subCode]);
+        logger.info({ subscription: subCode }, 'Subscription payment failed');
+      }
+    }
+
+    // Handle subscription disabled (cancelled from Paystack side)
+    if (event.event === 'subscription.disable') {
+      const subCode = data.subscription_code || data.code;
+      if (subCode) {
+        await query("UPDATE donations SET status='cancelled' WHERE subscription_code=$1", [subCode]);
+        logger.info({ subscription: subCode }, 'Subscription disabled via webhook');
+      }
+    }
+
+    res.status(200).end();
+  } catch (err) {
+    logger.error({ err }, 'Webhook processing error');
+    // Return 500 so Paystack retries
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
 app.use(express.json());
 app.use(cookieParser());
 

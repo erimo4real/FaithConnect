@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { FaHeart, FaBible, FaChurch, FaHandsHelping, FaGraduationCap, FaEnvelope, FaGlobe, FaUsers, FaPhone } from 'react-icons/fa';
+import { FaHeart, FaChurch, FaHandsHelping, FaGraduationCap, FaEnvelope, FaGlobe, FaUsers, FaPhone } from 'react-icons/fa';
 import Breadcrumbs from '../components/Breadcrumbs';
 import FadeInSection from '../components/FadeInSection';
 
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 const Donations = () => {
-  const [donationAmount, setDonationAmount] = useState(50);
+  const [donationAmount, setDonationAmount] = useState(1000);
   const [customAmount, setCustomAmount] = useState('');
+  const [customAmountError, setCustomAmountError] = useState('');
   const [donationType, setDonationType] = useState('one-time');
   const [donationCause, setDonationCause] = useState('general');
   const [formData, setFormData] = useState({
@@ -14,8 +17,8 @@ const Donations = () => {
     phone: '',
     message: ''
   });
-  const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
   const handleAmountClick = (amount) => {
     setDonationAmount(amount);
@@ -23,8 +26,14 @@ const Donations = () => {
   };
 
   const handleCustomAmountChange = (e) => {
-    setCustomAmount(e.target.value);
+    const val = e.target.value;
+    setCustomAmount(val);
     setDonationAmount(null);
+    if (val && parseInt(val) < 100) {
+      setCustomAmountError('Minimum donation is ₦100');
+    } else {
+      setCustomAmountError('');
+    }
   };
 
   const handleDonationTypeChange = (type) => {
@@ -41,11 +50,13 @@ const Donations = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
+    setError('');
     const amount = customAmount || donationAmount;
+
     try {
-      await fetch('/api/donations', {
+      const res = await fetch(`${API_URL}/donations/initialize`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -56,20 +67,19 @@ const Donations = () => {
           message: formData.message,
         }),
       });
-      setSubmitted(true);
-      setFormData({ name: '', email: '', phone: '', message: '' });
-      setDonationAmount(50);
-      setCustomAmount('');
-    } catch {
-      // silently fail
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to initialize payment');
+      window.location.href = data.authorization_url;
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSending(false);
     }
   };
 
   const donationTypes = [
-    { id: 'one-time', label: 'One Time', description: 'Single donation' },
-    { id: 'weekly', label: 'Weekly', description: 'Every week' },
+    { id: 'one-time', label: 'Offering', description: 'Single donation' },
+    { id: 'tithe', label: 'Tithe', description: 'Monthly recurring' },
     { id: 'monthly', label: 'Monthly', description: 'Every month' },
     { id: 'yearly', label: 'Yearly', description: 'Every year' }
   ];
@@ -130,12 +140,29 @@ const Donations = () => {
       <FadeInSection>
       <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4">
+          <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg mb-8 max-w-2xl mx-auto">
+            <h3 className="font-bold text-primary mb-3 text-center">How It Works</h3>
+            <ol className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+              <li className="flex gap-3 items-center">
+                <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shrink-0 text-xs font-bold">1</span>
+                <span>Fill in your details and click <strong>Donate</strong></span>
+              </li>
+              <li className="flex gap-3 items-center">
+                <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shrink-0 text-xs font-bold">2</span>
+                <span>You'll be redirected to <strong>Paystack</strong> to enter your card details securely</span>
+              </li>
+              <li className="flex gap-3 items-center">
+                <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shrink-0 text-xs font-bold">3</span>
+                <span>After payment, you'll be redirected back and a <strong>receipt</strong> will be emailed to you</span>
+              </li>
+            </ol>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-bold text-primary mb-6">Choose Your Donation</h2>
-              
+
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Donation Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Donation Type</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {donationTypes.map((type) => (
                     <button
@@ -155,9 +182,9 @@ const Donations = () => {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select Amount</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
-                  {[25, 50, 100, 250, 500, 1000].map((amount) => (
+                  {[1000, 5000, 10000, 25000, 50000, 100000].map((amount) => (
                     <button
                       key={amount}
                       onClick={() => handleAmountClick(amount)}
@@ -167,108 +194,121 @@ const Donations = () => {
                           : 'border-gray-200 hover:border-primary'
                       }`}
                     >
-                      ${amount}
+                      ₦{amount.toLocaleString()}
                     </button>
                   ))}
                 </div>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">₦</span>
                   <input
                     type="number"
                     placeholder="Custom amount"
+                    min="100"
                     value={customAmount}
                     onChange={handleCustomAmountChange}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   />
+                  {customAmountError && (
+                    <p className="text-red-500 text-xs mt-1">{customAmountError}</p>
+                  )}
                 </div>
               </div>
+
+              {donationType !== 'one-time' && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg mb-4 text-sm text-blue-700 dark:text-blue-300">
+                  You can cancel your recurring donation at any time. A cancellation link will be included in your receipt email.
+                </div>
+              )}
 
               <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg mb-6">
                 <h3 className="font-bold text-primary mb-4">Donation Summary</h3>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600 dark:text-gray-400">Amount:</span>
-                  <span className="text-xl font-bold text-primary">${customAmount || donationAmount}</span>
+                  <span className="text-xl font-bold text-primary">₦{(customAmount || donationAmount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600 dark:text-gray-400">Type:</span>
                   <span className="font-semibold text-primary capitalize">{donationType}</span>
                 </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Cause:</span>
+                  <span className="font-semibold text-primary">{donationCauses.find(c => c.id === donationCause)?.title || donationCause}</span>
+                </div>
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total:</span>
-                    <span className="text-2xl font-bold text-primary">${customAmount || donationAmount}</span>
+                    <span className="text-2xl font-bold text-primary">₦{(customAmount || donationAmount).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
               <div className="text-center text-gray-500 text-sm">
-                <p>🔒 Secure donation powered by encryption</p>
+                <p>Secured by Paystack</p>
                 <p>Tax deductible receipt will be emailed</p>
               </div>
             </div>
 
             <div>
               <h2 className="text-2xl font-bold text-primary mb-6">Your Information</h2>
-              {submitted ? (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center">
-                  <p className="font-bold text-lg">Thank you for your donation!</p>
-                  <p>A payment link will be sent to your email to complete the process.</p>
-                  <button onClick={() => setSubmitted(false)} className="mt-4 text-green-800 underline font-semibold">Donate Again</button>
-                </div>
-              ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name *</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address *</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number *</label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Dedication Message</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dedication Message *</label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
                     rows="3"
                     placeholder="In memory of... or To the glory of God..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
                   ></textarea>
                 </div>
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={sending}
                   className="w-full bg-primary text-white font-bold py-4 rounded-lg hover:bg-primary/90 transition-colors text-lg disabled:opacity-50"
                 >
-                  {sending ? 'Processing...' : `Donate $${customAmount || donationAmount}`}
+                  {sending ? 'Processing...' : `Donate ₦${(customAmount || donationAmount).toLocaleString()}`}
                 </button>
               </form>
-              )}
             </div>
           </div>
         </div>
@@ -294,31 +334,6 @@ const Donations = () => {
                 <p className="text-gray-600 dark:text-gray-400">{cause.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-      </FadeInSection>
-
-      <FadeInSection>
-      <section className="section-padding">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary font-display mb-4">Other Ways to Give</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-            <div className="p-6 dark:bg-gray-800 dark:text-gray-100">
-              <div className="text-4xl mb-4 text-primary"><FaEnvelope /></div>
-              <h3 className="text-xl font-bold text-primary mb-2">Bank Transfer</h3>
-              <p className="text-gray-600 dark:text-gray-400">Account: BETHEL CHURCH<br />Routing: XXXXXXXXX</p>
-            </div>
-            <div className="p-6 dark:bg-gray-800 dark:text-gray-100">
-              <div className="text-4xl mb-4 text-primary"><FaEnvelope /></div>
-              <h3 className="text-xl font-bold text-primary mb-2">Mail a Check</h3>
-              <p className="text-gray-600 dark:text-gray-400">123 Church Street<br />City, State 12345</p>
-            </div>
-            <div className="p-6 dark:bg-gray-800 dark:text-gray-100">
-              <div className="text-4xl mb-4 text-primary"><FaPhone /></div>
-              <h3 className="text-xl font-bold text-primary mb-2">Text to Give</h3>
-              <p className="text-gray-600 dark:text-gray-400">Text GIVE to (555) 123-4567</p>
-            </div>
           </div>
         </div>
       </section>
