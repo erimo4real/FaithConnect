@@ -20,21 +20,36 @@ const states = { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, C
 export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRelated }) {
   const containerRef = useRef(null);
   const playerRef = useRef(null);
+  const hiddenRef = useRef(false);
   const [playerState, setPlayerState] = useState(states.UNSTARTED);
   const isPaused = playerState === states.PAUSED;
   const isEnded = playerState === states.ENDED;
-  const showOverlay = (isPaused || isEnded) && relatedVideos.length > 0;
+  const showOverlay = isPaused || isEnded;
 
   useEffect(() => {
     if (!videoId || !containerRef.current) return;
     let player = null;
+    hiddenRef.current = false;
     ensureAPI().then(() => {
       if (!containerRef.current) return;
       player = new window.YT.Player(containerRef.current, {
         videoId,
         playerVars: { autoplay: 1, controls: 1, rel: 0, modestbranding: 1, playsinline: 1 },
         events: {
-          onStateChange: (e) => setPlayerState(e.data),
+          onStateChange: (e) => {
+            setPlayerState(e.data);
+            if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+              if (containerRef.current) {
+                containerRef.current.style.display = 'none';
+                hiddenRef.current = true;
+              }
+            } else if (hiddenRef.current) {
+              if (containerRef.current) {
+                containerRef.current.style.display = 'block';
+                hiddenRef.current = false;
+              }
+            }
+          },
         },
       });
       playerRef.current = player;
@@ -42,6 +57,7 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
     return () => {
       player?.destroy();
       playerRef.current = null;
+      hiddenRef.current = false;
     };
   }, [videoId]);
 
@@ -54,11 +70,7 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
 
   return (
     <div className="relative w-full h-full">
-      <div
-        ref={containerRef}
-        className="w-full h-full"
-        style={{ display: showOverlay ? 'none' : 'block' }}
-      />
+      <div ref={containerRef} className="w-full h-full" />
       {showOverlay && (
         <div className="absolute inset-0 bg-black flex flex-col z-20">
           <div className="flex-1 flex flex-col items-center justify-center px-4">
@@ -71,35 +83,37 @@ export default function YouTubePlayer({ videoId, relatedVideos = [], onSelectRel
             </button>
             <p className="text-white/60 text-xs mt-4">{isEnded ? 'Video ended' : 'Paused'}</p>
           </div>
-          <div className="px-3 pb-3">
-            <p className="text-white text-[11px] font-semibold mb-2 px-1">More videos</p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {relatedVideos.map((v, i) => (
-                <button
-                  key={v.id || i}
-                  onClick={() => onSelectRelated?.(v)}
-                  className="flex-shrink-0 w-28 rounded-lg overflow-hidden hover:ring-2 hover:ring-white/40 transition-all group text-left relative"
-                >
-                  {v.thumbnail || v.videoId ? (
-                    <img
-                      src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`}
-                      alt=""
-                      className="w-full aspect-video object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full aspect-video bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                      <span className="text-white/40 text-lg font-bold">{v.title?.charAt(0)?.toUpperCase() || '?'}</span>
+          {relatedVideos.length > 0 && (
+            <div className="px-3 pb-3">
+              <p className="text-white text-[11px] font-semibold mb-2 px-1">More videos</p>
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {relatedVideos.map((v, i) => (
+                  <button
+                    key={v.id || i}
+                    onClick={() => onSelectRelated?.(v)}
+                    className="flex-shrink-0 w-28 rounded-lg overflow-hidden hover:ring-2 hover:ring-white/40 transition-all group text-left relative"
+                  >
+                    {v.thumbnail || v.videoId ? (
+                      <img
+                        src={v.thumbnail || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`}
+                        alt=""
+                        className="w-full aspect-video object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full aspect-video bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                        <span className="text-white/40 text-lg font-bold">{v.title?.charAt(0)?.toUpperCase() || '?'}</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-1.5 pt-4 pb-1">
+                      <p className="text-white text-[10px] font-medium leading-tight truncate">{v.title}</p>
+                      {v.subtitle && <p className="text-white/60 text-[8px] mt-0.5">{v.subtitle}</p>}
                     </div>
-                  )}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-1.5 pt-4 pb-1">
-                    <p className="text-white text-[10px] font-medium leading-tight truncate">{v.title}</p>
-                    {v.subtitle && <p className="text-white/60 text-[8px] mt-0.5">{v.subtitle}</p>}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
