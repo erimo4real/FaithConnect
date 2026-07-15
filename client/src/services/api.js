@@ -68,6 +68,7 @@ export async function adminFetchSermons() { return apiFetch('/sermons'); }
 export async function adminCreateSermon(data) { return apiFetch('/sermons', { method: 'POST', body: JSON.stringify(data) }); }
 export async function adminUpdateSermon(id, data) { return apiFetch(`/sermons/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 export async function adminDeleteSermon(id) { return apiFetch(`/sermons/${id}`, { method: 'DELETE' }); }
+export async function adminBackfillThumbnails() { return apiFetch('/sermons/backfill-thumbnails', { method: 'POST' }); }
 
 export async function adminFetchEvents() { return apiFetch('/events'); }
 export async function adminCreateEvent(data) { return apiFetch('/events', { method: 'POST', body: JSON.stringify(data) }); }

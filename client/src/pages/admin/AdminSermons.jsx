@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminFetchSermons, adminCreateSermon, adminUpdateSermon, adminDeleteSermon } from '../../services/api';
+import { adminFetchSermons, adminCreateSermon, adminUpdateSermon, adminDeleteSermon, adminBackfillThumbnails } from '../../services/api';
 import AdminLayout from './AdminLayout';
 import { useToast } from '../../context/ToastContext';
 import { HiOutlinePencil, HiOutlineTrash, HiOutlinePlus } from 'react-icons/hi';
@@ -13,6 +13,7 @@ export default function AdminSermons() {
   const [form, setForm] = useState({ title: '', speaker: '', date: '', thumbnail: '', audio_url: '', video_url: '', description: '', status: 'published' });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [backfilling, setBackfilling] = useState(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -28,6 +29,7 @@ export default function AdminSermons() {
   const handleEdit = (item) => { setForm({ title: item.title || '', speaker: item.speaker || '', date: item.date?.slice(0, 10) || '', thumbnail: item.thumbnail || '', audio_url: item.audio_url || '', video_url: item.video_url || '', description: item.description || '', status: item.status || 'published' }); setEditId(item.id); setShowForm(true); };
   const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || new Date().toISOString().slice(0, 10) }; try { if (editId) { await adminUpdateSermon(editId, payload); toast.success('Sermon updated'); } else { await adminCreateSermon(payload); toast.success('Sermon created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
   const handleDelete = async (id) => { if (!confirm('Delete this sermon?')) return; setDeleting(id); try { await adminDeleteSermon(id); toast.success('Sermon deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
+  const handleBackfill = async () => { if (!confirm('Fetch thumbnails for all sermons missing them? This may take a while.')) return; setBackfilling(true); try { const result = await adminBackfillThumbnails(); toast.success(`Backfill done: ${result.updated} updated, ${result.failed} failed`); load(); } catch (err) { toast.error(err.message); } finally { setBackfilling(false); } };
 
   return (
     <AdminLayout title="Sermons">
@@ -36,6 +38,7 @@ export default function AdminSermons() {
           <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 shrink-0">{items.length} sermons</p>
           <div className="flex items-center gap-3">
             <input placeholder="Search..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200 w-48" />
+            <button onClick={handleBackfill} disabled={backfilling} className="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">{backfilling ? 'Fixing...' : 'Get Thumbnails'}</button>
             <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium">
             <HiOutlinePlus className="w-4 h-4" /> {showForm ? 'Cancel' : 'Add Sermon'}
           </button>

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import cloudinary from '../config/cloudinary.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
+import { uploadToCloudinary } from '../utils/cloudinary.js';
 import logger from '../config/logger.js';
 
 const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/flac', 'audio/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
@@ -18,42 +19,6 @@ const upload = multer({
   },
 });
 const router = Router();
-
-const folder = 'bethel-church';
-
-function optimizeUrl(url, isVideo = false) {
-  if (!url || !url.includes('res.cloudinary.com')) return url;
-  const transforms = isVideo ? 'vc_auto,q_auto,f_auto' : 'f_auto,q_auto';
-  return url.replace('/upload/', `/upload/${transforms}/`);
-}
-
-function uploadToCloudinary(buffer, filename) {
-  return new Promise((resolve, reject) => {
-    const ext = filename.split('.').pop().toLowerCase();
-    const isVideo = /^(mp4|webm|mov|avi|mkv)$/i.test(ext);
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder,
-        resource_type: isVideo ? 'video' : 'auto',
-        public_id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        ...(isVideo
-          ? { transformation: [{ width: 1280, crop: 'limit', quality: 'auto' }] }
-          : { transformation: [{ quality: 'auto', fetch_format: 'auto' }] }),
-      },
-      (err, result) => {
-        if (err) return reject(err);
-        resolve({
-          url: optimizeUrl(result.secure_url, isVideo),
-          public_id: result.public_id,
-          size: result.bytes,
-          format: result.format,
-          filename,
-        });
-      }
-    );
-    uploadStream.end(buffer);
-  });
-}
 
 router.post('/', authenticate, requireAdmin, async (req, res) => {
   upload.single('file')(req, res, async (err) => {

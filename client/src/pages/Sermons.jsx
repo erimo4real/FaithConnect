@@ -148,7 +148,7 @@ export default function Sermons() {
 
   const relatedVideos = filtered.filter((_, i) => i !== index).map(v => {
     const vi = getVideoInfo(v.videoUrl);
-    return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
+    return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: v.thumbnail || thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
   });
 
   const handleSelectRelated = useCallback((v) => {
@@ -210,6 +210,10 @@ export default function Sermons() {
               ) : (
                 <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                   <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
+                  <button onClick={() => setPlayingId(null)} className="absolute top-2 right-2 z-10 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7"/></svg>
+                    More videos
+                  </button>
                 </div>
               )
               ) : videoInfo?.needsResolve ? (
@@ -251,6 +255,10 @@ export default function Sermons() {
                   ) : (
                     <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                       <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
+                      <button onClick={() => setPlayingId(null)} className="absolute top-2 right-2 z-10 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7"/></svg>
+                        More videos
+                      </button>
                     </div>
                   )
                 ) : videoInfo?.needsResolve ? (
