@@ -291,6 +291,7 @@ export default function Sermons() {
                 <span className={`inline-flex items-center gap-1.5 text-[10px] md:text-[9px] px-2.5 py-1 rounded-full mt-1 text-white font-medium shadow-lg ${platformBadge.color}`}>
                   {BadgeIcon ? <BadgeIcon className="text-[11px]" /> : <TikTokIcon />} {platformBadge.label}
                 </span>
+                {s.description && <p className="text-white/50 text-[10px] md:text-[9px] leading-tight mt-2 max-w-[130px] line-clamp-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">{s.description}</p>}
               </div>
               <button onClick={() => setLiked(p => ({ ...p, [s.id]: !p[s.id] }))} className="flex flex-col items-center gap-1 text-white group">
                 {liked[s.id] ? <HiHeart className="text-3xl md:text-[28px] text-red-500 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition-transform group-active:scale-125" /> : <HiOutlineHeart className="text-3xl md:text-[28px] text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-110 group-active:scale-125" />}
