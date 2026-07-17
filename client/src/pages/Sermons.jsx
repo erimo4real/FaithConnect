@@ -26,7 +26,9 @@ export default function Sermons() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [thumbnails, setThumbnails] = useState({});
   const [resolvedTikTok, setResolvedTikTok] = useState({});
+  const [paused, setPaused] = useState(false);
   const containerRef = useRef(null);
+  const videoContainerRef = useRef(null);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
@@ -198,10 +200,18 @@ export default function Sermons() {
               ) : (
                 <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                   <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
-                  <button onClick={() => setPlayingId(null)} className="absolute top-2 right-2 z-10 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7"/></svg>
-                    More videos
+                  <button onClick={() => setPaused(true)} className="absolute top-2 right-2 z-30 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2"/></svg>
+                    Pause
                   </button>
+                  {paused && (
+                    <div className="absolute inset-0 bg-black z-20 flex flex-col items-center justify-center" style={{ height: '540px' }}>
+                      <button onClick={() => setPaused(false)} className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors" aria-label="Resume">
+                        <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                      </button>
+                      <p className="text-white/60 text-xs mt-4">Paused</p>
+                    </div>
+                  )}
                 </div>
               )
               ) : videoInfo?.needsResolve ? (
@@ -241,10 +251,18 @@ export default function Sermons() {
                   ) : (
                     <div className="relative w-full max-w-[300px]" style={{ height: '540px' }}>
                       <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
-                      <button onClick={() => setPlayingId(null)} className="absolute top-2 right-2 z-10 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7"/></svg>
-                        More videos
+                      <button onClick={() => setPaused(true)} className="absolute top-2 right-2 z-30 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2"/></svg>
+                        Pause
                       </button>
+                      {paused && (
+                        <div className="absolute inset-0 bg-black z-20 flex flex-col items-center justify-center" style={{ height: '540px' }}>
+                          <button onClick={() => setPaused(false)} className="w-16 h-16 rounded-full bg-white/15 backdrop-blur border-2 border-white/30 flex items-center justify-center shadow-2xl hover:bg-white/25 transition-colors" aria-label="Resume">
+                            <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                          </button>
+                          <p className="text-white/60 text-xs mt-4">Paused</p>
+                        </div>
+                      )}
                     </div>
                   )
                 ) : videoInfo?.needsResolve ? (
