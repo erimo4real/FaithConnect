@@ -246,17 +246,6 @@ export default function PastStreams() {
                 {playingUrl && !isFacebook ? (
                   <YouTubePlayer
                     videoId={videoId}
-                    relatedVideos={items.filter((_, i) => i !== index).map(v => ({
-                      id: v.id,
-                      title: v.title,
-                      videoId: getYoutubeId(v.youtube_url),
-                      thumbnail: thumbnails[v.id],
-                      subtitle: new Date(v.deactivated_at || v.activated_at).toLocaleDateString(),
-                    }))}
-                    onSelectRelated={(v) => {
-                      const idx = items.findIndex(item => item.id === v.id);
-                      if (idx >= 0) { setIndex(idx); playVideo(v.id, items[idx]); }
-                    }}
                   />
                 ) : playingUrl && (
                   <iframe

@@ -146,16 +146,6 @@ export default function Sermons() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [goNext, goPrev]);
 
-  const relatedVideos = filtered.filter((_, i) => i !== index).map(v => {
-    const vi = getVideoInfo(v.videoUrl);
-    return { id: v.id, title: v.title, videoId: vi?.platform === 'youtube' ? vi.id : null, thumbnail: v.thumbnail || thumbnails[v.id] || vi?.thumbnail, subtitle: v.date ? new Date(v.date).toLocaleDateString() : '' };
-  });
-
-  const handleSelectRelated = useCallback((v) => {
-    const idx = filtered.findIndex(item => item.id === v.id);
-    if (idx >= 0) { setIndex(idx); setPlayingId(v.id); }
-  }, [filtered]);
-
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4">
@@ -203,8 +193,6 @@ export default function Sermons() {
                 <div className="relative w-full h-full">
                   <YouTubePlayer
                     videoId={videoInfo.id}
-                    relatedVideos={relatedVideos}
-                    onSelectRelated={handleSelectRelated}
                   />
                 </div>
               ) : (
@@ -248,8 +236,6 @@ export default function Sermons() {
                     <div className="relative w-full h-full">
                       <YouTubePlayer
                         videoId={videoInfo.id}
-                    relatedVideos={relatedVideos}
-                    onSelectRelated={handleSelectRelated}
                   />
                 </div>
                   ) : (

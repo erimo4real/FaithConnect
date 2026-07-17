@@ -153,7 +153,6 @@ const Live = () => {
                   {!isFacebook ? (
                     <YouTubePlayer
                       videoId={getYoutubeId(streamUrl)}
-                      relatedVideos={[]}
                     />
                   ) : (
                     <iframe
