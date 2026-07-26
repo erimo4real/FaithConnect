@@ -2,6 +2,20 @@
   command = "cd client && npm install && npm run build"
   publish = "client/dist"
 
+# API proxy — forward /api/* to Render backend BEFORE the SPA fallback
+[[redirects]]
+  from = "/api/*"
+  to = "https://bethel-church-f1kp.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# Uploads proxy — forward /uploads/* to Render backend
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://bethel-church-f1kp.onrender.com/uploads/:splat"
+  status = 200
+  force = true
+
 # SPA fallback — all routes serve index.html so React Router handles them
 [[redirects]]
   from = "/*"
