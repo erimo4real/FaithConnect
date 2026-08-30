@@ -235,7 +235,7 @@ export default function Sermons() {
         {/* MAIN CONTENT — featured player + details */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto px-4 py-6">
-            <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/60 ring-1 ring-white/10">
+            <div className={`relative rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/60 ring-1 ring-white/10 ${videoInfo?.platform === 'tiktok' ? 'aspect-[9/16] max-h-[70vh] w-full max-w-[440px] mx-auto' : 'aspect-video'}`}>
               {videoInfo && embedUrl ? (
                 videoInfo.platform === 'youtube' ? (
                   <div className="relative w-full h-full">
