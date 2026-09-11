@@ -12,6 +12,17 @@ const EventCard = ({ event }) => {
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
+  const formatTime = (timeString) => {
+    if (!timeString) return null;
+    const match = timeString.match(/(\d{1,2}):(\d{2})/);
+    if (!match) return timeString;
+    let hours = parseInt(match[1], 10);
+    const minutes = match[2];
+    const period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${period}`;
+  };
+
   return (
     <>
       <div className="card overflow-hidden cursor-pointer hover:-translate-y-1" onClick={() => setShowPreview(true)}>
@@ -38,7 +49,7 @@ const EventCard = ({ event }) => {
             {event.time && (
               <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2">
                 <FaClock className="text-secondary shrink-0" />
-                {event.time}
+                {formatTime(event.time)}
               </p>
             )}
             <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2">
