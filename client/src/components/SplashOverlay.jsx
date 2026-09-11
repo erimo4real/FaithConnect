@@ -40,7 +40,7 @@ export default function SplashOverlay() {
       <img
         src="/fasting.jpeg"
         alt="Bethel Church Prayer and Fasting 40 Days"
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover"
       />
       <button
         onClick={dismiss}
