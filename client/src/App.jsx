@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { checkAuth } from './store/authSlice';
 import { ToastProvider } from './context/ToastContext';
@@ -50,7 +50,9 @@ import AdminVerses from './pages/admin/AdminVerses';
 
 function App() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const enableDonations = import.meta.env.VITE_ENABLE_DONATIONS === 'true';
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -108,7 +110,7 @@ function App() {
         </Layout>
       } />
     </Routes>
-    <SplashOverlay />
+    {!isAdminRoute && <SplashOverlay />}
     </ToastProvider>
     </ThemeProvider>
   );
