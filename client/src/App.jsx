@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import LiveChat from './components/LiveChat';
+import SplashOverlay from './components/SplashOverlay';
 import Home from './pages/Home';
 import About from './pages/About';
 import Sermons from './pages/Sermons';
@@ -107,6 +108,7 @@ function App() {
         </Layout>
       } />
     </Routes>
+    <SplashOverlay />
     </ToastProvider>
     </ThemeProvider>
   );
