@@ -59,7 +59,7 @@ export default function SplashOverlay() {
       <img
         src="/fasting.jpeg"
         alt="Bethel Church Prayer and Fasting 40 Days"
-        className={`w-full h-full flex-1 object-cover transition-transform duration-[3000ms] ${leaving ? 'scale-105' : 'scale-100'}`}
+        className={`w-full h-full flex-1 object-contain transition-transform duration-[3000ms] ${leaving ? 'scale-105' : 'scale-100'}`}
       />
 
       {/* readability gradient behind the badge */}
