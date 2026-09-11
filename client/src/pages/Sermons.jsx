@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchSermons, fetchEvents } from '../services/api';
+import { fetchSermons } from '../services/api';
 import { FaYoutube, FaFacebook, FaVimeoV, FaInstagram } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { getVideoInfo, getVideoIcon, fetchVideoThumbnail, resolveTikTokUrl } from '../utils/videoUtils';
@@ -32,7 +32,6 @@ if (enableDonations) {
 
 export default function Sermons() {
   const [items, setItems] = useState([]);
-  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [liked, setLiked] = useState(() => {
@@ -70,7 +69,6 @@ export default function Sermons() {
         }
       });
     }).catch(() => setLoading(false));
-    fetchEvents().then(setEvents).catch(() => {});
   }, []);
 
   // Resolve TikTok short URLs for selected video
@@ -344,26 +342,6 @@ export default function Sermons() {
                 </div>
               ))}
             </div>
-
-            {events.length > 0 && (
-              <>
-                <div className="px-4 mt-6 mb-2"><h2 className="text-sm font-semibold text-white/90">Upcoming Events</h2></div>
-                <div className="px-2 space-y-1">
-                  {events.slice(0, 4).map(ev => (
-                    <Link key={ev.id} to="/events" className="flex items-center gap-3 rounded-xl p-2 hover:bg-white/5 transition-colors min-h-[52px]">
-                      <div className="w-10 h-10 shrink-0 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center justify-center">
-                        <span className="text-[8px] uppercase text-white/40 font-semibold">{ev.date ? new Date(ev.date).toLocaleDateString(undefined, { month: 'short' }) : ''}</span>
-                        <span className="text-sm font-bold text-white/90">{ev.date ? new Date(ev.date).getDate() : ''}</span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-medium text-white/90">{ev.title}</p>
-                        <p className="truncate text-[10px] text-white/40">{ev.location || ev.time || 'Bethel Church'}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
 
           <div className="px-5 py-4 border-t border-white/10">
