@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS events (
   splash_to TEXT,
   splash_duration INTEGER DEFAULT 10,
   total_days INTEGER DEFAULT 40,
+  splash_order INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

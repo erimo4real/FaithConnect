@@ -26,6 +26,7 @@ export const eventSchema = z.object({
   splash_to: z.string().nullable().optional(),
   splash_duration: z.number().int().min(1).max(120).nullable().optional(),
   total_days: z.number().int().min(1).max(365).nullable().optional(),
+  splash_order: z.number().int().min(0).max(999).nullable().optional(),
 });
 
 export const sermonSchema = z.object({
