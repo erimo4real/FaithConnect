@@ -12,8 +12,10 @@ function currentDay(splash) {
 }
 
 export default function SplashOverlay() {
-  const [splash, setSplash] = useState(null);
+  const [splashes, setSplashes] = useState([]);
+  const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -21,17 +23,35 @@ export default function SplashOverlay() {
     fetchSplashEvents()
       .then(list => {
         if (cancelled || !Array.isArray(list) || list.length === 0) return;
-        setSplash(list[0]);
-        const durationMs = (list[0].splash_duration || 10) * 1000;
-        timerRef.current = setTimeout(() => setLeaving(true), durationMs);
+        setSplashes(list);
       })
       .catch(() => {});
     return () => { cancelled = true; if (timerRef.current) clearTimeout(timerRef.current); };
   }, []);
 
+  const splash = splashes[index];
+
+  useEffect(() => {
+    if (!splash || leaving) return;
+    const durationMs = (splash.splash_duration || 10) * 1000;
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      if (index < splashes.length - 1) {
+        setTransitioning(true);
+        setTimeout(() => {
+          setIndex(i => i + 1);
+          setTransitioning(false);
+        }, 500);
+      } else {
+        setLeaving(true);
+      }
+    }, durationMs);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [splash, index, splashes.length, leaving]);
+
   useEffect(() => {
     if (!leaving) return;
-    const t = setTimeout(() => setSplash(null), 800);
+    const t = setTimeout(() => setSplashes([]), 800);
     return () => clearTimeout(t);
   }, [leaving]);
 
@@ -40,10 +60,11 @@ export default function SplashOverlay() {
   const dismiss = () => setLeaving(true);
   const counter = currentDay(splash);
   const durationSec = splash.splash_duration || 10;
+  const fadeOut = (leaving || transitioning);
 
   return (
     <div
-      className={`fixed inset-0 z-[999] bg-black flex flex-col transition-opacity duration-700 ${leaving ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[999] bg-black flex flex-col transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
       onClick={dismiss}
       role="dialog"
       aria-label={splash.title || 'Announcement'}
@@ -51,19 +72,21 @@ export default function SplashOverlay() {
     >
       <div className="absolute top-0 left-0 right-0 h-[4px] bg-white/25">
         <div
+          key={splash.id}
           className="h-full bg-gradient-to-r from-amber-400 to-amber-500"
           style={{
-            animation: leaving ? 'none' : `splashProgress ${durationSec}s linear forwards`,
-            animationPlayState: leaving ? 'paused' : 'running',
+            animation: fadeOut ? 'none' : `splashProgress ${durationSec}s linear forwards`,
+            animationPlayState: fadeOut ? 'paused' : 'running',
           }}
         />
       </div>
 
       {splash.image ? (
         <img
+          key={splash.id}
           src={splash.image}
           alt={splash.title || 'Announcement'}
-          className={`w-full h-full flex-1 object-contain transition-transform duration-[3000ms] ${leaving ? 'scale-105' : 'scale-100'}`}
+          className={`w-full h-full flex-1 object-contain transition-transform duration-[3000ms] ${fadeOut ? 'scale-105' : 'scale-100'}`}
         />
       ) : (
         <div className="w-full h-full flex-1 flex items-center justify-center bg-gradient-to-br from-primary to-primary/70">
