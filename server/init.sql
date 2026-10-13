@@ -70,6 +70,11 @@ CREATE TABLE IF NOT EXISTS events (
   spots INTEGER DEFAULT 30,
   days TEXT,
   status TEXT NOT NULL DEFAULT 'published',
+  display_mode TEXT NOT NULL DEFAULT 'list',
+  splash_from TEXT,
+  splash_to TEXT,
+  splash_duration INTEGER DEFAULT 10,
+  total_days INTEGER DEFAULT 40,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

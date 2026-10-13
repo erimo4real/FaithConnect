@@ -11,7 +11,7 @@ export default function AdminEvents() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ title: '', date: '', time: '', days: '', location: '', description: '', image: '', spots: null, status: 'published' });
+  const [form, setForm] = useState({ title: '', date: '', time: '', days: '', location: '', description: '', image: '', spots: null, status: 'published', display_mode: 'list', splash_from: '', splash_to: '', splash_duration: 10, total_days: 40 });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [search, setSearch] = useState('');
@@ -25,9 +25,9 @@ export default function AdminEvents() {
 
   const load = async () => { try { setItems(await adminFetchEvents()); } catch (err) { toast.error(err.message); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
-  const resetForm = () => { setForm({ title: '', date: '', time: '', days: '', location: '', description: '', image: '', spots: null, status: 'published' }); setEditId(null); setShowForm(false); };
-  const handleEdit = (item) => { setForm({ ...item, date: item.date?.slice(0, 10) || '', time: item.time || '', days: item.days || '' }); setEditId(item.id); setShowForm(true); };
-  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || null, time: form.time || null, days: form.days || null }; try { if (editId) { await adminUpdateEvent(editId, payload); toast.success('Event updated'); } else { await adminCreateEvent(payload); toast.success('Event created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
+  const resetForm = () => { setForm({ title: '', date: '', time: '', days: '', location: '', description: '', image: '', spots: null, status: 'published', display_mode: 'list', splash_from: '', splash_to: '', splash_duration: 10, total_days: 40 }); setEditId(null); setShowForm(false); };
+  const handleEdit = (item) => { setForm({ ...item, date: item.date?.slice(0, 10) || '', time: item.time || '', days: item.days || '', display_mode: item.display_mode || 'list', splash_from: item.splash_from || '', splash_to: item.splash_to || '', splash_duration: item.splash_duration || 10, total_days: item.total_days || 40 }); setEditId(item.id); setShowForm(true); };
+  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || null, time: form.time || null, days: form.days || null, display_mode: form.display_mode || 'list', splash_from: form.splash_from || null, splash_to: form.splash_to || null, splash_duration: Number(form.splash_duration) || 10, total_days: form.total_days ? Number(form.total_days) : null }; try { if (editId) { await adminUpdateEvent(editId, payload); toast.success('Event updated'); } else { await adminCreateEvent(payload); toast.success('Event created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
   const handleDelete = async (id) => { if (!confirm('Delete this event?')) return; setDeleting(id); try { await adminDeleteEvent(id); toast.success('Event deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
 
   return (
@@ -61,6 +61,19 @@ export default function AdminEvents() {
                   <option value="published">Published</option>
                   <option value="draft">Draft</option>
                 </select>
+                <select value={form.display_mode} onChange={(e) => setForm({ ...form, display_mode: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200">
+                  <option value="list">Show on event page</option>
+                  <option value="splash">Splash (full-screen flash)</option>
+                  <option value="slide">Slide (homepage slide — later)</option>
+                </select>
+                {form.display_mode === 'splash' && (
+                  <>
+                    <input type="date" value={form.splash_from} onChange={(e) => setForm({ ...form, splash_from: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" title="Splash from (date)" />
+                    <input type="date" value={form.splash_to} onChange={(e) => setForm({ ...form, splash_to: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" title="Splash until (date)" />
+                    <input type="number" placeholder="Seconds per visit (e.g. 10)" min="1" max="120" value={form.splash_duration} onChange={(e) => setForm({ ...form, splash_duration: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
+                    <input type="number" placeholder="Total days (counter e.g. 40)" min="1" max="365" value={form.total_days} onChange={(e) => setForm({ ...form, total_days: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
+                  </>
+                )}
               </div>
               <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" rows="3" />
               <button type="submit" disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm font-medium transition-colors disabled:opacity-50">{saving ? 'Saving...' : (editId ? 'Update' : 'Create')}</button>

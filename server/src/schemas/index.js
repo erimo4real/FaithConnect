@@ -21,6 +21,11 @@ export const eventSchema = z.object({
   image: z.string().nullable().optional(),
   spots: z.number().int().nullable().optional(),
   status: z.enum(['published', 'draft']).optional(),
+  display_mode: z.enum(['list', 'splash', 'slide']).optional(),
+  splash_from: z.string().nullable().optional(),
+  splash_to: z.string().nullable().optional(),
+  splash_duration: z.number().int().min(1).max(120).nullable().optional(),
+  total_days: z.number().int().min(1).max(365).nullable().optional(),
 });
 
 export const sermonSchema = z.object({
