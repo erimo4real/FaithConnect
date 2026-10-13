@@ -43,6 +43,7 @@ export default function Sermons() {
   const [thumbnails, setThumbnails] = useState({});
   const [resolvedTikTok, setResolvedTikTok] = useState({});
   const [paused, setPaused] = useState(false);
+  const [playingId, setPlayingId] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -54,6 +55,12 @@ export default function Sermons() {
   useEffect(() => {
     localStorage.setItem('fc_sermon_liked', JSON.stringify(liked));
   }, [liked]);
+
+  // Show the lightweight poster (not the heavy embed) whenever the selection changes
+  useEffect(() => {
+    setPlayingId(null);
+    setPaused(false);
+  }, [selectedId]);
 
   useEffect(() => {
     fetchSermons().then(data => {
@@ -71,9 +78,10 @@ export default function Sermons() {
     }).catch(() => setLoading(false));
   }, []);
 
-  // Resolve TikTok short URLs for selected video
+  // Resolve TikTok short URLs only after the user presses play (not on page load)
   useEffect(() => {
-    const s = items.find(i => i.id === selectedId);
+    if (!playingId) return;
+    const s = items.find(i => i.id === playingId);
     if (!s?.videoUrl) return;
     const info = getVideoInfo(s.videoUrl);
     if (info?.needsResolve && !resolvedTikTok[s.id]) {
@@ -81,7 +89,7 @@ export default function Sermons() {
         if (result) setResolvedTikTok(p => ({ ...p, [s.id]: result }));
       });
     }
-  }, [items, selectedId]);
+  }, [playingId, items]);
 
   const speakers = ['all', ...new Set(items.map(s => s.speaker))];
   const years = ['all', ...new Set(items.map(s => s.date?.substring(0, 4)))];
@@ -137,6 +145,7 @@ export default function Sermons() {
   const platformBadge = getVideoIcon(videoInfo?.platform);
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
+  const isCurrentPlaying = !!s?.id && playingId === s.id;
 
   const sidebar = (other = items, cls = '', onSelect) => other.filter(x => x.id !== s.id).slice(0, 8).map(item => {
     const it = getVideoInfo(item.videoUrl);
@@ -234,14 +243,14 @@ export default function Sermons() {
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto px-4 py-6">
             <div className={`relative rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/60 ring-1 ring-white/10 ${videoInfo?.platform === 'tiktok' ? 'aspect-[9/16] w-full max-w-none' : 'aspect-video'}`}>
-              {videoInfo && embedUrl ? (
+              {isCurrentPlaying && videoInfo && embedUrl ? (
                 videoInfo.platform === 'youtube' ? (
                   <div className="relative w-full h-full">
                     <YouTubePlayer videoId={videoInfo.id} />
                   </div>
                 ) : (
                   <div className="relative w-full h-full">
-                    <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
+                    <iframe src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`} title={s.title} className="w-full h-full" frameBorder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation" />
                     <button onClick={() => setPaused(true)} className="absolute top-2 right-2 z-30 text-white/80 bg-black/50 backdrop-blur min-h-[36px] px-2.5 rounded-lg text-xs font-medium hover:bg-black/70 transition-colors flex items-center gap-1.5">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2"/></svg>
                       Pause
@@ -256,13 +265,34 @@ export default function Sermons() {
                     )}
                   </div>
                 )
-              ) : videoInfo?.needsResolve ? (
+              ) : isCurrentPlaying && videoInfo?.needsResolve ? (
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="flex items-center gap-2 text-white/40 text-sm">
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                     Loading video...
                   </div>
                 </div>
+              ) : videoInfo ? (
+                <button
+                  type="button"
+                  onClick={() => setPlayingId(s.id)}
+                  className="group absolute inset-0 w-full h-full"
+                  aria-label={`Play ${s.title}`}
+                >
+                  {thumbUrl ? (
+                    <img src={thumbUrl} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                  ) : (
+                    <span className="absolute inset-0 bg-gradient-to-br from-primary/40 via-black to-accent/40" />
+                  )}
+                  <span className="absolute inset-0 bg-black/40 group-hover:bg-black/25 transition-colors" />
+                  <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
+                    <span className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 flex items-center justify-center shadow-2xl group-hover:bg-white/30 group-hover:scale-105 transition-all">
+                      <svg className="w-7 h-7 md:w-9 md:h-9 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </span>
+                    {!thumbUrl && <span className="text-sm font-medium text-white/80 text-center line-clamp-2">{s.title}</span>}
+                    <span className="text-[11px] uppercase tracking-widest text-white/50">Tap to play</span>
+                  </span>
+                </button>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <p className="text-white/40 text-sm">Video unavailable for embedding</p>
@@ -307,6 +337,11 @@ export default function Sermons() {
               )}
 
               <div className="mt-4 flex items-center gap-2 text-white/30 text-xs">
+                <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white/60 transition-colors flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  Watch on {platformBadge.label}
+                </a>
+                <span className="text-white/20">·</span>
                 <a href="/podcast" className="hover:text-white/60 transition-colors flex items-center gap-1">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m-4 0h8"/></svg>
                   Podcast

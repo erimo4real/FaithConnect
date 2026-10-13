@@ -34,6 +34,11 @@ import { exportCSV } from './src/export.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Behind Render's load balancer (and Netlify's /api proxy). Without this, Express
+// reports the proxy's IP as req.ip for every visitor, turning every rate limiter
+// into a single site-wide bucket that locks out all users once it fills.
+app.set('trust proxy', 1);
+
 // Security
 app.use(helmet());
 const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/+$/, '');
@@ -135,19 +140,28 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Rate limiting — applied before auth routes to protect login/register too
+// Keyed per client IP (see `trust proxy` above). Auth and uploads stay strict;
+// the general API cap is generous so normal browsing and the site's polling
+// (Home every 30s, Live every 5s) never trip it.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { error: 'Too many requests, try again later' },
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { error: 'Too many login attempts, try again later' },
 });
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { error: 'Too many uploads, try again later' },
 });
 
