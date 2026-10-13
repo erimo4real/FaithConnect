@@ -2,12 +2,14 @@ import { useEffect, useState, useRef } from 'react';
 import { fetchSplashEvents } from '../services/api';
 
 function currentDay(splash) {
-  if (!splash?.splash_from) return null;
-  const start = new Date(splash.splash_from + 'T00:00:00');
+  const startDate = splash?.date || splash?.splash_from;
+  if (!startDate) return null;
+  const start = new Date(String(startDate).slice(0, 10) + 'T00:00:00');
   const now = new Date();
   const msPerDay = 86400000;
   const day = Math.floor((now - start) / msPerDay) + 1;
   const total = splash.total_days || 1;
+  if (day < 1 || day > total) return null;
   return { day, total };
 }
 
