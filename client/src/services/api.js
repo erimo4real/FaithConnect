@@ -55,7 +55,10 @@ export async function sendPrayerRequest(formData) {
 }
 
 export async function fetchSermons() { return apiFetch('/sermons'); }
-export async function fetchEvents() { return apiFetch('/events'); }
+export async function fetchEvents() {
+  const events = await apiFetch('/events');
+  return (Array.isArray(events) ? events : []).filter(e => !e.display_mode || e.display_mode === 'list');
+}
 export async function fetchSplashEvents() { return apiFetch('/events/splash'); }
 export async function fetchBlogPosts() { return apiFetch('/blog'); }
 export async function fetchGallery() { return apiFetch('/gallery'); }
