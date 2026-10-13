@@ -19,7 +19,7 @@ router.get('/splash', async (req, res) => {
          AND splash_from IS NOT NULL
          AND splash_to IS NOT NULL
          AND (CURRENT_DATE BETWEEN splash_from::date AND splash_to::date)
-       ORDER BY splash_from ASC`
+       ORDER BY splash_from DESC`
     );
     res.json(result.rows);
   } catch (err) {
