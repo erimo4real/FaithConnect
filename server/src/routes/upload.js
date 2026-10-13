@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import cloudinary from '../config/cloudinary.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
-import { uploadToCloudinary } from '../utils/cloudinary.js';
+import { uploadToCloudinary, folder, optimizeUrl } from '../utils/cloudinary.js';
 import logger from '../config/logger.js';
 
 const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/flac', 'audio/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];

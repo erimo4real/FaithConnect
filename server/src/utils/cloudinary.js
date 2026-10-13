@@ -1,9 +1,9 @@
 import cloudinary from '../config/cloudinary.js';
 import logger from '../config/logger.js';
 
-const folder = 'bethel-church';
+export const folder = 'bethel-church';
 
-function optimizeUrl(url, isVideo = false) {
+export function optimizeUrl(url, isVideo = false) {
   if (!url || !url.includes('res.cloudinary.com')) return url;
   const transforms = isVideo ? 'vc_auto,q_auto,f_auto' : 'f_auto,q_auto';
   return url.replace('/upload/', `/upload/${transforms}/`);
