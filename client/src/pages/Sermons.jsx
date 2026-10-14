@@ -146,6 +146,9 @@ export default function Sermons() {
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
   const isCurrentPlaying = !!s?.id && playingId === s.id;
+  // TikTok's embed endpoint is unreliable (frequent 429/503), so open TikTok
+  // clips in a new tab instead of mounting the player. Others embed inline.
+  const opensExternal = videoInfo?.platform === 'tiktok';
 
   const sidebar = (other = items, cls = '', onSelect) => other.filter(x => x.id !== s.id).slice(0, 8).map(item => {
     const it = getVideoInfo(item.videoUrl);
@@ -275,9 +278,15 @@ export default function Sermons() {
               ) : videoInfo ? (
                 <button
                   type="button"
-                  onClick={() => setPlayingId(s.id)}
+                  onClick={() => {
+                    if (opensExternal) {
+                      window.open(s.videoUrl, '_blank', 'noopener,noreferrer');
+                    } else {
+                      setPlayingId(s.id);
+                    }
+                  }}
                   className="group absolute inset-0 w-full h-full"
-                  aria-label={`Play ${s.title}`}
+                  aria-label={opensExternal ? `Watch ${s.title} on TikTok` : `Play ${s.title}`}
                 >
                   {thumbUrl ? (
                     <img src={thumbUrl} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
@@ -287,10 +296,14 @@ export default function Sermons() {
                   <span className="absolute inset-0 bg-black/40 group-hover:bg-black/25 transition-colors" />
                   <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
                     <span className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 flex items-center justify-center shadow-2xl group-hover:bg-white/30 group-hover:scale-105 transition-all">
-                      <svg className="w-7 h-7 md:w-9 md:h-9 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                      {opensExternal ? (
+                        <svg className="w-7 h-7 md:w-9 md:h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                      ) : (
+                        <svg className="w-7 h-7 md:w-9 md:h-9 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                      )}
                     </span>
                     {!thumbUrl && <span className="text-sm font-medium text-white/80 text-center line-clamp-2">{s.title}</span>}
-                    <span className="text-[11px] uppercase tracking-widest text-white/50">Tap to play</span>
+                    <span className="text-[11px] uppercase tracking-widest text-white/50">{opensExternal ? 'Watch on TikTok' : 'Tap to play'}</span>
                   </span>
                 </button>
               ) : (
