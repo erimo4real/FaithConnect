@@ -362,6 +362,44 @@ setInterval(async () => {
   }
 })();
 
+// Self-heal sermon covers. TikTok's oEmbed change (~mid-2026) silently left
+// newer sermons without cover images. On startup, best-effort backfill any
+// that are missing — same logic as the admin 'Get Thumbnails' button, so
+// covers restore automatically with no admin action. Idempotent: only rows
+// with thumbnail IS NULL are processed, so it no-ops once everything has
+// a cover. Runs in the background; failures never affect startup.
+(async () => {
+  try {
+    const { rows } = await query(
+      'SELECT id, video_url FROM sermons WHERE thumbnail IS NULL AND video_url IS NOT NULL'
+    );
+    if (rows.length === 0) return;
+    logger.info({ count: rows.length }, 'Backfilling missing sermon cover images');
+    const { fetchAndUploadThumbnail } = await import('./src/utils/thumbnail.js');
+    for (const row of rows) {
+      try {
+        const thumbnail = await fetchAndUploadThumbnail(row.video_url);
+        if (thumbnail) {
+          // Guarded with thumbnail IS NULL so a concurrent admin edit is
+          // never overwritten by the backfill.
+          await query('UPDATE sermons SET thumbnail=$1 WHERE id=$2 AND thumbnail IS NULL', [
+            thumbnail,
+            row.id,
+          ]);
+          logger.info({ sermonId: row.id }, 'Sermon cover restored');
+        }
+        // Pace the metadata API (rate-limited to ~1 req/sec)
+        await new Promise(r => setTimeout(r, 1500));
+      } catch (err) {
+        logger.error({ err, sermonId: row.id }, 'Sermon cover backfill failed');
+      }
+    }
+    logger.info('Sermon cover backfill complete');
+  } catch (err) {
+    logger.warn({ err }, 'Sermon cover backfill skipped');
+  }
+})();
+
 app.listen(PORT, () => {
   logger.info({ port: PORT }, 'Bethel Church API started');
 });
