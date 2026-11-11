@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { adminFetchSermons, adminCreateSermon, adminUpdateSermon, adminDeleteSermon, adminBackfillThumbnails } from '../../services/api';
 import AdminLayout from './AdminLayout';
 import { useToast } from '../../context/ToastContext';
+import { resolveCoverImage } from '../../utils/coverUtils';
 import { HiOutlinePencil, HiOutlineTrash, HiOutlinePlus } from 'react-icons/hi';
 
 export default function AdminSermons() {
@@ -27,7 +28,26 @@ export default function AdminSermons() {
 
   const resetForm = () => { setForm({ title: '', speaker: '', date: '', thumbnail: '', audio_url: '', video_url: '', description: '', status: 'published' }); setEditId(null); setShowForm(false); };
   const handleEdit = (item) => { setForm({ title: item.title || '', speaker: item.speaker || '', date: item.date?.slice(0, 10) || '', thumbnail: item.thumbnail || '', audio_url: item.audio_url || '', video_url: item.video_url || '', description: item.description || '', status: item.status || 'published' }); setEditId(item.id); setShowForm(true); };
-  const handleSubmit = async (e) => { e.preventDefault(); setSaving(true); const payload = { ...form, date: form.date || new Date().toISOString().slice(0, 10) }; try { if (editId) { await adminUpdateSermon(editId, payload); toast.success('Sermon updated'); } else { await adminCreateSermon(payload); toast.success('Sermon created'); } resetForm(); load(); } catch (err) { toast.error(err.message); } finally { setSaving(false); } };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    const payload = { ...form, date: form.date || new Date().toISOString().slice(0, 10) };
+    try {
+      // No cover given? Resolve one from the video link here in the browser —
+      // the hosted server can't reach the TikTok metadata service. Only on
+      // create, or when the video link itself changed, so an admin who
+      // deliberately clears a cover on edit keeps it cleared.
+      const original = editId ? items.find(item => item.id === editId) : null;
+      const videoChanged = !editId || (original?.video_url || '') !== (payload.video_url || '');
+      if (!payload.thumbnail?.trim() && payload.video_url && videoChanged) {
+        toast.info('Fetching cover image from the video link...');
+        const cover = await resolveCoverImage(payload.video_url);
+        if (cover) payload.thumbnail = cover;
+      }
+      if (editId) { await adminUpdateSermon(editId, payload); toast.success('Sermon updated'); } else { await adminCreateSermon(payload); toast.success('Sermon created'); }
+      resetForm(); load();
+    } catch (err) { toast.error(err.message); } finally { setSaving(false); }
+  };
   const handleDelete = async (id) => { if (!confirm('Delete this sermon?')) return; setDeleting(id); try { await adminDeleteSermon(id); toast.success('Sermon deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
   const handleBackfill = async () => { if (!confirm('Fetch thumbnails for all sermons missing them? This may take a while.')) return; setBackfilling(true); try { const result = await adminBackfillThumbnails(); toast.success(`Backfill done: ${result.updated} updated, ${result.failed} failed`); load(); } catch (err) { toast.error(err.message); } finally { setBackfilling(false); } };
 
@@ -52,7 +72,7 @@ export default function AdminSermons() {
                 <input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" required />
                 <input placeholder="Speaker" value={form.speaker} onChange={(e) => setForm({ ...form, speaker: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" required />
                 <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
-                <input placeholder="Thumbnail URL" value={form.thumbnail} onChange={(e) => setForm({ ...form, thumbnail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
+                <input placeholder="Thumbnail URL (leave empty to auto-grab from video)" value={form.thumbnail} onChange={(e) => setForm({ ...form, thumbnail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
                 <input placeholder="Audio URL" value={form.audio_url} onChange={(e) => setForm({ ...form, audio_url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
                 <input placeholder="Video URL" value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200" />
                 <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200">
