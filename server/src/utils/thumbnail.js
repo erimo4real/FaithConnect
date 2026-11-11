@@ -49,19 +49,31 @@ function isTikTokCdnUrl(u) {
 // the caller can fall back to oEmbed or a manual upload. Only cover URLs on
 // TikTok's own CDN are trusted (tikwm is a third party — never let it aim
 // image downloads at arbitrary hosts).
+// The API is flaky from shared/datacenter IPs (rate limits), so transient
+// failures get one retry; a valid response without a cover (e.g. a deleted
+// video) is not retried.
 async function fetchTikTokCover(videoUrl) {
-  try {
-    const resp = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`, {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    const cover = data?.data?.cover || data?.data?.origin_cover || null;
-    return cover && isTikTokCdnUrl(cover) ? cover : null;
-  } catch {
-    return null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const resp = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`, {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!resp.ok) {
+        if (attempt === 0) {
+          await new Promise((r) => setTimeout(r, 2000));
+          continue;
+        }
+        return null;
+      }
+      const data = await resp.json();
+      const cover = data?.data?.cover || data?.data?.origin_cover || null;
+      return cover && isTikTokCdnUrl(cover) ? cover : null;
+    } catch {
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 2000));
+    }
   }
+  return null;
 }
 
 async function fetchOembedThumbnail(oembedUrl) {
@@ -75,13 +87,25 @@ async function fetchOembedThumbnail(oembedUrl) {
   }
 }
 
+const MAX_THUMBNAIL_BYTES = 10 * 1024 * 1024;
+
 async function downloadImage(url) {
   try {
-    const resp = await fetch(url);
+    // Defense-in-depth: oEmbed metadata points at platform CDNs, but only
+    // https image responses are accepted, downloads are size-capped, and a
+    // timeout applies — a hostile or compromised response can't exhaust
+    // memory/storage or hang the request.
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return null;
+    const resp = await fetch(url, { signal: AbortSignal.timeout(15000) });
     if (!resp.ok) return null;
-    const buffer = Buffer.from(await resp.arrayBuffer());
     const contentType = resp.headers.get('content-type') || 'image/jpeg';
-    const ext = contentType.split('/').pop() || 'jpg';
+    if (!contentType.startsWith('image/')) return null;
+    const length = Number(resp.headers.get('content-length') || 0);
+    if (length > MAX_THUMBNAIL_BYTES) return null;
+    const buffer = Buffer.from(await resp.arrayBuffer());
+    if (buffer.length > MAX_THUMBNAIL_BYTES) return null;
+    const ext = contentType.split('/').pop().split(';')[0] || 'jpg';
     return { buffer, ext };
   } catch {
     return null;

@@ -74,7 +74,7 @@ router.put('/:id', authenticate, requireAdmin, validate(sermonSchema), auditLog(
       if (fetched) finalThumbnail = fetched;
     }
 
-    if (thumbnail !== undefined && isCloudinaryUrl(existingRow.thumbnail) && existingRow.thumbnail !== thumbnail) {
+    if (thumbnail !== undefined && isCloudinaryUrl(existingRow.thumbnail) && existingRow.thumbnail !== finalThumbnail) {
       await deleteCloudinaryImage(existingRow.thumbnail);
     }
 
