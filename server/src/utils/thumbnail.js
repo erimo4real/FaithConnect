@@ -35,6 +35,35 @@ async function resolveTikTokLongUrl(shortUrl) {
   return null;
 }
 
+function isTikTokCdnUrl(u) {
+  try {
+    const parsed = new URL(u);
+    return parsed.protocol === 'https:' && /(^|\.)tiktokcdn(-us)?\.com$/.test(parsed.hostname);
+  } catch { return false; }
+}
+
+// TikTok's oEmbed stopped returning thumbnail_url (~mid-2026) and the video
+// page serves a JS shell to server-side fetchers, so sermon covers are
+// resolved via tikwm's public metadata API, which accepts both vt.tiktok.com
+// short links and canonical URLs. Best-effort: any failure returns null so
+// the caller can fall back to oEmbed or a manual upload. Only cover URLs on
+// TikTok's own CDN are trusted (tikwm is a third party — never let it aim
+// image downloads at arbitrary hosts).
+async function fetchTikTokCover(videoUrl) {
+  try {
+    const resp = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const cover = data?.data?.cover || data?.data?.origin_cover || null;
+    return cover && isTikTokCdnUrl(cover) ? cover : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchOembedThumbnail(oembedUrl) {
   try {
     const resp = await fetch(oembedUrl);
@@ -69,10 +98,18 @@ export async function fetchAndUploadThumbnail(videoUrl) {
 
   if (info.platform === 'youtube') {
     thumbnailUrl = info.thumbnail;
-  } else if (info.needsResolve) {
-    const resolved = await resolveTikTokLongUrl(videoUrl);
-    if (resolved) {
-      thumbnailUrl = await fetchOembedThumbnail(resolved.url);
+  } else if (info.platform === 'tiktok' || info.needsResolve) {
+    // TikTok: resolve the cover via the metadata API first (works for both
+    // short and canonical URLs), then fall back to the legacy oEmbed path.
+    thumbnailUrl = await fetchTikTokCover(videoUrl);
+    if (!thumbnailUrl && info.oembed) {
+      thumbnailUrl = await fetchOembedThumbnail(info.oembed);
+    }
+    if (!thumbnailUrl && info.needsResolve) {
+      const resolved = await resolveTikTokLongUrl(videoUrl);
+      if (resolved) {
+        thumbnailUrl = await fetchOembedThumbnail(resolved.url);
+      }
     }
   } else if (info.oembed) {
     thumbnailUrl = await fetchOembedThumbnail(info.oembed);
