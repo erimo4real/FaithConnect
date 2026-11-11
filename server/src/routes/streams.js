@@ -54,9 +54,17 @@ router.get('/resolve-tiktok', async (req, res) => {
   try {
     const { url } = req.query;
     if (!url) return res.status(400).json({ error: 'Missing url param' });
-    if (!url.includes('tiktok.com')) return res.json({ videoUrl: null });
+    // Only https TikTok URLs may be fetched server-side — blocks SSRF via
+    // crafted strings that merely contain "tiktok.com" as a substring.
+    let parsed;
+    try { parsed = new URL(url); } catch { return res.json({ videoUrl: null }); }
+    if (parsed.protocol !== 'https:' || !/(^|\.)tiktok\.com$/.test(parsed.hostname)) {
+      return res.json({ videoUrl: null });
+    }
     const resp = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
     const finalUrl = resp.url || url;
+    const finalHost = (() => { try { return new URL(finalUrl).hostname; } catch { return ''; } })();
+    if (!/(^|\.)tiktok\.com$/.test(finalHost)) return res.json({ videoUrl: null });
     const match = finalUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
     if (match) return res.json({ videoUrl: finalUrl, id: match[1] });
     res.json({ videoUrl: finalUrl, id: null });

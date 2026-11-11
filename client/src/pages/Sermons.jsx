@@ -5,6 +5,7 @@ import { FaYoutube, FaFacebook, FaVimeoV, FaInstagram } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { getVideoInfo, getVideoIcon, fetchVideoThumbnail, resolveTikTokUrl } from '../utils/videoUtils';
 import YouTubePlayer from '../components/YouTubePlayer';
+import TikTokEmbed from '../components/TikTokEmbed';
 
 const platformIcons = { FaYoutube, FaFacebook, FaVimeoV, FaInstagram };
 
@@ -78,18 +79,32 @@ export default function Sermons() {
     }).catch(() => setLoading(false));
   }, []);
 
-  // Resolve TikTok short URLs only after the user presses play (not on page load)
+  // Resolve the selected sermon's TikTok short URL in the background so the
+  // video ID is ready before the user presses play. Only the selected sermon
+  // is resolved (never the whole list) to keep page load light.
+  const resolveSermonId = useCallback((sermon) => {
+    if (!sermon?.videoUrl) return;
+    const info = getVideoInfo(sermon.videoUrl);
+    if (!info?.needsResolve) return;
+    resolveTikTokUrl(sermon.videoUrl).then(result => {
+      if (result?.id) {
+        setResolvedTikTok(p => ({ ...p, [sermon.id]: result }));
+      } else {
+        setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true } }));
+      }
+    }).catch(() => {
+      setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true } }));
+    });
+  }, []);
+
   useEffect(() => {
-    if (!playingId) return;
-    const s = items.find(i => i.id === playingId);
-    if (!s?.videoUrl) return;
-    const info = getVideoInfo(s.videoUrl);
-    if (info?.needsResolve && !resolvedTikTok[s.id]) {
-      resolveTikTokUrl(s.videoUrl).then(result => {
-        if (result) setResolvedTikTok(p => ({ ...p, [s.id]: result }));
-      });
+    const target = items.find(i => i.id === selectedId);
+    if (!target) return;
+    const info = getVideoInfo(target.videoUrl);
+    if (info?.needsResolve && !resolvedTikTok[target.id]) {
+      resolveSermonId(target);
     }
-  }, [playingId, items]);
+  }, [selectedId, items, resolvedTikTok, resolveSermonId]);
 
   const speakers = ['all', ...new Set(items.map(s => s.speaker))];
   const years = ['all', ...new Set(items.map(s => s.date?.substring(0, 4)))];
@@ -108,7 +123,6 @@ export default function Sermons() {
 
   const selectedIndex = filtered.findIndex(s => s.id === selectedId);
   const s = filtered[selectedIndex >= 0 ? selectedIndex : 0];
-  const isPlaying = !!s?.id && selectedId === s.id;
 
   const goPrev = useCallback(() => {
     setSelectedId(filtered[Math.max(selectedIndex - 1, 0)]?.id);
@@ -141,14 +155,17 @@ export default function Sermons() {
   }
 
   const videoInfo = getVideoInfo(s.videoUrl);
-  const embedUrl = videoInfo?.embedUrl || resolvedTikTok[s.id]?.embedUrl;
+  const embedUrl = videoInfo?.embedUrl;
   const platformBadge = getVideoIcon(videoInfo?.platform);
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
   const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
   const isCurrentPlaying = !!s?.id && playingId === s.id;
-  // TikTok's embed endpoint is unreliable (frequent 429/503), so open TikTok
-  // clips in a new tab instead of mounting the player. Others embed inline.
-  const opensExternal = videoInfo?.platform === 'tiktok';
+  // TikTok sermons play ON the site via TikTok's official embed.js widget
+  // (TikTokEmbed). The raw embed/v2 iframe was unreliable (blank/429), so it
+  // is no longer used. Nobody is sent to tiktok.com to watch.
+  const isTikTok = videoInfo?.platform === 'tiktok';
+  const tiktokId = videoInfo?.id || resolvedTikTok[s.id]?.id || null;
+  const tiktokResolveFailed = isTikTok && !!videoInfo?.needsResolve && resolvedTikTok[s.id]?.failed === true;
 
   const sidebar = (other = items, cls = '', onSelect) => other.filter(x => x.id !== s.id).slice(0, 8).map(item => {
     const it = getVideoInfo(item.videoUrl);
@@ -245,8 +262,40 @@ export default function Sermons() {
         {/* MAIN CONTENT — featured player + details */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto px-4 py-6">
-            <div className={`relative rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/60 ring-1 ring-white/10 ${videoInfo?.platform === 'tiktok' ? 'aspect-[9/16] w-full max-w-none' : 'aspect-video'}`}>
-              {isCurrentPlaying && videoInfo && embedUrl ? (
+            <div className={`relative rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/60 ring-1 ring-white/10 ${isTikTok ? 'aspect-[9/16] w-full max-w-[min(420px,100%)] mx-auto' : 'aspect-video'}`}>
+              {isCurrentPlaying && isTikTok ? (
+                tiktokId ? (
+                  <TikTokEmbed videoId={tiktokId} citeUrl={s.videoUrl} title={s.title} />
+                ) : tiktokResolveFailed ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-6">
+                    <p className="text-white/60 text-sm text-center">Couldn't load this video right now.</p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setResolvedTikTok(p => { const c = { ...p }; delete c[s.id]; return c; })}
+                        className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-xs font-medium hover:bg-white/20 transition-colors min-h-[38px]"
+                      >
+                        Try again
+                      </button>
+                      <a
+                        href={s.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 rounded-full bg-primary text-white text-xs font-medium hover:bg-accent transition-colors min-h-[38px] inline-flex items-center"
+                      >
+                        Watch on TikTok ↗
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-white/40 text-sm">
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                      Loading video...
+                    </div>
+                  </div>
+                )
+              ) : isCurrentPlaying && videoInfo && embedUrl ? (
                 videoInfo.platform === 'youtube' ? (
                   <div className="relative w-full h-full">
                     <YouTubePlayer videoId={videoInfo.id} />
@@ -268,25 +317,12 @@ export default function Sermons() {
                     )}
                   </div>
                 )
-              ) : isCurrentPlaying && videoInfo?.needsResolve ? (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="flex items-center gap-2 text-white/40 text-sm">
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    Loading video...
-                  </div>
-                </div>
               ) : videoInfo ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    if (opensExternal) {
-                      window.open(s.videoUrl, '_blank', 'noopener,noreferrer');
-                    } else {
-                      setPlayingId(s.id);
-                    }
-                  }}
+                  onClick={() => setPlayingId(s.id)}
                   className="group absolute inset-0 w-full h-full"
-                  aria-label={opensExternal ? `Watch ${s.title} on TikTok` : `Play ${s.title}`}
+                  aria-label={`Play ${s.title}`}
                 >
                   {thumbUrl ? (
                     <img src={thumbUrl} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
@@ -296,14 +332,10 @@ export default function Sermons() {
                   <span className="absolute inset-0 bg-black/40 group-hover:bg-black/25 transition-colors" />
                   <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
                     <span className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 flex items-center justify-center shadow-2xl group-hover:bg-white/30 group-hover:scale-105 transition-all">
-                      {opensExternal ? (
-                        <svg className="w-7 h-7 md:w-9 md:h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                      ) : (
-                        <svg className="w-7 h-7 md:w-9 md:h-9 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                      )}
+                      <svg className="w-7 h-7 md:w-9 md:h-9 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </span>
                     {!thumbUrl && <span className="text-sm font-medium text-white/80 text-center line-clamp-2">{s.title}</span>}
-                    <span className="text-[11px] uppercase tracking-widest text-white/50">{opensExternal ? 'Watch on TikTok' : 'Tap to play'}</span>
+                    <span className="text-[11px] uppercase tracking-widest text-white/50">Tap to play</span>
                   </span>
                 </button>
               ) : (
