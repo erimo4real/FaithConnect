@@ -5,6 +5,7 @@ import { paginate } from '../paginate.js';
 import { auditLog } from '../middleware/audit.js';
 import { deleteCloudinaryImage, isCloudinaryUrl } from '../utils/cloudinary.js';
 import { fetchAndUploadThumbnail } from '../utils/thumbnail.js';
+import { backfillSermonThumbnails } from '../utils/backfillSermonThumbnails.js';
 import logger from '../config/logger.js';
 import { validate } from '../middleware/validate.js';
 import { sermonSchema } from '../schemas/index.js';
@@ -65,7 +66,9 @@ router.put('/:id', authenticate, requireAdmin, validate(sermonSchema), auditLog(
     if (existing.rows.length === 0) return res.status(404).json({ error: 'Not found' });
     const existingRow = existing.rows[0];
 
-    let finalThumbnail = thumbnail !== undefined ? thumbnail : existingRow.thumbnail;
+    // A cleared thumbnail input arrives as '' — store NULL instead, the
+    // canonical "missing" value the cover backfill and client checks use.
+    let finalThumbnail = thumbnail !== undefined ? (thumbnail?.trim() || null) : existingRow.thumbnail;
     if (thumbnail === undefined && video_url && video_url !== existingRow.video_url) {
       const fetched = await fetchAndUploadThumbnail(video_url);
       if (fetched) finalThumbnail = fetched;
@@ -100,24 +103,8 @@ router.delete('/:id', authenticate, requireAdmin, auditLog('delete', 'sermon'), 
 
 router.post('/backfill-thumbnails', authenticate, requireAdmin, async (req, res) => {
   try {
-    const result = await query("SELECT id, video_url FROM sermons WHERE thumbnail IS NULL AND video_url IS NOT NULL");
-    const rows = result.rows;
-    let updated = 0;
-    let failed = 0;
-    for (const row of rows) {
-      try {
-        const thumbnail = await fetchAndUploadThumbnail(row.video_url);
-        if (thumbnail) {
-          await query('UPDATE sermons SET thumbnail=$1 WHERE id=$2', [thumbnail, row.id]);
-          updated++;
-        } else {
-          failed++;
-        }
-      } catch {
-        failed++;
-      }
-    }
-    res.json({ total: rows.length, updated, failed });
+    const { attempted: total, restored: updated, failed } = await backfillSermonThumbnails();
+    res.json({ total, updated, failed });
   } catch (err) {
     logger.error({ err }, 'Failed to backfill thumbnails');
     res.status(500).json({ error: 'Backfill failed' });
