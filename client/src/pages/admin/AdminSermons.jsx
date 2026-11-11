@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminFetchSermons, adminCreateSermon, adminUpdateSermon, adminDeleteSermon, adminBackfillThumbnails } from '../../services/api';
+import { adminFetchSermons, adminCreateSermon, adminUpdateSermon, adminDeleteSermon } from '../../services/api';
 import AdminLayout from './AdminLayout';
 import { useToast } from '../../context/ToastContext';
 import { resolveCoverImage } from '../../utils/coverUtils';
@@ -15,6 +15,7 @@ export default function AdminSermons() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [backfilling, setBackfilling] = useState(false);
+  const [backfillProgress, setBackfillProgress] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -49,7 +50,40 @@ export default function AdminSermons() {
     } catch (err) { toast.error(err.message); } finally { setSaving(false); }
   };
   const handleDelete = async (id) => { if (!confirm('Delete this sermon?')) return; setDeleting(id); try { await adminDeleteSermon(id); toast.success('Sermon deleted'); load(); } catch (err) { toast.error(err.message); } finally { setDeleting(null); } };
-  const handleBackfill = async () => { if (!confirm('Fetch thumbnails for all sermons missing them? This may take a while.')) return; setBackfilling(true); try { const result = await adminBackfillThumbnails(); toast.success(`Backfill done: ${result.updated} updated, ${result.failed} failed`); load(); } catch (err) { toast.error(err.message); } finally { setBackfilling(false); } };
+  const handleBackfill = async () => {
+    // Runs in the admin's browser: the hosted server is blocked by the cover
+    // metadata service, so a server-side repair can never fetch TikTok covers.
+    const missing = items.filter(item => !item.thumbnail?.trim() && item.video_url);
+    if (missing.length === 0) { toast.info('All sermons already have cover images'); return; }
+    if (!confirm(`Fetch cover images for ${missing.length} sermon(s)? This runs in your browser and may take a minute.`)) return;
+    setBackfilling(true);
+    // Stay under the server's upload rate limit (50 per 15 min per IP).
+    const batch = missing.slice(0, 40);
+    let updated = 0, failed = 0;
+    try {
+      for (let i = 0; i < batch.length; i++) {
+        const item = batch[i];
+        setBackfillProgress(`${i + 1}/${batch.length}`);
+        const cover = await resolveCoverImage(item.video_url);
+        if (!cover) { failed++; continue; }
+        try {
+          await adminUpdateSermon(item.id, {
+            title: item.title,
+            speaker: item.speaker,
+            date: item.date?.slice(0, 10) || null,
+            thumbnail: cover,
+            audio_url: item.audio_url || null,
+            video_url: item.video_url || null,
+            description: item.description || null,
+            status: item.status || 'published',
+          });
+          updated++;
+        } catch { failed++; }
+      }
+      toast.success(`Covers updated: ${updated}, failed: ${failed}`);
+      load();
+    } catch (err) { toast.error(err.message); } finally { setBackfilling(false); setBackfillProgress(''); }
+  };
 
   return (
     <AdminLayout title="Sermons">
@@ -58,7 +92,7 @@ export default function AdminSermons() {
           <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 shrink-0">{items.length} sermons</p>
           <div className="flex items-center gap-3">
             <input placeholder="Search..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm dark:bg-gray-800 dark:text-gray-200 w-48" />
-            <button onClick={handleBackfill} disabled={backfilling} className="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">{backfilling ? 'Fixing...' : 'Get Thumbnails'}</button>
+            <button onClick={handleBackfill} disabled={backfilling} className="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">{backfilling ? `Fixing ${backfillProgress}...` : 'Get Thumbnails'}</button>
             <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors text-sm font-medium">
             <HiOutlinePlus className="w-4 h-4" /> {showForm ? 'Cancel' : 'Add Sermon'}
           </button>
