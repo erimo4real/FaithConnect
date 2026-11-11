@@ -45,7 +45,7 @@ export function getVideoInfo(url) {
 function resolveTikTokOembed(url) {
   return new Promise((resolve) => {
     const cb = '_tto_' + Date.now();
-    window[cb] = (d) => { delete window[cb]; sh(); const id = d?.thumbnail_url?.match(/\/video\/(\d+)/)?.[1] || d?.author_url?.match(/\/video\/(\d+)/)?.[1]; resolve(id ? { id, embedUrl: `https://www.tiktok.com/player/v1/${id}` } : null); };
+    window[cb] = (d) => { delete window[cb]; sh(); const id = d?.thumbnail_url?.match(/\/video\/(\d+)/)?.[1] || d?.author_url?.match(/\/video\/(\d+)/)?.[1]; resolve(id ? { id, embedUrl: `https://www.tiktok.com/player/v1/${id}`, thumbnail: d?.thumbnail_url || null } : null); };
     const sh = () => { try { document.head.removeChild(s); } catch {} };
     const s = document.createElement('script');
     s.src = `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}&callback=${cb}`;
@@ -65,7 +65,7 @@ export async function resolveTikTokUrl(url) {
       if (!res.ok) continue; // cold start / transient gateway error -> retry
       const data = await res.json();
       if (data.id) {
-        return { id: data.id, embedUrl: `https://www.tiktok.com/player/v1/${data.id}` };
+        return { id: data.id, embedUrl: `https://www.tiktok.com/player/v1/${data.id}`, thumbnail: data.thumbnail || null };
       }
       if (data.videoUrl) {
         const match = data.videoUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);

@@ -64,19 +64,39 @@ export default function Sermons() {
   }, [selectedId]);
 
   useEffect(() => {
-    fetchSermons().then(data => {
-      const videos = data.filter(s => s.video_url).map(s => ({ ...s, videoUrl: s.video_url }));
-      setItems(videos);
-      if (videos.length > 0) setSelectedId(videos[0].id);
-      setLoading(false);
-      videos.forEach(s => {
-        if (s.videoUrl && !getVideoInfo(s.videoUrl)?.thumbnail) {
-          fetchVideoThumbnail(s.videoUrl).then(t => {
-            if (t) setThumbnails(p => ({ ...p, [s.id]: t }));
-          });
+    let cancelled = false;
+    let retryTimer = null;
+    const load = async (attempt = 0) => {
+      try {
+        const data = await fetchSermons();
+        if (cancelled) return;
+        const videos = data.filter(s => s.video_url).map(s => ({ ...s, videoUrl: s.video_url }));
+        setItems(videos);
+        if (videos.length > 0) setSelectedId(videos[0].id);
+        setLoading(false);
+        videos.forEach(s => {
+          if (s.videoUrl && !getVideoInfo(s.videoUrl)?.thumbnail) {
+            fetchVideoThumbnail(s.videoUrl).then(t => {
+              if (t) setThumbnails(p => ({ ...p, [s.id]: t }));
+            });
+          }
+        });
+      } catch {
+        // The API can briefly 503 while the backend dyno wakes up — retry
+        // with backoff instead of rendering an empty "No video sermons" page.
+        if (cancelled) return;
+        if (attempt < 2) {
+          retryTimer = setTimeout(() => load(attempt + 1), attempt === 0 ? 4000 : 10000);
+        } else {
+          setLoading(false);
         }
-      });
-    }).catch(() => setLoading(false));
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+      clearTimeout(retryTimer);
+    };
   }, []);
 
   // Warm TikTok's player script while the visitor is still looking at the
@@ -97,6 +117,11 @@ export default function Sermons() {
     resolveTikTokUrl(sermon.videoUrl).then(result => {
       if (result?.id) {
         setResolvedTikTok(p => ({ ...p, [sermon.id]: result }));
+        // TikTok's own cover (from oEmbed) — used as the poster behind the
+        // player while it boots, for sermons with no thumbnail in the DB.
+        if (result.thumbnail) {
+          setThumbnails(p => (p[sermon.id] ? p : { ...p, [sermon.id]: result.thumbnail }));
+        }
       } else {
         setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true, attempts: attemptCount + 1 } }));
       }
@@ -174,7 +199,9 @@ export default function Sermons() {
   const embedUrl = videoInfo?.embedUrl;
   const platformBadge = getVideoIcon(videoInfo?.platform);
   const BadgeIcon = platformIcons[platformBadge.icon] || null;
-  const thumbUrl = thumbnails[s.id] || videoInfo?.thumbnail;
+  // Poster chain: admin's DB thumbnail first (stable, curated), then any
+  // cover fetched live (Facebook scrape / TikTok oEmbed), then a derived one.
+  const thumbUrl = s?.thumbnail || thumbnails[s.id] || videoInfo?.thumbnail;
   const isCurrentPlaying = !!s?.id && playingId === s.id;
   // TikTok sermons play ON the site via TikTok's official embed.js widget
   // (TikTokEmbed). The raw embed/v2 iframe was unreliable (blank/429), so it
@@ -189,7 +216,7 @@ export default function Sermons() {
 
   const sidebar = (other = items, cls = '', onSelect) => other.filter(x => x.id !== s.id).slice(0, 8).map(item => {
     const it = getVideoInfo(item.videoUrl);
-    const itThumb = thumbnails[item.id] || it?.thumbnail;
+    const itThumb = item?.thumbnail || thumbnails[item.id] || it?.thumbnail;
     const itBadge = getVideoIcon(it?.platform);
     const ItIcon = platformIcons[itBadge.icon] || TikTokIcon;
     return (
@@ -284,10 +311,17 @@ export default function Sermons() {
           <div className="max-w-4xl mx-auto px-4 py-6">
             <div className={`relative rounded-2xl overflow-hidden bg-black shadow-2xl shadow-black/60 ring-1 ring-white/10 ${isTikTok ? 'aspect-[9/16] w-full max-w-[min(420px,100%)] mx-auto' : 'aspect-video'}`}>
               {isCurrentPlaying && isTikTok ? (
-                tiktokId ? (
-                  <TikTokEmbed videoId={tiktokId} citeUrl={s.videoUrl} title={s.title} />
-                ) : tiktokResolveFailed ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-6">
+                <>
+                  {/* Keep the sermon's cover image behind the player while
+                      TikTok's player boots (~10s), so it never reads as a
+                      dead black box. The opaque player covers it once up. */}
+                  {thumbUrl && (
+                    <img src={thumbUrl} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" />
+                  )}
+                  {tiktokId ? (
+                    <TikTokEmbed videoId={tiktokId} citeUrl={s.videoUrl} title={s.title} />
+                  ) : tiktokResolveFailed ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 bg-black/60">
                     <p className="text-white/60 text-sm text-center">Couldn't load this video right now.</p>
                     <div className="flex items-center gap-3">
                       <button
@@ -308,13 +342,14 @@ export default function Sermons() {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-white/40 text-sm">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-white/80 text-sm bg-black/60 px-4 py-2 rounded-full backdrop-blur-sm">
                       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                       Loading video...
                     </div>
                   </div>
-                )
+                )}
+              </>
               ) : isCurrentPlaying && videoInfo && embedUrl ? (
                 videoInfo.platform === 'youtube' ? (
                   <div className="relative w-full h-full">

@@ -66,6 +66,9 @@ router.get('/resolve-tiktok', async (req, res) => {
     const finalHost = (() => { try { return new URL(finalUrl).hostname; } catch { return ''; } })();
     if (!/(^|\.)tiktok\.com$/.test(finalHost)) return res.json({ videoUrl: null });
     const match = finalUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
+    // Note: TikTok's oEmbed no longer returns thumbnail_url and the video
+    // page serves a JS shell to server-side fetchers, so there is no
+    // server-side cover source — posters come from the sermons DB.
     if (match) return res.json({ videoUrl: finalUrl, id: match[1] });
     res.json({ videoUrl: finalUrl, id: null });
   } catch (err) {

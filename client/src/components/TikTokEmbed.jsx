@@ -117,14 +117,26 @@ export default function TikTokEmbed({ videoId, citeUrl, title }) {
 
     const markMounted = () => {
       if (cancelled) return;
-      if (host.querySelector('iframe')) {
-        setPlayerMounted(true);
-        setShowFallback(false);
+      // The widget inserts its iframe at 0x0 (hidden) and only sizes it
+      // once the player has actually loaded, ~10s later on a cold visitor.
+      // "Mounted" therefore means a VISIBLE, sized iframe — otherwise we'd
+      // drop the loading spinner while the user stares at a black box.
+      const frame = host.querySelector('iframe');
+      if (frame) {
+        const rect = frame.getBoundingClientRect();
+        if (rect.width > 50 && rect.height > 50) {
+          setPlayerMounted(true);
+          setShowFallback(false);
+        }
       }
     };
+    // Watch DOM structure AND style/class changes: embed.js sizes the
+    // hidden iframe via inline styles, which childList-only observation
+    // would miss. A short poll covers any remaining gaps.
     const observer = new MutationObserver(markMounted);
-    observer.observe(host, { childList: true, subtree: true });
+    observer.observe(host, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
     markMounted();
+    const poll = setInterval(markMounted, 400);
 
     const onMessage = (e) => {
       if (!cancelled && isTikTokOrigin(e?.origin) && isReadySignal(e?.data)) {
@@ -138,21 +150,29 @@ export default function TikTokEmbed({ videoId, citeUrl, title }) {
       if (!cancelled) setShowFallback(true);
     });
 
-    // Watchdog. embed.js itself can take ~9s to fetch on a cold browser, so
-    // give it 12s; if no player iframe exists by then, retry once. Only if
-    // the retry window also passes with nothing mounted offer recovery.
+    // Watchdog. embed.js itself can take ~9s to fetch on a cold browser, and
+    // the player another stretch to size its iframe; give it 15s, then retry
+    // once. Only if the retry window also passes with nothing mounted offer
+    // recovery.
+    const visibleFrame = () => {
+      const frame = host.querySelector('iframe');
+      if (!frame) return null;
+      const rect = frame.getBoundingClientRect();
+      return rect.width > 50 && rect.height > 50 ? frame : null;
+    };
     const first = setTimeout(() => {
-      if (cancelled || host.querySelector('iframe')) return;
+      if (cancelled || visibleFrame()) return;
       if (attempt === 0) setAttempt(1);
-    }, 12000);
+    }, 15000);
     const second = setTimeout(() => {
-      if (!cancelled && !host.querySelector('iframe')) setShowFallback(true);
-    }, attempt > 0 ? 14000 : 26000);
+      if (!cancelled && !visibleFrame()) setShowFallback(true);
+    }, attempt > 0 ? 15000 : 30000);
 
     return () => {
       cancelled = true;
       clearTimeout(first);
       clearTimeout(second);
+      clearInterval(poll);
       observer.disconnect();
       window.removeEventListener('message', onMessage);
       host.replaceChildren();
@@ -164,11 +184,12 @@ export default function TikTokEmbed({ videoId, citeUrl, title }) {
       <div ref={hostRef} className="tt-embed-host w-full h-full" />
 
       {!playerMounted && !showFallback && (
-        <div className="absolute inset-0 flex items-start justify-center pt-16 pointer-events-none">
-          <div className="flex items-center gap-2 text-white/70 text-sm bg-black/70 px-4 py-2 rounded-full backdrop-blur-sm">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none bg-black/60">
+          <div className="flex items-center gap-2 text-white/80 text-sm bg-black/70 px-4 py-2 rounded-full backdrop-blur-sm">
             <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-            Loading video...
+            Loading sermon video...
           </div>
+          <span className="text-white/40 text-xs">This can take a few seconds</span>
         </div>
       )}
 
