@@ -55,19 +55,28 @@ function resolveTikTokOembed(url) {
 }
 
 export async function resolveTikTokUrl(url) {
-  try {
-    const res = await fetch(`${API_URL}/streams/resolve-tiktok?url=${encodeURIComponent(url)}`);
-    const data = await res.json();
-    if (data.id) {
-      return { id: data.id, embedUrl: `https://www.tiktok.com/player/v1/${data.id}` };
-    }
-    if (data.videoUrl) {
-      const match = data.videoUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
-      if (match) {
-        return { id: match[1], embedUrl: `https://www.tiktok.com/player/v1/${match[1]}` };
+  // The resolve API can briefly 503 while the backend dyno wakes up. Retry
+  // with backoff so a cold start doesn't look like a dead video.
+  const delays = [0, 3000, 10000];
+  for (const delay of delays) {
+    if (delay) await new Promise(r => setTimeout(r, delay));
+    try {
+      const res = await fetch(`${API_URL}/streams/resolve-tiktok?url=${encodeURIComponent(url)}`);
+      if (!res.ok) continue; // cold start / transient gateway error -> retry
+      const data = await res.json();
+      if (data.id) {
+        return { id: data.id, embedUrl: `https://www.tiktok.com/player/v1/${data.id}` };
       }
-    }
-  } catch {}
+      if (data.videoUrl) {
+        const match = data.videoUrl.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
+        if (match) {
+          return { id: match[1], embedUrl: `https://www.tiktok.com/player/v1/${match[1]}` };
+        }
+      }
+      // 200 but unresolvable — the server-side lookup may have transiently
+      // failed, so let the retry loop try again before giving up.
+    } catch {}
+  }
   return resolveTikTokOembed(url);
 }
 

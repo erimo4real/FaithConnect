@@ -10,10 +10,14 @@ import { useEffect, useRef, useState, useCallback } from 'react';
  *    nodes and replaces each with a player iframe.
  *  - Re-inserting a fresh <script> node re-runs that scan, which is how the
  *    player is re-created for every sermon without reloading the page.
- *  - The player signals readiness by posting its rendered height to the host
- *    page. If no signal arrives within the watchdog window we keep the embed
- *    mounted but surface an in-page recovery bar (TikTok rate-limits embed
- *    data calls per visitor, especially after rapid sermon switching).
+ *  - Readiness is detected with a MutationObserver on the host: when embed.js
+ *    inserts the player iframe, the widget did its job and the loading
+ *    spinner is removed. (The player iframe never posts a postMessage we can
+ *    rely on, so DOM observation is the source of truth; a height message
+ *    from tiktok.com is still honored as extra confirmation.)
+ *  - embed.js can take ~9s to fetch on a cold browser. If no player iframe
+ *    appears within 12s the widget retries itself once, and only after that
+ *    surfaces an in-page recovery bar.
  */
 
 let scriptPromise = null;
@@ -35,11 +39,19 @@ function loadTikTokScript() {
   return scriptPromise;
 }
 
+// Re-running embed.js is what transforms blockquotes into players; a fresh
+// <script> node (even served from cache) re-executes and re-scans the DOM.
 function rescanTikTokScript() {
   const existing = document.querySelector('script[data-tt-embed]');
   if (existing) existing.remove();
   scriptPromise = null;
   return loadTikTokScript();
+}
+
+// Warm the TikTok player script while the visitor is still looking at the
+// poster, so the first play click mounts the player almost instantly.
+export function prefetchTikTokPlayer() {
+  loadTikTokScript().catch(() => {});
 }
 
 function isReadySignal(data) {
@@ -67,19 +79,18 @@ function safeTikTokLink(citeUrl, videoId) {
 
 export default function TikTokEmbed({ videoId, citeUrl, title }) {
   const hostRef = useRef(null);
-  const [ready, setReady] = useState(false);
+  const [playerMounted, setPlayerMounted] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   const retry = useCallback(() => {
-    setReady(false);
+    setPlayerMounted(false);
     setShowFallback(false);
     setAttempt((a) => a + 1);
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    let gotSignal = false;
     const host = hostRef.current;
     if (!host || !videoId) return undefined;
 
@@ -104,28 +115,45 @@ export default function TikTokEmbed({ videoId, citeUrl, title }) {
     bq.appendChild(section);
     host.appendChild(bq);
 
+    const markMounted = () => {
+      if (cancelled) return;
+      if (host.querySelector('iframe')) {
+        setPlayerMounted(true);
+        setShowFallback(false);
+      }
+    };
+    const observer = new MutationObserver(markMounted);
+    observer.observe(host, { childList: true, subtree: true });
+    markMounted();
+
     const onMessage = (e) => {
       if (!cancelled && isTikTokOrigin(e?.origin) && isReadySignal(e?.data)) {
-        gotSignal = true;
-        setReady(true);
+        setPlayerMounted(true);
         setShowFallback(false);
       }
     };
     window.addEventListener('message', onMessage);
 
-    (attempt > 0 ? rescanTikTokScript() : loadTikTokScript()).catch(() => {
+    rescanTikTokScript().catch(() => {
       if (!cancelled) setShowFallback(true);
     });
 
-    // Watchdog: TikTok throttles player data per visitor. If the player never
-    // signals readiness, keep it mounted but offer recovery options.
-    const timer = setTimeout(() => {
-      if (!cancelled && !gotSignal) setShowFallback(true);
-    }, 9000);
+    // Watchdog. embed.js itself can take ~9s to fetch on a cold browser, so
+    // give it 12s; if no player iframe exists by then, retry once. Only if
+    // the retry window also passes with nothing mounted offer recovery.
+    const first = setTimeout(() => {
+      if (cancelled || host.querySelector('iframe')) return;
+      if (attempt === 0) setAttempt(1);
+    }, 12000);
+    const second = setTimeout(() => {
+      if (!cancelled && !host.querySelector('iframe')) setShowFallback(true);
+    }, attempt > 0 ? 14000 : 26000);
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      clearTimeout(first);
+      clearTimeout(second);
+      observer.disconnect();
       window.removeEventListener('message', onMessage);
       host.replaceChildren();
     };
@@ -135,7 +163,7 @@ export default function TikTokEmbed({ videoId, citeUrl, title }) {
     <div className="relative w-full h-full">
       <div ref={hostRef} className="tt-embed-host w-full h-full" />
 
-      {!ready && !showFallback && (
+      {!playerMounted && !showFallback && (
         <div className="absolute inset-0 flex items-start justify-center pt-16 pointer-events-none">
           <div className="flex items-center gap-2 text-white/70 text-sm bg-black/70 px-4 py-2 rounded-full backdrop-blur-sm">
             <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />

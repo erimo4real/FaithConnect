@@ -5,7 +5,7 @@ import { FaYoutube, FaFacebook, FaVimeoV, FaInstagram } from 'react-icons/fa';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { getVideoInfo, getVideoIcon, fetchVideoThumbnail, resolveTikTokUrl } from '../utils/videoUtils';
 import YouTubePlayer from '../components/YouTubePlayer';
-import TikTokEmbed from '../components/TikTokEmbed';
+import TikTokEmbed, { prefetchTikTokPlayer } from '../components/TikTokEmbed';
 
 const platformIcons = { FaYoutube, FaFacebook, FaVimeoV, FaInstagram };
 
@@ -79,10 +79,18 @@ export default function Sermons() {
     }).catch(() => setLoading(false));
   }, []);
 
+  // Warm TikTok's player script while the visitor is still looking at the
+  // poster — the first play click then mounts the video almost instantly
+  // instead of paying embed.js's ~9s fetch cost.
+  useEffect(() => {
+    prefetchTikTokPlayer();
+  }, []);
+
   // Resolve the selected sermon's TikTok short URL in the background so the
   // video ID is ready before the user presses play. Only the selected sermon
-  // is resolved (never the whole list) to keep page load light.
-  const resolveSermonId = useCallback((sermon) => {
+  // is resolved (never the whole list) to keep page load light. Transient
+  // failures (API cold start) are retried automatically before giving up.
+  const resolveSermonId = useCallback((sermon, attemptCount = 0) => {
     if (!sermon?.videoUrl) return;
     const info = getVideoInfo(sermon.videoUrl);
     if (!info?.needsResolve) return;
@@ -90,20 +98,28 @@ export default function Sermons() {
       if (result?.id) {
         setResolvedTikTok(p => ({ ...p, [sermon.id]: result }));
       } else {
-        setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true } }));
+        setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true, attempts: attemptCount + 1 } }));
       }
     }).catch(() => {
-      setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true } }));
+      setResolvedTikTok(p => ({ ...p, [sermon.id]: { failed: true, attempts: attemptCount + 1 } }));
     });
   }, []);
 
   useEffect(() => {
     const target = items.find(i => i.id === selectedId);
-    if (!target) return;
+    if (!target) return undefined;
     const info = getVideoInfo(target.videoUrl);
-    if (info?.needsResolve && !resolvedTikTok[target.id]) {
+    if (!info?.needsResolve) return undefined;
+    const entry = resolvedTikTok[target.id];
+    if (!entry) {
       resolveSermonId(target);
+      return undefined;
     }
+    if (entry.failed && entry.attempts < 3) {
+      const t = setTimeout(() => resolveSermonId(target, entry.attempts), 6000);
+      return () => clearTimeout(t);
+    }
+    return undefined;
   }, [selectedId, items, resolvedTikTok, resolveSermonId]);
 
   const speakers = ['all', ...new Set(items.map(s => s.speaker))];
@@ -165,7 +181,11 @@ export default function Sermons() {
   // is no longer used. Nobody is sent to tiktok.com to watch.
   const isTikTok = videoInfo?.platform === 'tiktok';
   const tiktokId = videoInfo?.id || resolvedTikTok[s.id]?.id || null;
-  const tiktokResolveFailed = isTikTok && !!videoInfo?.needsResolve && resolvedTikTok[s.id]?.failed === true;
+  // Only surface the "couldn't load" state after the automatic retries ran
+  // out — before that the spinner stays up while the resolve is retried.
+  const resolveEntry = resolvedTikTok[s.id];
+  const tiktokResolveFailed = isTikTok && !!videoInfo?.needsResolve
+    && resolveEntry?.failed === true && (resolveEntry.attempts || 0) >= 3;
 
   const sidebar = (other = items, cls = '', onSelect) => other.filter(x => x.id !== s.id).slice(0, 8).map(item => {
     const it = getVideoInfo(item.videoUrl);
